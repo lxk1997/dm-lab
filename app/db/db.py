@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from flask import current_app, g
 from flask.cli import with_appcontext
 
-from models import init_models
+from .models import init_models
 
 def _get_engine():
     config = current_app.config['PGDB']

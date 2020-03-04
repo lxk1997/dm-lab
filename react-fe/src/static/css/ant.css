@@ -10,3 +10,13 @@
   [data-theme="dark"] .site-layout .site-layout-background {
     background: #141414;
   }
+
+.login-form, .signup-form {
+  max-width: 300px;
+}
+.login-form-forgot {
+  float: right;
+}
+.login-form-button, .signup-form-button {
+  width: 100%;
+}

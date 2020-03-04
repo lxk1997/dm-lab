@@ -34,13 +34,13 @@ class User:
                 if offset is not None:
                     query = query.offset(offset)
             rets = query.all()
-            users = map(lambda u: {
+            users = list(map(lambda u: {
                 'user_id': u.id,
-                'user_name': u.name,
+                'user_name': u.username,
                 'password': u.password,
                 'email': u.email,
                 'create_time': u.create_time
-            }, rets)
+            }, rets))
         finally:
             self._db.close()
         return users

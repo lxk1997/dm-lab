@@ -33,19 +33,23 @@ export default class Nav extends React.Component {
                 <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
                     <Menu.Item key="1">
                         <HomeOutlined/>
-                        <Link to="/home">首页</Link>
+                        <span>首页</span>
+                        <Link to="/home"/>
                     </Menu.Item>
                     <Menu.Item key="2">
                         <ExperimentOutlined/>
-                        <Link to="/experimental">实验</Link>
+                        <span>实验</span>
+                        <Link to="/experimental"/>
                     </Menu.Item>
                     <Menu.Item key="3">
                         <ApartmentOutlined/>
-                        <Link to="/project">工程</Link>
+                        <span>工程</span>
+                        <Link to="/project"/>
                     </Menu.Item>
                     <Menu.Item key="4">
                         <MonitorOutlined/>
-                        <Link to="/monitor">任务</Link>
+                        <span>任务</span>
+                        <Link to="/monitor"/>
                     </Menu.Item>
                     <SubMenu
                         key="sub_mine"
@@ -55,9 +59,9 @@ export default class Nav extends React.Component {
                                     <span>我的</span>
                                 </span>
                         }>
-                        <Menu.Item key="5"><Link to="/clazz">班级</Link></Menu.Item>
-                        <Menu.Item key="6"><Link to="/grade">成绩</Link></Menu.Item>
-                        <Menu.Item key="7"><Link to="/evaluation">评测</Link></Menu.Item>
+                        <Menu.Item key="5"><Link to="/clazz"/><span>班级</span></Menu.Item>
+                        <Menu.Item key="6"><Link to="/grade"/><span>成绩</span></Menu.Item>
+                        <Menu.Item key="7"><Link to="/evaluation"/><span>评测</span></Menu.Item>
                     </SubMenu>
                 </Menu>
             </Sider>

@@ -31,15 +31,20 @@ def handle_create_user():
     password = request.form['password']
     email = request.form['email']
     role_id = 0
-    user_id = User().create(username, generate_password_hash(password), email, role_id)
     data = {}
-    if user_id != -1:
-        msg = 'ok'
-        error = 0
-        data = {'user_id': user_id}
-    else:
-        msg = 'fail'
+    users = User().query(username=username)
+    if users:
+        msg = 'Username has been exists.'
         error = 1
+    else:
+        user_id = User().create(username, generate_password_hash(password), email, role_id)
+        if user_id != -1:
+            msg = 'ok'
+            error = 0
+            data = {'user_id': user_id}
+        else:
+            msg = 'fail'
+            error = 1
     return api_response(msg, error, data)
 
 
@@ -49,7 +54,7 @@ def handle_login():
     password = request.form['password']
     users = User().query(username=username)
     data = {}
-    if not len(users):
+    if not users:
         msg = 'Incorrect username.'
         error = 1
     else:

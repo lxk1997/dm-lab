@@ -1,0 +1,4 @@
+werkzeug
+flask
+sqlalchemy
+click

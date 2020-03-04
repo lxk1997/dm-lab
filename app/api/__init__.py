@@ -1,5 +1,5 @@
-import api
-import auth
+from . import api
+from . import auth
 
 
 def init_app(app):

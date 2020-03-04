@@ -2,11 +2,11 @@ import os
 
 from flask import Flask
 
-import db
-import api
-import files
-import session
-import extensions
+from . import db
+from . import api
+from . import files
+from . import session
+from . import extensions
 
 import logging
 logging.basicConfig(
@@ -15,7 +15,7 @@ logging.basicConfig(
 
 def init_app(app):
     api.init_app(app)
-    files.init_app(app)
+    #files.init_app(app)
     db.init_app(app)
     session.init_app(app)
     extensions.register_module(app)

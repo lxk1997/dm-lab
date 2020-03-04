@@ -3,10 +3,10 @@ import {render} from 'react-dom'
 import {BrowserRouter} from 'react-router-dom'
 import Nav from './nav'
 import AppContent from "./content";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import 'antd/dist/antd.css';
 import './static/css/ant.css';
 import {Layout, Menu} from 'antd';
+import Parend from "./component/auth";
 
 const {Content} = Layout;
 const {} = Menu;
@@ -14,9 +14,6 @@ const {} = Menu;
 const $ = require('jquery');
 window.$ = $;
 window.jQuery = $;
-require('bootstrap/dist/js/bootstrap.min');
-
-require('./static/css/custom.css')
 
 class App extends React.Component {
     constructor(props) {
@@ -38,10 +35,10 @@ class App extends React.Component {
 
     render() {
         this.checkLogin();
-        if (this.login === true) {
+        if (this.login !== true) {
             return (
                 <div>
-                    <Nav/>
+                    <Parend/>
                 </div>
             )
         } else {
@@ -49,11 +46,11 @@ class App extends React.Component {
                 <div>
                     <Layout style={{minHeight: '100vh'}}>
                         <Nav/>
-                    </Layout>
-                    <Layout className="site-layout">
-                        <Content style={{margin: '0 16px'}}>
-                           <AppContent/>
-                        </Content>
+                        <Layout className="site-layout">
+                            <Content style={{margin: '0 16px'}}>
+                                <AppContent/>
+                            </Content>
+                        </Layout>
                     </Layout>
                 </div>
             )

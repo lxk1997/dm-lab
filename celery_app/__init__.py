@@ -1,4 +1,4 @@
-from eval_app import create_app
+from app import create_app
 from celery import Celery
 
 def make_celery(app):
