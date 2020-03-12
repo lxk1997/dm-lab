@@ -4,7 +4,7 @@ import Home from './page/home'
 import Monitor from './component/monitor'
 import Experimental from './component/experimental'
 import Project from './component/project'
-import Clazz from './component/clazz'
+import Clazz, {ClazzDetail} from './component/clazz'
 import Grade from './component/grade'
 import Evaluation from './component/evaluation'
 import page404 from './404'
@@ -23,6 +23,7 @@ function AppContent(props) {
                 <Route path='/project' exact component={Project}/>
 
                 <Route path='/clazz' exact component={Clazz}/>
+                <Route path='/clazz/:clazz_id' exact component={ClazzDetail}/>
 
                 <Route path='/grade' exact component={Grade}/>
 

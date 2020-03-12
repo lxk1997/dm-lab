@@ -23,22 +23,23 @@ class UserModel(Base):
     create_time = Column(DateTime(timezone=False), server_default=func.now())
 
 
-class ClassesModel(Base):
-    __tablename__ = 'classes'
+class ClazzModel(Base):
+    __tablename__ = 'clazz'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(100), nullable=False)
     teacher_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"), nullable=False)
     description = Column(Text)
-    invite_code = Column(String(20), nullable=False)
+    invite_code = Column(String(100), nullable=False)
     deleted = Column(Integer, nullable=False)
     create_time = Column(DateTime, server_default=func.now())
 
 
-class UserClassesRelationModel(Base):
-    __tablename__ = 'user_classes_relation'
+class UserClazzRelationModel(Base):
+    __tablename__ = 'user_clazz_relation'
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    classes_id = Column(Integer, ForeignKey('classes.id', ondelete='CASCADE'), nullable=False)
+    clazz_id = Column(Integer, ForeignKey('clazz.id', ondelete='CASCADE'), nullable=False)
+    join_time = Column(DateTime, server_default=func.now())
     deleted = Column(Integer, nullable=False)
 
 
@@ -75,7 +76,7 @@ class ComponentModel(Base):
 class ExperimentalItemModel(Base):
     __tablename__ = 'experimental_item'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    classes_id = Column(Integer, ForeignKey('classes.id', ondelete='CASCADE'), nullable=False)
+    clazz_id = Column(Integer, ForeignKey('clazz.id', ondelete='CASCADE'), nullable=False)
     name = Column(String(50), nullable=False)
     description = Column(Text)
     deleted = Column(Integer, nullable=False)
