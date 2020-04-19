@@ -1,5 +1,5 @@
 from ..db import get_db
-from ..models import ExperimentalItemModel, ClassesModel, ExperimentalTaskModel
+from ..models import ExperimentalItemModel, ClazzModel, ExperimentalTaskModel
 
 
 class ExperimentalTask:
@@ -19,17 +19,19 @@ class ExperimentalTask:
             self._db.close()
         return et_id
 
-    def query(self, experimental_task_id=None, experimental_task_name=None, experimental_item_id=None, classes_id=None, start_time=None, dead_line=None, content=None, file=None, description=None, deleted=0, limit=None, offset=None):
+    def query(self, experimental_task_id=None, experimental_task_name=None, experimental_item_id=None, clazz_id=None, teacher_id=None, start_time=None, dead_line=None, content=None, file=None, description=None, deleted=0, limit=None, offset=None):
         try:
-            query = self._db.query(ExperimentalTaskModel, ExperimentalItemModel, ClassesModel).filter(ExperimentalTaskModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.classes_id == ClassesModel.id, ClassesModel.deleted == 0, ExperimentalItemModel.deleted == 0)
+            query = self._db.query(ExperimentalTaskModel, ExperimentalItemModel, ClazzModel).filter(ExperimentalTaskModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id, ClazzModel.deleted == 0, ExperimentalItemModel.deleted == 0)
             if experimental_task_id is not None:
                 query = query.filter(ExperimentalTaskModel.id == experimental_task_id)
             if experimental_task_name is not None:
                 query = query.filter(ExperimentalTaskModel.name == experimental_task_name)
             if experimental_item_id is not None:
                 query = query.filter(ExperimentalTaskModel.experimental_item_id == experimental_item_id)
-            if classes_id is not None:
-                query = query.filter(ExperimentalItemModel.classes_id == classes_id)
+            if clazz_id is not None:
+                query = query.filter(ExperimentalItemModel.clazz_id == clazz_id)
+            if teacher_id is not None:
+                query = query.filter(ClazzModel.teacher_id == teacher_id)
             if start_time is not None:
                 query = query.filter(ExperimentalTaskModel.start_time == start_time)
             if dead_line is not None:
@@ -47,11 +49,12 @@ class ExperimentalTask:
                 if offset is not None:
                     query = query.offset(offset)
             rets = query.all()
-            ets = map(lambda et: {
+            ets = list(map(lambda et: {
                 'experimental_task_id': et.ExperimentalTaskModel.id,
                 'experimental_task_name': et.ExperimentalTaskModel.name,
                 'experimental_item_id': et.ExperimentalTaskModel.experimental_item_id,
-                'classes_id': et.ExperimentalItemModel.classes_id,
+                'clazz_id': et.ExperimentalItemModel.clazz_id,
+                'teacher_id': et.ClazzModel.teacher_id,
                 'start_time': et.ExperimentalTaskModel.start_time,
                 'dead_line': et.ExperimentalTaskModel.dead_line,
                 'content': et.ExperimentalTaskModel.content,
@@ -59,7 +62,7 @@ class ExperimentalTask:
                 'description': et.ExperimentalTaskModel.description,
                 'deleted': et.ExperimentalTaskModel.deleted,
                 'create_time': et.ExperimentalTaskModel.create_time
-            }, rets)
+            }, rets))
         finally:
             self._db.close()
         return ets

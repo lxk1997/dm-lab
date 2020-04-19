@@ -39,7 +39,7 @@ export default class Nav extends React.Component {
                     <Menu.Item key="2">
                         <ExperimentOutlined/>
                         <span>实验</span>
-                        <Link to="/experimental"/>
+                        <Link to="/experimental-item"/>
                     </Menu.Item>
                     <Menu.Item key="3">
                         <ApartmentOutlined/>

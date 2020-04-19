@@ -1,5 +1,7 @@
+from sqlalchemy import func
+
 from ..db import get_db
-from ..models import ClassesModel, DatasetModel
+from ..models import ClazzModel, DatasetModel, ExperimentalItemModel
 
 
 class Dataset:
@@ -21,7 +23,7 @@ class Dataset:
 
     def query(self, dataset_id=None, dataset_name=None, experimental_item_id=None, file_key=None, deleted=0, description=None, limit=None, offset=None):
         try:
-            query = self._db.query(DatasetModel)
+            query = self._db.query(DatasetModel, ExperimentalItemModel).filter(DatasetModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.deleted == 0)
             if dataset_id is not None:
                 query = query.filter(DatasetModel.id == dataset_id)
             if dataset_name is not None:
@@ -39,15 +41,15 @@ class Dataset:
                 if offset is not None:
                     query = query.offset(offset)
             rets = query.all()
-            datasets = map(lambda d: {
-                'dataset_id': d.id,
-                'dataset_name': d.name,
-                'experimental_item_id': d.experimental_item_id,
-                'file_key': d.file_key,
-                'deleted': d.deleted,
-                'description': d.description,
-                'create_time': d.create_time
-            }, rets)
+            datasets = list(map(lambda d: {
+                'dataset_id': d.DatasetModel.id,
+                'dataset_name': d.DatasetModel.name,
+                'experimental_item_id': d.DatasetModel.experimental_item_id,
+                'file_key': d.DatasetModel.file_key,
+                'deleted': d.DatasetModel.deleted,
+                'description': d.DatasetModel.description,
+                'create_time': d.DatasetModel.create_time
+            }, rets))
         finally:
             self._db.close()
         return datasets
@@ -80,6 +82,13 @@ class Dataset:
         finally:
             self._db.close()
         return flag
+
+    def get_count(self, experimental_item_id):
+        try:
+            count = self._db.query(func.count(DatasetModel.id)).filter(DatasetModel.experimental_item_id == experimental_item_id, DatasetModel.deleted == 0).first()[0]
+        finally:
+            self._db.close()
+        return count
 
 
 

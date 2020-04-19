@@ -5,6 +5,15 @@ export function getId(url, key) {
         case "clazz":
             reg = /clazz\/(\d+)/
             break;
+        case "experimental-item":
+            reg = /experimental-item\/(\d+)/
+            break;
+        case "experimental-task":
+            reg = /experimental-task\/(\d+)/
+            break;
+        case "dataset":
+            reg = /dataset\/(\d+)/
+            break;
         default:
             break;
     }

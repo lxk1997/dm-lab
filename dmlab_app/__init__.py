@@ -7,6 +7,7 @@ from . import api
 from . import files
 from . import session
 from . import extensions
+from . import filesystem
 
 import logging
 logging.basicConfig(
@@ -15,7 +16,8 @@ logging.basicConfig(
 
 def init_app(app):
     api.init_app(app)
-    #files.init_app(app)
+    #files.init_app(dmlab_app)
+    filesystem.init_app(app)
     db.init_app(app)
     session.init_app(app)
     extensions.register_module(app)

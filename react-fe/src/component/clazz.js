@@ -258,7 +258,7 @@ export class ClazzDetail extends React.Component {
             dataType: 'json',
             success: (jsonData) => {
                 if (jsonData.error) {
-                    message.errer(jsonData)
+                    message.error(jsonData)
                 } else {
                     if(this.state.clazz.length || this.state.students.length) {
                         this.setState({clazz: [], students: []})

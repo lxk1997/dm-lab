@@ -20,3 +20,14 @@
 .login-form-button, .signup-form-button {
   width: 100%;
 }
+.editor {
+    display: flex;
+    width: 60%;
+    flex: 1;
+    background-color: #ffffff;
+    border: #7e10c7
+  }
+
+  .editorBd {
+    flex: 1;
+  }
