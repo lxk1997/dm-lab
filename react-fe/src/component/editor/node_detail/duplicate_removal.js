@@ -10,11 +10,12 @@ import {checkFetchStatus} from "../../../page/utils";
 const {Item}=Form;
 const { Panel } = Collapse;
 
-class OutputSource extends React.Component{
+class DuplicateRemoval extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
-            dataset_columns: []
+            dataset_columns: [],
+            selected_columns: []
         }
         this.columns = [
             {
@@ -81,13 +82,13 @@ class OutputSource extends React.Component{
         return(
             <Collapse defaultActiveKey={['1']}>
                 <Panel header="字段属性" key="1">
-                    <div>输出字段</div>
+                    <div>特征</div>
                     <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
                     {fields_msg}
                 </Panel>
                 <Panel header="组件描述" key="2">
                 <div>
-                    输出源：将数据表中的数据导出到指定的数据库中
+                    记录去重是去除数据表中的重复的行数据，只保留其中一行数据。
                 </div>
                 </Panel>
             </Collapse>
@@ -95,7 +96,7 @@ class OutputSource extends React.Component{
     }
 }
 
-export default withPropsAPI(OutputSource);
+export default withPropsAPI(DuplicateRemoval);
 
 
 

@@ -92,6 +92,131 @@ class OutputSourceContextMenu extends React.Component{
         })
     }
 
+    handleGlobalRun = () => {
+        const {propsAPI}=this.props;
+        const {getSelected,update, save, find}=propsAPI;
+        const item=getSelected()[0];
+        if(!item) return;
+        let values = item.getModel();
+        let mp = save();
+        let edges = mp.edges;
+        let nodes = mp.nodes;
+        if(edges === null) {
+            edges = []
+        }
+        if(nodes === null) {
+            nodes = []
+        }
+        let idx = 0;
+        let arr_nodes = []
+        for(idx = 0; idx < nodes.length; idx++) {
+            let tmp_item = find(nodes[idx].id)
+            arr_nodes.push(nodes[idx].id)
+            let tmp_values = tmp_item.getModel();
+            tmp_values.color = "#1890ff"
+            tmp_values.status = false
+            update(tmp_item, {...tmp_values})
+        }
+        //top_sort
+        let in_degree = {};
+        let out_degree = {};
+        let one_way = {};
+        let anti_way = {};
+        for(idx = 0; idx < edges.length; idx++) {
+            let source = edges[idx].source;
+            let target = edges[idx].target;
+            if(out_degree.hasOwnProperty(source)) {
+                out_degree[source] += 1
+            } else {
+                out_degree[source] = 1
+            }
+            if(in_degree.hasOwnProperty(target)) {
+                in_degree[target] += 1
+            } else {
+                in_degree[target] = 1
+            }
+            anti_way[target] = source
+            one_way[source] = target
+        }
+        while(arr_nodes.length) {
+            for(idx = 0; idx < arr_nodes.length; idx++) {
+                let tmp_node = arr_nodes[idx];
+                if(!in_degree.hasOwnProperty(tmp_node) || in_degree[tmp_node] === 0) {
+                    let tmp_item = find(tmp_node)
+                    let tmp_values = tmp_item.getModel()
+                    if(anti_way.hasOwnProperty(tmp_values.id)) {
+                        let par_item = find(anti_way[tmp_values.id])
+                        let par_values = par_item.getModel();
+                        if(par_values.status !== true) {
+                            arr_nodes.splice(idx, 1)
+                            in_degree[one_way[tmp_values.id]] -= 1
+                            continue;
+                        }
+                    }
+                    let params = {}
+                    switch(tmp_values.task_name) {
+                        case "Input Source":
+                            params = {dataset_name: tmp_values.dataset !== '' ? tmp_values.dataset: null};
+                            break;
+                        case "Output Source":
+                            params = {parent_id: anti_way.hasOwnProperty(tmp_values.id) ? anti_way[tmp_values.id]: null};
+                            break;
+                        case "Duplicate Removal":
+                            params = {parent_id: anti_way.hasOwnProperty(tmp_values.id) ? anti_way[tmp_values.id]: null, selected_columns: tmp_values.selected_columns};
+                            break;
+                    }
+                    $.ajax({
+                        type: 'POST',
+                        url: '/api/component',
+                        async: false,
+                        dataType: 'json',
+                        data: {
+                            item_id: tmp_values.id,
+                            task_name: tmp_values.task_name,
+                            params: JSON.stringify(params)
+                        },
+                        success: (jsonData) => {
+                            if (jsonData.error) {
+                                tmp_values.color = "#EE0000"
+                                tmp_values.status = false
+                                update(tmp_item, {...tmp_values})
+                            } else {
+                                tmp_values.color = "#00EE00"
+                                tmp_values.status = true
+                                update(tmp_item, {...tmp_values})
+                            }
+                        }
+                    })
+                    arr_nodes.splice(idx, 1)
+                    in_degree[one_way[tmp_values.id]] -= 1
+                }
+            }
+        }
+        //end
+        $.ajax({
+            type: 'POST',
+            url: '/api/component',
+            async: false,
+            dataType: 'json',
+            data: {
+                item_id: values.id,
+                task_name: values.task_name,
+                params: JSON.stringify({dataset_name: values.dataset !== '' ? values.dataset: null})
+            },
+            success: (jsonData) => {
+                if (jsonData.error) {
+                    values.color = "#EE0000"
+                    values.status = false
+                    update(item, {...values})
+                } else {
+                    values.color = "#00EE00"
+                    values.status = true
+                    update(item, {...values})
+                }
+            }
+        })
+    }
+
     handleDisplayData = () => {
         const {propsAPI}=this.props;
         const {getSelected}=propsAPI;
@@ -145,9 +270,9 @@ class OutputSourceContextMenu extends React.Component{
             case "2":
                  this.handleRemove();
                  break;
-            // case "3":
-            //     this.handleGlobalRun();
-            //     break;
+             case "3":
+                 this.handleGlobalRun();
+                 break;
             // case "4":
             //     this.handleRunToThis();
             //     break;

@@ -6,6 +6,7 @@ import {withPropsAPI} from 'gg-editor';
 import 'antd/dist/antd.css';
 import InputSource from "./input_source";
 import OutputSource from "./output_source";
+import DuplicateRemoval from "./duplicate_removal";
 import FlowContextMenu from "../flow_context_menu";
 
 const {Item}=Form;
@@ -30,6 +31,9 @@ class NodeDetail extends React.Component{
                 break;
             case '输出源':
                 Component = OutputSource;
+                break;
+            case '记录去重':
+                Component = DuplicateRemoval;
                 break;
         }
         return(<div>

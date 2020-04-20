@@ -6,6 +6,7 @@ import {withPropsAPI} from 'gg-editor';
 import 'antd/dist/antd.css';
 import InputSourceContextMenu from "./input_source";
 import OutputSourceContextMenu from "./output_source";
+import DuplicateRemovalContextMenu from "./duplicate_removal";
 
 const {Item}=Form;
 
@@ -28,6 +29,9 @@ class FlowContextMenu extends React.Component{
                 break;
             case '输出源':
                 MenuComponent = OutputSourceContextMenu;
+                break;
+            case '记录去重':
+                MenuComponent = DuplicateRemovalContextMenu;
                 break;
         }
         return(<MenuComponent/>)

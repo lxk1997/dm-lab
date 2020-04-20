@@ -12,7 +12,7 @@ import 'antd/dist/antd.css';
 import styles from './index.scss';
 import iconfont from '../theme/iconfont.scss';
 
-class InputSourceContextMenu extends React.Component{
+class DuplicateRemovalContextMenu extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
@@ -49,13 +49,25 @@ class InputSourceContextMenu extends React.Component{
 
     handleRunThis = () => {
         const {propsAPI}=this.props;
-        const {getSelected,update}=propsAPI;
+        const {getSelected,update, save}=propsAPI;
         const item=getSelected()[0];
         if(!item) return;
         let values = item.getModel();
         values.color = "#1890ff"
         values.status = false
         update(item, {...values})
+        let mp = save();
+        let edges = mp.edges;
+        if(edges === null) {
+            edges = []
+        }
+        let parent_id = null;
+        for(var idx = 0; idx < edges.length; idx++) {
+            if(edges[idx].target === values.id) {
+                parent_id = edges[idx].source;
+                break;
+            }
+        }
         $.ajax({
             type: 'POST',
             url: '/api/component',
@@ -64,7 +76,7 @@ class InputSourceContextMenu extends React.Component{
             data: {
                 item_id: values.id,
                 task_name: values.task_name,
-                params: JSON.stringify({dataset_name: values.dataset !== '' ? values.dataset: null})
+                params: JSON.stringify({parent_id: parent_id, selected_columns: values.selected_columns})
             },
             success: (jsonData) => {
                 if (jsonData.error) {
@@ -258,9 +270,9 @@ class InputSourceContextMenu extends React.Component{
             case "2":
                  this.handleRemove();
                  break;
-            case "3":
-                this.handleGlobalRun();
-                break;
+             case "3":
+                 this.handleGlobalRun();
+                 break;
             // case "4":
             //     this.handleRunToThis();
             //     break;
@@ -322,7 +334,7 @@ class InputSourceContextMenu extends React.Component{
     }
 }
 
-export default withPropsAPI(InputSourceContextMenu);
+export default withPropsAPI(DuplicateRemovalContextMenu);
 
 class RenameModal extends React.Component {
     constructor(props) {

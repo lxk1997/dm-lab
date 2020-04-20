@@ -19,7 +19,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class OutputSource(Base):
+class DuplicateRemoval(Base):
     component_id = 1
     menu_info_names = [{'name': "重命名"},
                        {'name': '删除'},
@@ -28,22 +28,26 @@ class OutputSource(Base):
                        {'name': '运行该节点'},
                        {'name': '从此节点运行'},
                        {'name': '查看数据'},
-                       {'name': '查看日志'},
-                       {'name': '数据下载'}]
+                       {'name': '查看日志'}]
 
     evaluation_info_names = [{'name': 'data', 'type': 'data'},
-                             {'name': 'log', 'type': 'text'},
-                             {'name': 'file', 'type': 'file'}]
+                             {'name': 'log', 'type': 'text'}]
 
     def _get_evaluation_dir(self, evaluation_id):
         return 'evaluations/%s' % evaluation_id
 
     def _check_valid_params(self, logger, params=None):
-        if params and params.get('parent_id'):
-            return True
-        else:
+        if not params:
+            logger.exception('params is None')
+            return False
+        elif not params.get('parent_id'):
             logger.exception('params has no attribute name "parent_id"')
             return False
+        elif not params.get('selected_columns'):
+            logger.exception('params has no attribute name "selected_columns"')
+            return False
+        else:
+            return True
 
     def execute(self, evaluation_id=None, params=None, item_id=None):
         fs = get_fs()
@@ -63,15 +67,17 @@ class OutputSource(Base):
         logger.addHandler(fh)
 
         success = self._check_valid_params(logger, params)
+        selected_columns = params['selected_columns']
         if success:
             par_evaluation_dir = self._get_evaluation_dir(params['parent_id'])
             par_evaluation_output_dir = fs.join(par_evaluation_dir, 'outputs')
             par_data_path = fs.join(par_evaluation_output_dir, 'data.json')
             if fs.isfile(par_data_path):
                 with fs.open(par_data_path, 'r') as fin:
-                    data_content = fin.read()
+                    data_content = json.loads(fin.read())
+                rsts = self._duplicate_remove(data_content, selected_columns)
                 with fs.open(data_path, 'w') as fout:
-                    json.dump(json.loads(data_content), fout, indent=2)
+                    json.dump(json.loads(rsts), fout, indent=2)
             else:
                 logger.exception(Exception('parent %s has no data.' % params['parent_id']))
                 success = False
@@ -84,8 +90,6 @@ class OutputSource(Base):
             return self._get_evaluation_data(item_id, limit=limit, offset=offset)
         elif info_name == 'log':
             return self._get_evaluation_log(item_id, limit=limit, offset=offset)
-        # elif info_name == 'file':
-        #     return self._get_evaluation_files(item_id, limit=limit, offset=offset)
         else:
             raise NotImplementedError
 
@@ -142,5 +146,24 @@ class OutputSource(Base):
         else:
             offset = int(offset)
         return logs[offset:offset + limit], count, None
+
+    def _duplicate_remove(self, data, selected_columns):
+        selected_columns_idx = []
+        columns = []
+        for idx, item in enumerate(data['headers']):
+            if item in selected_columns:
+                selected_columns_idx.append(idx)
+                columns.append(item)
+        rsts = []
+        for idx, item in enumerate(data['content']):
+            rst = []
+            for idx1, item1 in enumerate(item):
+                if idx1 in selected_columns_idx:
+                    rst.append(item1)
+            rsts.append(rst)
+        rsts = list(set([tuple(t) for t in rsts]))
+        rsts = [list(v) for v in rsts]
+        rsts = {'headers': columns, 'content': rsts}
+        return rsts
 
 

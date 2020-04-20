@@ -91,6 +91,20 @@ export class Component extends React.Component {
                             label={'输出源'}
                             children={<div>输出源</div>}
                         />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'记录去重',
+                                task_name: 'Duplicate Removal',
+                                status: '',
+                                selected_columns: []
+                            }}
+                            label={'记录去重'}
+                            children={<div>记录去重</div>}
+                        />
                     </Card>
                 </ItemPanel>
             </div>

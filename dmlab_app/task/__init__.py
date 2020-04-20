@@ -1,3 +1,4 @@
+from dmlab_app.task.data_preprocessing.duplicate_removal import DuplicateRemoval
 from dmlab_app.task.io_source.input_source import InputSource
 from dmlab_app.task.io_source.output_source import OutputSource
 
@@ -11,7 +12,12 @@ _tasks = [
             'id'        : 2,
             'name'      : 'Output Source',
             'method'    : OutputSource(),
-        }
+        },
+        {
+            'id'        : 3,
+            'name'      : 'Duplicate Removal',
+            'method'    : DuplicateRemoval(),
+        },
     ]
 
 assert len(_tasks) == len(set(map(lambda t: t['id'], _tasks)))
