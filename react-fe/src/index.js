@@ -1,6 +1,6 @@
 import React from 'react'
 import {render} from 'react-dom'
-import {BrowserRouter} from 'react-router-dom'
+import {BrowserRouter, Redirect} from 'react-router-dom'
 import Nav from './nav'
 import AppContent from "./content";
 import 'antd/dist/antd.css';

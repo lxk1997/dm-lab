@@ -7,6 +7,7 @@ import {Layout} from 'antd';
 import {Form, Input, Button, Checkbox} from 'antd';
 import {UserOutlined, LockOutlined, MailOutlined} from '@ant-design/icons';
 import Home from "../page/home";
+import page404 from "../404";
 
 const {Header, Content} = Layout;
 
@@ -23,13 +24,16 @@ export default class Parend extends React.Component {
                     <Redirect from='/' to='/login' exact/>
                     <Route path='/login' exact component={Login}/>
                     <Route path='/signup' exact component={SignUp}/>
+
+                    <Route path='*' component={page404}/>
+
                 </Switch>
             </Content>
         </Layout>);
     }
 }
 
-class Login extends React.Component {
+export class Login extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -110,7 +114,7 @@ class Login extends React.Component {
     }
 }
 
-class SignUp extends React.Component {
+export class SignUp extends React.Component {
     constructor(props) {
         super(props)
         this.state = {

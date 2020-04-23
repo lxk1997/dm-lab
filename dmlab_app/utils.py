@@ -2,6 +2,7 @@ import logging
 import threading
 import json
 import multiprocessing
+import numpy as np
 from flask import jsonify, copy_current_request_context
 
 # TODO
@@ -47,3 +48,26 @@ def is_json(value):
     except:
         return False
     return True
+
+
+def numeric(value=None):
+    if not value:
+        return None
+    if isinstance(value, str):
+        if value.find('.') != -1:
+            value = float(value)
+        elif value.isdigit():
+            value = int(value)
+    return value
+
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(NpEncoder, self).default(obj)

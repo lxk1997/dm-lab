@@ -8,6 +8,7 @@ import InputSource from "./input_source";
 import OutputSource from "./output_source";
 import DuplicateRemoval from "./duplicate_removal";
 import FlowContextMenu from "../flow_context_menu";
+import CARTClassifier from "./cart_classifier";
 
 const {Item}=Form;
 
@@ -34,6 +35,9 @@ class NodeDetail extends React.Component{
                 break;
             case '记录去重':
                 Component = DuplicateRemoval;
+                break;
+            case 'CART分类树':
+                Component = CARTClassifier;
                 break;
         }
         return(<div>

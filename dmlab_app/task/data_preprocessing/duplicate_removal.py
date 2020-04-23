@@ -77,7 +77,7 @@ class DuplicateRemoval(Base):
                     data_content = json.loads(fin.read())
                 rsts = self._duplicate_remove(data_content, selected_columns)
                 with fs.open(data_path, 'w') as fout:
-                    json.dump(json.loads(rsts), fout, indent=2)
+                    json.dump(rsts, fout, indent=2)
             else:
                 logger.exception(Exception('parent %s has no data.' % params['parent_id']))
                 success = False

@@ -89,7 +89,6 @@ class InputSource extends React.Component{
                             this.setState({dataset_columns: []})
                         }
                         let data = jsonData.data.detail
-                        console.log(data)
                         let dataset_columns = datasetColumnTableFilter(data)
                         this.setState({dataset_columns: dataset_columns})
 

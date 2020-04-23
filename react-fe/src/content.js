@@ -15,6 +15,8 @@ function AppContent(props) {
         <div>
             <Switch> {/* display the first match route*/}
                 <Redirect from='/' to='/home' exact/>
+                <Redirect from='/login' to='/home' exact/>
+                <Redirect from='/signup' to='/home' exact/>
                 <Route path='/home' exact component={Home}/>
 
                 <Route path='/experimental-item' exact component={ExperimentalItem}/>

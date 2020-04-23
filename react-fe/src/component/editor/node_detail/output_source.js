@@ -40,30 +40,48 @@ class OutputSource extends React.Component{
 
     handleFieldRefresh = () => {
         const {propsAPI}=this.props;
-        const {getSelected}=propsAPI;
+        const {getSelected, save, find}=propsAPI;
 
         const item=getSelected()[0]
 
         if(!item) return null;
         let values = item.getModel()
-        $.ajax({
-            type: 'GET',
-            url: `/api/component/${values.task_name}/${values.id}/data`,
-            async: false,
-            dataType: 'json',
-            success: (jsonData) => {
-                if (jsonData.error) {
-                    message.error('当前组件运行数据不存在')
-                } else {
-                    if(this.state.dataset_columns.length) {
-                        this.setState({dataset_columns: []})
-                    }
-                    let data = JSON.parse(jsonData.data.detail[0].data)
-                    let dataset_columns = datasetColumnTableFilter(data)
-                    this.setState({dataset_columns: dataset_columns})
-                }
+        let mp = save();
+        let edges = mp.edges;
+        if(edges === null) {
+            edges = []
+        }
+        let parent_id = null;
+        for(var idx = 0; idx < edges.length; idx++) {
+            if(edges[idx].target === values.id) {
+                parent_id = edges[idx].source;
+                break;
             }
-        })
+        }
+        if(parent_id === null) {
+            message.error('当前组件运行数据不存在')
+        } else {
+            let tmp_item = find(parent_id)
+            let tmp_values = tmp_item.getModel()
+            $.ajax({
+                type: 'GET',
+                url: `/api/component/${tmp_values.task_name}/${tmp_values.id}/data`,
+                async: false,
+                dataType: 'json',
+                success: (jsonData) => {
+                    if (jsonData.error) {
+                        message.error('当前组件运行数据不存在')
+                    } else {
+                        if(this.state.dataset_columns.length) {
+                            this.setState({dataset_columns: []})
+                        }
+                        let data = JSON.parse(jsonData.data.detail[0].data)
+                        let dataset_columns = datasetColumnTableFilter(data)
+                        this.setState({dataset_columns: dataset_columns})
+                    }
+                }
+            })
+        }
     }
 
     render(){
