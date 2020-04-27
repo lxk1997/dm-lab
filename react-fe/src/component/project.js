@@ -4,7 +4,7 @@ import '../static/css/ant.css';
 import {Item, ItemPanel} from "gg-editor";
 import {Button, Tree, Card} from 'antd';
 import 'antd/dist/antd.css';
-import styles from '../component/editor/editor_item_panel/index.scss';
+import styles from '../static/css/ggeditor.scss';
 import {
     PlusCircleOutlined,
     FrownFilled,
@@ -17,7 +17,9 @@ import FlowPage from "./editor/flow";
 export default class ProjectParent extends React.Component {
     render() {
         return (
-            <FlowPage/>
+            <div className="gg-editor-background">
+                <FlowPage/>
+            </div>
         )
     }
 

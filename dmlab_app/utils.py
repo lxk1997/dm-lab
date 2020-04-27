@@ -51,7 +51,7 @@ def is_json(value):
 
 
 def numeric(value=None):
-    if not value:
+    if value is None:
         return None
     if isinstance(value, str):
         if value.find('.') != -1:

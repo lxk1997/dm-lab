@@ -326,57 +326,61 @@ class CARTClassifier extends React.Component{
 
         }
         return(
-            <Collapse defaultActiveKey={['1']}>
-                <Panel header="字段属性" key="1">
-                    <div>特征</div>
-                    <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
-                    {fields_msg}
-                    <div>标签</div>
-                    <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
-                    {target_fields_msg}
-                </Panel>
-                <Panel header="基础参数" key="2">
-                    <div>切分评价准则</div>
-                    <Select style={{ width: 130 }} defaultValue={this.state.criterion} onChange={this.onCriterionChange}>
-                        <Option value={"gini"}>{"Gini系数"}</Option>
-                        <Option value={"entropy"}>{"信息增益"}</Option>
-                    </Select>
-                    <div>切分原则</div>
-                    <Select style={{ width: 130 }} defaultValue={this.state.splitter} onChange={this.onSplitterChange}>
-                        <Option value={"best"}>{"最优切分"}</Option>
-                        <Option value={"random"}>{"随机切分"}</Option>
-                    </Select>
-                </Panel>
-                <Panel header="高级参数" key="3">
-                    <div>最大深度</div>
-                    <Input defaultValue={this.state.max_depth} onChange={this.onMaxDepthChange}/>
-                    <div>最小分裂样本数</div>
-                    <InputNumber min={0} step={0.1} defaultValue={this.state.min_samples_split} onChange={this.onMinSamplesSplitChange} />
-                    <div>叶节点最少样本数</div>
-                    <InputNumber min={0} step={0.1} defaultValue={this.state.min_samples_leaf} onChange={this.onMinSamplesLeafChange} />
-                    <div>叶节点样本数最小权重</div>
-                    <InputNumber min={0} step={0.1} max={1} defaultValue={this.state.min_weight_fraction_leaf} onChange={this.onMinWeightFractionLeafChange} />
-                    <div>参与分裂特征数</div>
-                    <Input defaultValue={this.state.max_features} onChange={this.onMaxFeaturesChange}/>
-                    <div>随机模式参数</div>
-                    <Input defaultValue={this.state.random_state} onChange={this.onRandomStateChange}/>
-                    <div>最大叶节点数</div>
-                    <Input defaultValue={this.state.max_leaf_nodes} onChange={this.onMaxLeafNodesChange}/>
-                    <div>最小不纯度值减少量</div>
-                    <InputNumber min={0} step={0.1} defaultValue={this.state.min_impurity_decrease} onChange={this.onMinImpurityDecreaseChange} />
-                    <div>最小不纯度值</div>
-                    <Input defaultValue={this.state.min_impurity_split} onChange={this.onMinImpuritySplitChange}/>
-                    <div>样本各类别权重</div>
-                    <Input defaultValue={this.state.class_weight} onChange={this.onClassWeightChange}/>
-                    <div>预排序</div>
-                    <Switch checkedChildren="开" unCheckedChildren="关" defaultChecked={this.state.presort} onChange={this.onPreSortChange}/>
-                </Panel>
-                <Panel header="组件描述" key="4">
-                <div>
-                    CART(Classification And Regression Tree)算法是一种决策树分类方法。它采用一种二分递归分割的技术，分割方法采用基于最小距离的基尼指数估计函数，将当前的样本集分为两个子样本集，使得生成的的每个非叶子节点都有两个分支。因此，CART算法生成的决策树是结构简洁的二叉树。
-                </div>
-                </Panel>
-            </Collapse>
+            <div>
+                <Collapse defaultActiveKey={['1']} accordion expandIconPosition={'right'} style={{'margin-bottom': '45px'}}>
+                    <Panel header="字段属性" key="1">
+                        <div>特征</div>
+                        <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
+                        {fields_msg}
+                        <div>标签</div>
+                        <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
+                        {target_fields_msg}
+                    </Panel>
+                    <Panel header="基础参数" key="2">
+                        <div>切分评价准则</div>
+                        <Select style={{ width: 130 }} defaultValue={this.state.criterion} onChange={this.onCriterionChange}>
+                            <Option value={"gini"}>{"Gini系数"}</Option>
+                            <Option value={"entropy"}>{"信息增益"}</Option>
+                        </Select>
+                        <div>切分原则</div>
+                        <Select style={{ width: 130 }} defaultValue={this.state.splitter} onChange={this.onSplitterChange}>
+                            <Option value={"best"}>{"最优切分"}</Option>
+                            <Option value={"random"}>{"随机切分"}</Option>
+                        </Select>
+                    </Panel>
+                    <Panel header="高级参数" key="3">
+                        <div>最大深度</div>
+                        <Input defaultValue={this.state.max_depth} onChange={this.onMaxDepthChange}/>
+                        <div>最小分裂样本数</div>
+                        <InputNumber min={0} step={0.1} defaultValue={this.state.min_samples_split} onChange={this.onMinSamplesSplitChange} />
+                        <div>叶节点最少样本数</div>
+                        <InputNumber min={0} step={0.1} defaultValue={this.state.min_samples_leaf} onChange={this.onMinSamplesLeafChange} />
+                        <div>叶节点样本数最小权重</div>
+                        <InputNumber min={0} step={0.1} max={1} defaultValue={this.state.min_weight_fraction_leaf} onChange={this.onMinWeightFractionLeafChange} />
+                        <div>参与分裂特征数</div>
+                        <Input defaultValue={this.state.max_features} onChange={this.onMaxFeaturesChange}/>
+                        <div>随机模式参数</div>
+                        <Input defaultValue={this.state.random_state} onChange={this.onRandomStateChange}/>
+                        <div>最大叶节点数</div>
+                        <Input defaultValue={this.state.max_leaf_nodes} onChange={this.onMaxLeafNodesChange}/>
+                        <div>最小不纯度值减少量</div>
+                        <InputNumber min={0} step={0.1} defaultValue={this.state.min_impurity_decrease} onChange={this.onMinImpurityDecreaseChange} />
+                        <div>最小不纯度值</div>
+                        <Input defaultValue={this.state.min_impurity_split} onChange={this.onMinImpuritySplitChange}/>
+                        <div>样本各类别权重</div>
+                        <Input defaultValue={this.state.class_weight} onChange={this.onClassWeightChange}/>
+                        <div>预排序</div>
+                        <Switch checkedChildren="开" unCheckedChildren="关" defaultChecked={this.state.presort} onChange={this.onPreSortChange}/>
+                    </Panel>
+                </Collapse>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                    <Panel header="组件描述" key="1">
+                    <div>
+                        CART(Classification And Regression Tree)算法是一种决策树分类方法。它采用一种二分递归分割的技术，分割方法采用基于最小距离的基尼指数估计函数，将当前的样本集分为两个子样本集，使得生成的的每个非叶子节点都有两个分支。因此，CART算法生成的决策树是结构简洁的二叉树。
+                    </div>
+                    </Panel>
+                 </Collapse>
+            </div>
         )
     }
 }

@@ -297,33 +297,33 @@ class DuplicateRemovalContextMenu extends React.Component{
                 <RenameModal visiable={this.state.rename_modal_visible} ref={"renameModal"} parent={this}/>
                 <LogModal visiable={this.state.log_modal_visible} ref={"logModal"} parent={this}/>
                 <DataModal visiable={this.state.data_modal_visible} ref={"dataModal"} parent={this}/>
-                <ContextMenu className={styles.contextMenu}>
+                <ContextMenu className={styles.contextMenu} style={{'box-shadow': 'darkgrey 0px 0px 3px 1px', 'text-align': 'center'}}>
                     <NodeMenu>
-                        <Menu onClick={this.handleMenuClick}>
-                            <Menu.Item key="1">
+                        <Menu onClick={this.handleMenuClick} style={{'text-align': 'center'}}>
+                            <Menu.Item key="1" style={{'margin':'0 auto', 'height':'26px', 'line-height': 'normal'}}>
                               重命名
                             </Menu.Item>
-                            <Menu.Item key="2">
+                            <Menu.Item key="2" style={{'margin':'0 auto', 'height':'26px', 'line-height': 'normal'}}>
                               删除
                             </Menu.Item>
                             <Menu.Divider/>
-                            <Menu.Item key="3">
+                            <Menu.Item key="3" style={{'margin':'0 auto', 'height':'26px', 'line-height': 'normal'}}>
                               全部运行
                             </Menu.Item>
-                            <Menu.Item key="4">
+                            <Menu.Item key="4" style={{'margin':'0 auto', 'height':'26px', 'line-height': 'normal'}}>
                               运行到此处
                             </Menu.Item>
-                            <Menu.Item key="5">
+                            <Menu.Item key="5" style={{'margin':'0 auto', 'height':'26px', 'line-height': 'normal'}}>
                               运行该节点
                             </Menu.Item>
-                            <Menu.Item key="6">
+                            <Menu.Item key="6" style={{'margin':'0 auto', 'height':'26px', 'line-height': 'normal'}}>
                               从此节点运行
                             </Menu.Item>
                             <Menu.Divider/>
-                            <Menu.Item key="7">
+                            <Menu.Item key="7" style={{'margin':'0 auto', 'height':'26px', 'line-height': 'normal'}}>
                               查看数据
                             </Menu.Item>
-                            <Menu.Item key="8">
+                            <Menu.Item key="8" style={{'margin':'0 auto', 'height':'26px', 'line-height': 'normal'}}>
                               查看日志
                             </Menu.Item>
                           </Menu>

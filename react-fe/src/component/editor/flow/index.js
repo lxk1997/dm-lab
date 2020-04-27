@@ -5,21 +5,20 @@ import FlowDetailPanel from '../editor_detail_panel';
 import styles from './index.scss';
 import 'antd/dist/antd.css';
 import {Component, Project} from "../../project";
-import FlowToolbar from "../editor_toolbar";
 
 class FlowPage extends React.Component{
     render(){
         return(
         <GGEditor className={styles.editor}>
-            <Row type='flex' className={styles.editorBd}>
-                <Col span={4} className={styles.editorSidebar}>
+            <Row className={styles.editorBd}>
+                <Col flex="0 0 160px" className={styles.editorSidebar}>
                     <Project/>
                     <Component/>
                 </Col>
-                <Col span={16} className={styles.editorContent}>
-                    <Flow grid={grid} className={styles.flow} style={{"height": 400, marginLeft: '8px', marginRight: '8px'}}/>
+                <Col flex="0 1 calc(100% - 540px)" className={styles.editorContent}>
+                    <Flow grid={grid} className={styles.flow} style={{"height": '510px', marginLeft: '4px', background: '#FEFEFE', 'border-left': '1px solid #F6C67B', 'border-right': '1px solid #DCDCDC', 'border-top': '1px solid #F6C67B', 'border-bottom': '1px solid #F6C67B'}}/>
                 </Col>
-                <Col span={4} className={styles.editorSidebar}>
+                <Col flex="0 1 160px" className={styles.editorSidebar}>
                     <FlowDetailPanel/>
                 </Col>
             </Row>
@@ -29,12 +28,12 @@ class FlowPage extends React.Component{
 }
 
 const grid = {
-    cell:20,
-    type:'point',
+    cell:5,
+    type:'line',
     line:{
-      color:'#f7f7f7',
-      fill:'#f7f7f7',
-      stroke: '#D3D3D3',
+      color:'#F8F8F8',
+      fill:'#F8F8F8',
+      stroke: '#F8F8F8',
       lineWidth: 0.1
     }
 }

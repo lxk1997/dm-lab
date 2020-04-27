@@ -97,18 +97,22 @@ class OutputSource extends React.Component{
             fields_msg = <Table columns={this.columns} dataSource={this.state.dataset_columns} pagination={null} scroll={{y: 150}}  style={{"overflow":"scroll", "width": "300px"}}/>
         }
         return(
-            <Collapse defaultActiveKey={['1']}>
-                <Panel header="字段属性" key="1">
-                    <div>输出字段</div>
-                    <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
-                    {fields_msg}
-                </Panel>
-                <Panel header="组件描述" key="2">
-                <div>
-                    输出源：将数据表中的数据导出到指定的数据库中
-                </div>
-                </Panel>
-            </Collapse>
+            <div>
+                <Collapse defaultActiveKey={['1']} accordion expandIconPosition={'right'} style={{'margin-bottom': '45px'}}>
+                    <Panel header="字段属性" key="1">
+                        <div>输出字段</div>
+                        <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
+                        {fields_msg}
+                    </Panel>
+                </Collapse>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                    <Panel header="组件描述" key="1">
+                    <div>
+                        输出源：将数据表中的数据导出到指定的数据库中
+                    </div>
+                    </Panel>
+                 </Collapse>
+            </div>
         )
     }
 }

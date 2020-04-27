@@ -113,37 +113,40 @@ class InputSource extends React.Component{
             fields_msg = <Table columns={this.columns} dataSource={this.state.dataset_columns} pagination={null} scroll={{y: 150}}  style={{"overflow":"scroll", "width": "300px"}}/>
         }
         return(
-            <Collapse defaultActiveKey={['1']}>
-                <Panel header="字段属性" key="1">
-                <Form onFinish={this.handleSubmit}
-                initialValues={{dataset: dataset}}>
-                    <div>数据表</div>
-                    <Form.Item name="dataset">
-                        <Select
-                            style={{width: '60%'}}
-                            placeholder="请选择数据集"
-                            onChange={this.handleSubmit}>
-                            {this.dataset_options}</Select>
-                    </Form.Item>
-                    <div>字段信息</div>
-                    <Form.Item>
-                        <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
-                        {fields_msg}
-                    </Form.Item>
-                </Form>
-                </Panel>
-                <Panel header="组件描述" key="2">
-                <div>
-                    输入源：读取表数据组件。当输入表名后，会自动读取表的结构数据，在字段信息中可查看当数据源是来来源于数据库时，表字段修改后，如增加或删除某个字段，在平台是无法感知的，需要用户重新设置一下数据源，数据同步一下这个表信息.
-                </div>
-                </Panel>
-            </Collapse>
+            <div>
+                <Collapse defaultActiveKey={['1']} accordion expandIconPosition={'right'} style={{'margin-bottom': '45px'}}>
+                    <Panel header="字段属性" key="1">
+                    <Form onFinish={this.handleSubmit}
+                    initialValues={{dataset: dataset}}>
+                        <div>数据表</div>
+                        <Form.Item name="dataset">
+                            <Select
+                                style={{width: '60%'}}
+                                placeholder="请选择数据集"
+                                onChange={this.handleSubmit}>
+                                {this.dataset_options}</Select>
+                        </Form.Item>
+                        <div>字段信息</div>
+                        <Form.Item>
+                            <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
+                            {fields_msg}
+                        </Form.Item>
+                    </Form>
+                    </Panel>
+                </Collapse>
+                 <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                    <Panel header="组件描述" key="1">
+                    <div>
+                        输入源：读取表数据组件。当输入表名后，会自动读取表的结构数据，在字段信息中可查看当数据源是来来源于数据库时，表字段修改后，如增加或删除某个字段，在平台是无法感知的，需要用户重新设置一下数据源，数据同步一下这个表信息.
+                    </div>
+                    </Panel>
+                 </Collapse>
+            </div>
         )
     }
 }
 
 export default withPropsAPI(InputSource);
-
 
 
 function datasetColumnTableFilter(data) {

@@ -120,18 +120,27 @@ class DuplicateRemoval extends React.Component{
             fields_msg = <Table rowSelection={rowSelection} columns={this.columns} dataSource={this.state.dataset_columns} pagination={null} scroll={{y: 150}}  style={{"overflow":"scroll", "width": "300px"}}/>
         }
         return(
-            <Collapse defaultActiveKey={['1']}>
-                <Panel header="字段属性" key="1">
-                    <div>特征</div>
-                    <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
-                    {fields_msg}
-                </Panel>
-                <Panel header="组件描述" key="2">
-                <div>
-                    记录去重是去除数据表中的重复的行数据，只保留其中一行数据。
-                </div>
-                </Panel>
-            </Collapse>
+            <div>
+                <Collapse defaultActiveKey={['1']} accordion expandIconPosition={'right'} style={{'margin-bottom': '45px'}}>
+                    <Panel header="字段属性" key="1">
+                        <div>特征</div>
+                        <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
+                        {fields_msg}
+                    </Panel>
+                    <Panel header="组件描述" key="2">
+                    <div>
+                        记录去重是去除数据表中的重复的行数据，只保留其中一行数据。
+                    </div>
+                    </Panel>
+                </Collapse>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                    <Panel header="组件描述" key="1">
+                    <div>
+                        记录去重是去除数据表中的重复的行数据，只保留其中一行数据。
+                    </div>
+                    </Panel>
+                 </Collapse>
+            </div>
         )
     }
 }

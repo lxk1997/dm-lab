@@ -12,7 +12,7 @@ import Dataset from "./component/dataset";
 
 function AppContent(props) {
     return (
-        <div>
+        <div style={{'margin-top': '5px'}}>
             <Switch> {/* display the first match route*/}
                 <Redirect from='/' to='/home' exact/>
                 <Redirect from='/login' to='/home' exact/>
