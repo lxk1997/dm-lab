@@ -135,6 +135,33 @@ export class Component extends React.Component {
                             label={'CART分类树'}
                             children={<div>CART分类树</div>}
                         />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'支持向量机',
+                                task_name: 'SVM Classifier',
+                                status: '',
+                                selected_columns: [],
+                                target_column: '',
+                                C: 1.0,
+                                kernel: 'rbf',
+                                degree: 3,
+                                gamma: 'scale',
+                                coef0: 0.0,
+                                probability: false,
+                                shrinking: true,
+                                tol: 0.001,
+                                cache_size: 200,
+                                class_weight: 'None',
+                                max_iter: -1,
+                                random_state: 'None'
+                            }}
+                            label={'支持向量机'}
+                            children={<div>支持向量机</div>}
+                        />
                     </Card>
                 </ItemPanel>
             </div>

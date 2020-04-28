@@ -9,6 +9,7 @@ import OutputSource from "./output_source";
 import DuplicateRemoval from "./duplicate_removal";
 import FlowContextMenu from "../flow_context_menu";
 import CARTClassifier from "./cart_classifier";
+import SVMClassifier from "./svm_classifier";
 
 const {Item}=Form;
 
@@ -38,6 +39,9 @@ class NodeDetail extends React.Component{
                 break;
             case 'CART分类树':
                 Component = CARTClassifier;
+                break;
+            case '支持向量机':
+                Component = SVMClassifier;
                 break;
         }
         return(<div>

@@ -1,4 +1,5 @@
 from dmlab_app.task.classification.cart_classifier import CARTClassifier
+from dmlab_app.task.classification.svm_classifier import SVMClassifier
 from dmlab_app.task.data_preprocessing.duplicate_removal import DuplicateRemoval
 from dmlab_app.task.io_source.input_source import InputSource
 from dmlab_app.task.io_source.output_source import OutputSource
@@ -23,6 +24,11 @@ _tasks = [
             'id'        : 4,
             'name'      : 'CART Classifier',
             'method'    : CARTClassifier(),
+        },
+        {
+            'id'        : 5,
+            'name'      : 'SVM Classifier',
+            'method'    : SVMClassifier(),
         },
     ]
 
