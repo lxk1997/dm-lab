@@ -197,6 +197,32 @@ export class Component extends React.Component {
                             label={'朴素贝叶斯'}
                             children={<div>朴素贝叶斯</div>}
                         />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'逻辑回归',
+                                task_name: 'LR Classifier',
+                                status: '',
+                                selected_columns: [],
+                                target_column: '',
+                                penalty: 'l2',
+                                dual: false,
+                                tol: 0.0001,
+                                fit_intercept: true,
+                                intercept_scaling: 1,
+                                class_weight: 'None',
+                                solver: 'lbfgs',
+                                C: 1.0,
+                                multi_class: 'auto',
+                                max_iter: 100,
+                                l1_ratio: 'None'
+                            }}
+                            label={'逻辑回归'}
+                            children={<div>逻辑回归</div>}
+                        />
                     </Card>
                 </ItemPanel>
             </div>

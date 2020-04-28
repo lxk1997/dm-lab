@@ -12,6 +12,7 @@ import CARTClassifier from "./cart_classifier";
 import SVMClassifier from "./svm_classifier";
 import KNNClassifier from "./knn_classifier";
 import NBClassifier from "./nb_classifier";
+import LRClassifier from "./lr_classifier";
 
 const {Item}=Form;
 
@@ -50,6 +51,9 @@ class NodeDetail extends React.Component{
                 break;
             case '朴素贝叶斯':
                 Component = NBClassifier;
+                break;
+            case '逻辑回归':
+                Component = LRClassifier;
                 break;
         }
         return(<div>

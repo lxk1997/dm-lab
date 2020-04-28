@@ -11,6 +11,7 @@ import CARTClassifierContextMenu from "./cart_classifier";
 import SVMClassifierContextMenu from "./svm_classifier";
 import KNNClassifierContextMenu from "./knn_classifier";
 import NBClassifierContextMenu from "./nb_classifier";
+import LRClassifierContextMenu from "./lr_classifier";
 
 const {Item}=Form;
 
@@ -48,6 +49,9 @@ class FlowContextMenu extends React.Component{
                 break;
             case '朴素贝叶斯':
                 MenuComponent = NBClassifierContextMenu;
+                break;
+            case '逻辑回归':
+                MenuComponent = LRClassifierContextMenu;
                 break;
         }
         return(<MenuComponent/>)

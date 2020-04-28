@@ -1,5 +1,6 @@
 from dmlab_app.task.classification.cart_classifier import CARTClassifier
 from dmlab_app.task.classification.knn_classifier import KNNClassifier
+from dmlab_app.task.classification.lr_classifier import LRClassifier
 from dmlab_app.task.classification.nb_classifier import NBClassifier
 from dmlab_app.task.classification.svm_classifier import SVMClassifier
 from dmlab_app.task.data_preprocessing.duplicate_removal import DuplicateRemoval
@@ -41,6 +42,11 @@ _tasks = [
             'id'        : 7,
             'name'      : 'NB Classifier',
             'method'    : NBClassifier(),
+        },
+        {
+            'id'        : 8,
+            'name'      : 'LR Classifier',
+            'method'    : LRClassifier(),
         },
     ]
 
