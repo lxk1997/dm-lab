@@ -11,6 +11,7 @@ import FlowContextMenu from "../flow_context_menu";
 import CARTClassifier from "./cart_classifier";
 import SVMClassifier from "./svm_classifier";
 import KNNClassifier from "./knn_classifier";
+import NBClassifier from "./nb_classifier";
 
 const {Item}=Form;
 
@@ -46,6 +47,9 @@ class NodeDetail extends React.Component{
                 break;
             case '最近邻分类':
                 Component = KNNClassifier;
+                break;
+            case '朴素贝叶斯':
+                Component = NBClassifier;
                 break;
         }
         return(<div>

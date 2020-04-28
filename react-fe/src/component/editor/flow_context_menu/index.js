@@ -10,6 +10,7 @@ import DuplicateRemovalContextMenu from "./duplicate_removal";
 import CARTClassifierContextMenu from "./cart_classifier";
 import SVMClassifierContextMenu from "./svm_classifier";
 import KNNClassifierContextMenu from "./knn_classifier";
+import NBClassifierContextMenu from "./nb_classifier";
 
 const {Item}=Form;
 
@@ -44,6 +45,9 @@ class FlowContextMenu extends React.Component{
                 break;
             case '最近邻分类':
                 MenuComponent = KNNClassifierContextMenu;
+                break;
+            case '朴素贝叶斯':
+                MenuComponent = NBClassifierContextMenu;
                 break;
         }
         return(<MenuComponent/>)

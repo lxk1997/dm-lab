@@ -181,6 +181,22 @@ export class Component extends React.Component {
                             label={'最近邻分类'}
                             children={<div>最近邻分类</div>}
                         />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'朴素贝叶斯',
+                                task_name: 'NB Classifier',
+                                status: '',
+                                selected_columns: [],
+                                target_column: '',
+                                method: 'Gaussian'
+                            }}
+                            label={'朴素贝叶斯'}
+                            children={<div>朴素贝叶斯</div>}
+                        />
                     </Card>
                 </ItemPanel>
             </div>
