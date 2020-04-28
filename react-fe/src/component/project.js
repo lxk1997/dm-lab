@@ -162,6 +162,25 @@ export class Component extends React.Component {
                             label={'支持向量机'}
                             children={<div>支持向量机</div>}
                         />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'最近邻分类',
+                                task_name: 'KNN Classifier',
+                                status: '',
+                                selected_columns: [],
+                                target_column: '',
+                                n_neighbors: 5,
+                                weights: 'uniform',
+                                algorithm: 'auto',
+                                leaf_size: 30
+                            }}
+                            label={'最近邻分类'}
+                            children={<div>最近邻分类</div>}
+                        />
                     </Card>
                 </ItemPanel>
             </div>

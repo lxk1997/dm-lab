@@ -17,7 +17,7 @@ from ...db.dao.user_clazz_relation import UserClazzRelation
 from ...filesystem import get_fs, get_tmp_dir
 
 from sklearn.model_selection import train_test_split
-from sklearn import svm, metrics
+from sklearn import neighbors, metrics
 import pydotplus
 import matplotlib
 import matplotlib.pyplot as plt
@@ -33,7 +33,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class SVMClassifier(Base):
+class KNNClassifier(Base):
     component_id = 1
     menu_info_names = [{'name': "重命名"},
                        {'name': '删除'},
@@ -104,18 +104,10 @@ class SVMClassifier(Base):
                                                                                               target_rsts['content'],
                                                                                               test_size=0.33,
                                                                                               random_state=42)
-                    dt_model = svm.SVC(C=numeric(params['C']),
-                                       kernel=numeric(params['kernel']),
-                                       degree=numeric(params['degree']),
-                                       gamma=numeric(params['gamma']),
-                                       coef0=numeric(params['coef0']),
-                                       shrinking=numeric(params['shrinking']),
-                                       probability=numeric(params['probability']),
-                                       tol=numeric(params['tol']),
-                                       cache_size=numeric(params['cache_size']),
-                                       class_weight=numeric(params['class_weight']),
-                                       max_iter=numeric(params['max_iter']),
-                                       random_state=numeric(params['random_state']))
+                    dt_model = neighbors.KNeighborsClassifier(n_neighbors=numeric(params['n_neighbors']),
+                                                              weights=numeric(params['weights']),
+                                                              algorithm=numeric(params['algorithm']),
+                                                              leaf_size=numeric(params['leaf_size']))
                     dt_model.fit(feature_train, target_train)
                     prediction_test = dt_model.predict(feature_test)
                     acc = metrics.accuracy_score(target_test, prediction_test)

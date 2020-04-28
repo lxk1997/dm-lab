@@ -10,6 +10,7 @@ import DuplicateRemoval from "./duplicate_removal";
 import FlowContextMenu from "../flow_context_menu";
 import CARTClassifier from "./cart_classifier";
 import SVMClassifier from "./svm_classifier";
+import KNNClassifier from "./knn_classifier";
 
 const {Item}=Form;
 
@@ -42,6 +43,9 @@ class NodeDetail extends React.Component{
                 break;
             case '支持向量机':
                 Component = SVMClassifier;
+                break;
+            case '最近邻分类':
+                Component = KNNClassifier;
                 break;
         }
         return(<div>
