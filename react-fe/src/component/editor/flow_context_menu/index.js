@@ -12,6 +12,7 @@ import SVMClassifierContextMenu from "./svm_classifier";
 import KNNClassifierContextMenu from "./knn_classifier";
 import NBClassifierContextMenu from "./nb_classifier";
 import LRClassifierContextMenu from "./lr_classifier";
+import CARTRegressorContextMenu from "./cart_regressor";
 
 const {Item}=Form;
 
@@ -52,6 +53,9 @@ class FlowContextMenu extends React.Component{
                 break;
             case '逻辑回归':
                 MenuComponent = LRClassifierContextMenu;
+                break;
+            case 'CART回归树':
+                MenuComponent = CARTRegressorContextMenu;
                 break;
         }
         return(<MenuComponent/>)

@@ -11,8 +11,9 @@ import {withPropsAPI} from 'gg-editor';
 import 'antd/dist/antd.css';
 import styles from './index.scss';
 import iconfont from '../theme/iconfont.scss';
+import CARTRegressor from "../node_detail/cart_regressor";
 
-class CARTClassifierContextMenu extends React.Component{
+class CARTRegressorContextMenu extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
@@ -92,9 +93,8 @@ class CARTClassifierContextMenu extends React.Component{
                     random_state: values.random_state === 'None' ? null : values.random_state,
                     max_leaf_nodes: values.max_leaf_nodes === 'None' ? null : values.max_leaf_nodes,
                     min_impurity_decrease: values.min_impurity_decrease,
-                    min_impurity_split: values.min_impurity_split === 'None' ? null : values.min_impurity_split,
-                    class_weight: values.class_weight === 'None' ? null : values.class_weight,
-                    presort: values.presort
+                    min_impurity_split: values.min_impurity_split,
+                    ccp_alpha: values.ccp_alpha
                 })
             },
             success: (jsonData) => {
@@ -381,7 +381,7 @@ class CARTClassifierContextMenu extends React.Component{
     }
 }
 
-export default withPropsAPI(CARTClassifierContextMenu);
+export default withPropsAPI(CARTRegressorContextMenu);
 
 class RenameModal extends React.Component {
     constructor(props) {
@@ -606,5 +606,9 @@ function tableRender(data) {
 }
 
 function imageRender(data) {
-    return (<div style={{'text-align': 'center'}}><img src={data.data} width={"680px"}/><br/><span style={{'margin-bottom': '5px'}}>{data.name}</span></div>)
+    if(data.name === 'Overview') {
+        return (<div style={{'text-align': 'center'}}><img src={data.data} width={"500px"}/><br/><span style={{'margin-bottom': '5px'}}>{data.name}</span></div>)
+    } else {
+        return (<div style={{'text-align': 'center'}}><img src={data.data} width={"680px"}/><br/><span style={{'margin-bottom': '5px'}}>{data.name}</span></div>)
+    }
 }

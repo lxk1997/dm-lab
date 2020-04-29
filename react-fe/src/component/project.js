@@ -223,6 +223,33 @@ export class Component extends React.Component {
                             label={'逻辑回归'}
                             children={<div>逻辑回归</div>}
                         />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'CART回归树',
+                                task_name: 'CART Regressor',
+                                status: '',
+                                selected_columns: [],
+                                target_column: '',
+                                criterion: 'mse',
+                                splitter: 'best',
+                                max_depth: 'None',
+                                min_samples_split: 2,
+                                min_samples_leaf: 1,
+                                min_weight_fraction_leaf: 0,
+                                max_features: "None",
+                                random_state: "None",
+                                max_leaf_nodes: "None",
+                                min_impurity_decrease: 0,
+                                min_impurity_split: 0.0000001,
+                                ccp_alpha: 0.0
+                            }}
+                            label={'CART回归树'}
+                            children={<div>CART回归树</div>}
+                        />
                     </Card>
                 </ItemPanel>
             </div>
