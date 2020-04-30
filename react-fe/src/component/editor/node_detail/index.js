@@ -14,6 +14,7 @@ import KNNClassifier from "./knn_classifier";
 import NBClassifier from "./nb_classifier";
 import LRClassifier from "./lr_classifier";
 import CARTRegressor from "./cart_regressor";
+import Apriori from "./apriori";
 
 const {Item}=Form;
 
@@ -58,6 +59,9 @@ class NodeDetail extends React.Component{
                 break;
             case 'CART回归树':
                 Component = CARTRegressor;
+                break;
+            case 'Apriori':
+                Component = Apriori;
                 break;
         }
         return(<div>

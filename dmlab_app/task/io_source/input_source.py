@@ -93,7 +93,7 @@ class InputSource(Base):
                 with fs.open(dataset['file_key'], 'r') as fin:
                     datau.csv2obj(fin)
                 with fs.open(data_path, 'w') as fout:
-                    json.dump(datau.format_dict(), fout, indent=2)
+                    json.dump(datau.format_dict(), fout, indent=2, ensure_ascii=False)
                 success = True
             else:
                 logger.exception(Exception(dataset['file_key'] + ' is not a file'))

@@ -136,14 +136,14 @@ class CARTClassifier(Base):
                         'report': report
                     }
                     with fs.open(result_path, 'w') as fout:
-                        json.dump(json_data, fout, indent=2)
+                        json.dump(json_data, fout, indent=2, ensure_ascii=False)
                     merge_content = []
                     for idx, content in enumerate(feature_test):
                         new_content = content + [target_test[idx], prediction_test[idx]]
                         merge_content.append(new_content)
                     data = {'headers': feature_rsts['headers'] + [target_rsts['header'], 'pred'], 'content': merge_content}
                     with fs.open(data_path, 'w') as fout:
-                        json.dump(data, fout, indent=2, cls=NpEncoder)
+                        json.dump(data, fout, indent=2, cls=NpEncoder, ensure_ascii=False)
                     dot_data = tree.export_graphviz(dt_model, out_file=None,
                                                     feature_names=feature_rsts['headers'],
                                                     class_names=target_rsts['names'],

@@ -1,3 +1,4 @@
+from dmlab_app.task.association_rule.apriori import Apriori
 from dmlab_app.task.classification.cart_classifier import CARTClassifier
 from dmlab_app.task.classification.knn_classifier import KNNClassifier
 from dmlab_app.task.classification.lr_classifier import LRClassifier
@@ -53,6 +54,11 @@ _tasks = [
             'id'        : 9,
             'name'      : 'CART Regressor',
             'method'    : CARTRegressor(),
+        },
+        {
+            'id'        : 10,
+            'name'      : 'Apriori',
+            'method'    : Apriori(),
         },
     ]
 

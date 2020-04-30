@@ -71,7 +71,7 @@ class OutputSource(Base):
                 with fs.open(par_data_path, 'r') as fin:
                     data_content = fin.read()
                 with fs.open(data_path, 'w') as fout:
-                    json.dump(json.loads(data_content), fout, indent=2)
+                    json.dump(json.loads(data_content), fout, indent=2, ensure_ascii=False)
             else:
                 logger.exception(Exception('parent %s has no data.' % params['parent_id']))
                 success = False

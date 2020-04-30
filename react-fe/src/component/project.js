@@ -250,6 +250,22 @@ export class Component extends React.Component {
                             label={'CART回归树'}
                             children={<div>CART回归树</div>}
                         />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'Apriori',
+                                task_name: 'Apriori',
+                                status: '',
+                                min_support: 0.5,
+                                min_confidence: 0.5,
+                                max_length: 8
+                            }}
+                            label={'Apriori'}
+                            children={<div>Apriori</div>}
+                        />
                     </Card>
                 </ItemPanel>
             </div>

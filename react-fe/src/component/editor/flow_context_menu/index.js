@@ -13,6 +13,7 @@ import KNNClassifierContextMenu from "./knn_classifier";
 import NBClassifierContextMenu from "./nb_classifier";
 import LRClassifierContextMenu from "./lr_classifier";
 import CARTRegressorContextMenu from "./cart_regressor";
+import AprioriContextMenu from "./apriori";
 
 const {Item}=Form;
 
@@ -56,6 +57,9 @@ class FlowContextMenu extends React.Component{
                 break;
             case 'CART回归树':
                 MenuComponent = CARTRegressorContextMenu;
+                break;
+            case 'Apriori':
+                MenuComponent = AprioriContextMenu;
                 break;
         }
         return(<MenuComponent/>)
