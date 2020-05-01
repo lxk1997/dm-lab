@@ -1,7 +1,9 @@
 # coding=utf-8
 import logging
+import os
+from datetime import datetime
 
-from flask import Blueprint, request, g
+from flask import Blueprint, request, g, url_for
 
 from .auth import login_required
 from ..db.dao.experimental_item import ExperimentalItem
@@ -24,6 +26,18 @@ def handle_get_experimental_task(experimental_task_id):
         error = 1
     else:
         experimental_task = experimental_tasks[0]
+        if datetime.now() < experimental_task['start_time']:
+            status = '未开始'
+        elif datetime.now() < experimental_task['dead_line']:
+            status = '正在进行'
+        else:
+            status = '已结束'
+        experimental_task['status'] = status
+        experimental_task['create_time'] = experimental_task['create_time'].strftime("%Y-%m-%d  %H:%M:%S")
+        experimental_task['start_time'] = experimental_task['start_time'].strftime("%Y-%m-%d  %H:%M:%S")
+        experimental_task['dead_line'] = experimental_task['dead_line'].strftime("%Y-%m-%d  %H:%M:%S")
+        experimental_task['file_path'] = url_for('files_file.handle_get_info', path=experimental_task['file_key'])
+        experimental_task['file_name'] = os.path.basename(experimental_task['file_key'])
         if not UserClazzRelation().query(user_id=g.user['user_id'], clazz_id=experimental_task['clazz_id']):
             msg = 'Permission denied.'
             error = 1
@@ -42,7 +56,16 @@ def handle_get_experimental_tasks():
     experimental_item_id = request.args.get('experimental_item_id')
     experimental_tasks = ExperimentalTask().query(experimental_item_id=experimental_item_id, limit=limit, offset=offset)
     for experimental_task in experimental_tasks:
-        experimental_task['status'] = '未开始'
+        if datetime.now() < experimental_task['start_time']:
+            status = '未开始'
+        elif datetime.now() < experimental_task['dead_line']:
+            status = '正在进行'
+        else:
+            status = '已结束'
+        experimental_task['status'] = status
+        experimental_task['create_time'] = experimental_task['create_time'].strftime("%Y-%m-%d  %H:%M:%S")
+        experimental_task['start_time'] = experimental_task['start_time'].strftime("%Y-%m-%d  %H:%M:%S")
+        experimental_task['dead_line'] = experimental_task['dead_line'].strftime("%Y-%m-%d  %H:%M:%S")
     count = 1
     data = {
         'detail': experimental_tasks,

@@ -49,7 +49,7 @@ class Component:
                 'user_id': c.ComponentModel.user_id,
                 'deleted': c.ComponentModel.deleted,
                 'description': c.ComponentModel.description,
-                'create_time': c.ComponentModel.create_time
+                'create_time': c.ComponentModel.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets)
         finally:
             self._db.close()

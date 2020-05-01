@@ -53,7 +53,7 @@ class ExperimentalItem:
                 'teacher_id': ei.ClazzModel.teacher_id,
                 'description': ei.ExperimentalItemModel.description,
                 'deleted': ei.ExperimentalItemModel.deleted,
-                'create_time': ei.ExperimentalItemModel.create_time
+                'create_time': ei.ExperimentalItemModel.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets))
         finally:
             self._db.close()

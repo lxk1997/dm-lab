@@ -48,7 +48,7 @@ class Dataset:
                 'file_key': d.DatasetModel.file_key,
                 'deleted': d.DatasetModel.deleted,
                 'description': d.DatasetModel.description,
-                'create_time': d.DatasetModel.create_time
+                'create_time': d.DatasetModel.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets))
         finally:
             self._db.close()

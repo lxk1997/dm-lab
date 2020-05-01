@@ -41,7 +41,7 @@ class Grade:
                 'user_id': g.user_id,
                 'experimental_task_id': g.experimental_task_id,
                 'score': g.score,
-                'create_time': g.create_time
+                'create_time': g.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets)
         finally:
             self._db.close()

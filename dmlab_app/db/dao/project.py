@@ -46,7 +46,7 @@ class Project:
                 'content': p.content,
                 'deleted': p.deleted,
                 'description': p.description,
-                'create_time': p.create_time
+                'create_time': p.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets)
         finally:
             self._db.close()

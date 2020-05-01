@@ -39,7 +39,7 @@ class User:
                 'user_name': u.username,
                 'password': u.password,
                 'email': u.email,
-                'create_time': u.create_time
+                'create_time': u.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets))
         finally:
             self._db.close()

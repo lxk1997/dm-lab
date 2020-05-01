@@ -42,7 +42,7 @@ class UserClazzRelation:
                 'email': ucr.UserModel.email,
                 'clazz_id': ucr.UserClazzRelationModel.clazz_id,
                 'deleted': ucr.UserClazzRelationModel.deleted,
-                'join_time': ucr.UserClazzRelationModel.join_time,
+                'join_time': ucr.UserClazzRelationModel.join_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets))
         finally:
             self._db.close()

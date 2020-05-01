@@ -89,7 +89,7 @@ class ExperimentalTaskModel(Base):
     experimental_item_id = Column(Integer, ForeignKey('experimental_item.id', ondelete='CASCADE'), nullable=False)
     name = Column(String(50), nullable=False)
     content = Column(Text)
-    file = Column(BYTEA)
+    file_key = Column(String(100))
     description = Column(Text)
     deleted = Column(Integer, nullable=False)
     start_time = Column(DateTime, nullable=False)

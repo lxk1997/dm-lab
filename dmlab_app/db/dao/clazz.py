@@ -47,7 +47,7 @@ class Clazz:
                 'teacher_id': c.teacher_id,
                 'deleted': c.deleted,
                 'description': c.description,
-                'create_time': c.create_time
+                'create_time': c.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets))
         finally:
             self._db.close()

@@ -256,6 +256,27 @@ class ExperimentalTask extends React.Component {
                 title: '状态',
                 dataIndex: 'status',
                 key: 'status',
+                render: status => {
+                    let color = ""
+                    switch (status) {
+                        case "未开始":
+                            color = "green"
+                            break
+                        case "正在进行":
+                            color = "blue"
+                            break
+                        default:
+                            color = 'gray'
+                            break
+                    }
+                    return (
+                        <span>
+                            <Tag color={color} key={status}>
+                              {status}
+                            </Tag>
+                        </span>
+                    );
+                }
             },
             {
                 title: '开始时间',
@@ -385,10 +406,10 @@ export class ExperimentalTaskDetail extends React.Component {
           defaultFileList: [
             {
               uid: '1',
-              name: '实验一 Apriori',
+              name: this.state.experimental_task.file_name,
               status: 'done',
-              response: 'Server Error 500', // custom error message to show
-              url: 'http://www.baidu.com/xxx.png',
+              response: '200',
+              url: this.state.experimental_task.file_path
             },
           ],
           showUploadList: {

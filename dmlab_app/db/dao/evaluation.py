@@ -44,7 +44,7 @@ class Evaluation:
                 'experimental_task_id': e.experimental_task_id,
                 'status': e.status,
                 'content': e.content,
-                'create_time': e.create_time
+                'create_time': e.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets)
         finally:
             self._db.close()
