@@ -68,6 +68,7 @@ class ComponentModel(Base):
     component_type_id = Column(Integer, ForeignKey('component_type.id', ondelete='CASCADE'), nullable=False)
     description = Column(Text)
     is_public = Column(Integer, nullable=False)
+    file_key = Column(String(100))
     user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'))
     deleted = Column(Integer, nullable=False)
     create_time = Column(DateTime, server_default=func.now())

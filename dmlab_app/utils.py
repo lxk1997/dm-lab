@@ -2,6 +2,8 @@ import logging
 import threading
 import json
 import multiprocessing
+import uuid
+
 import numpy as np
 from flask import jsonify, copy_current_request_context
 
@@ -71,3 +73,13 @@ class NpEncoder(json.JSONEncoder):
             return obj.tolist()
         else:
             return super(NpEncoder, self).default(obj)
+
+def get_uuid():
+    return str(uuid.uuid4()).replace('-', '')
+
+
+def create_instance(module_name, class_name, *args, **kwargs):
+    module_meta = __import__(module_name, globals(), locals(), [class_name])
+    class_meta = getattr(module_meta, class_name)
+    obj = class_meta(*args, **kwargs)
+    return obj

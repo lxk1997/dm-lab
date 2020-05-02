@@ -32,11 +32,11 @@ class ComponentType:
                 if offset is not None:
                     query = query.offset(offset)
             rets = query.all()
-            component_types = map(lambda ct: {
+            component_types = list(map(lambda ct: {
                 'component_type_id': ct.id,
                 'component_type_name': ct.name,
                 'deleted': ct.deleted
-            }, rets)
+            }, rets))
         finally:
             self._db.close()
         return component_types

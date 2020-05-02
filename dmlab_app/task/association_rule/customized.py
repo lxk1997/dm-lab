@@ -1,6 +1,7 @@
 # coding=utf-8
 import json
 import logging
+import os
 
 import matplotlib
 from efficient_apriori import apriori
@@ -8,7 +9,7 @@ from efficient_apriori import apriori
 from ..base import Base
 from ..dataset_utils import DatasetUtils
 from ...filesystem import get_fs
-from ...utils import NpEncoder, numeric
+from ...utils import NpEncoder, numeric, create_instance
 
 matplotlib.use('Agg')
 
@@ -19,7 +20,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class Apriori(Base):
+class CustomizedAssociationRule(Base):
     component_id = 1
     menu_info_names = [{'name': "重命名"},
                        {'name': '删除'},
@@ -45,6 +46,9 @@ class Apriori(Base):
         elif not params.get('parent_id'):
             logger.exception('params has no attribute name "parent_id"')
             return False
+        elif not params.get('script_key'):
+            logger.exception('params has no attribute name "script_key"')
+            return False
         else:
             return True
 
@@ -69,6 +73,9 @@ class Apriori(Base):
         success = self._check_valid_params(logger, params)
         if success:
             par_evaluation_dir = self._get_evaluation_dir(params['parent_id'])
+            script_key = params['script_key']
+            params.pop('script_key')
+            params.pop('parent_id')
             par_evaluation_output_dir = fs.join(par_evaluation_dir, 'outputs')
             par_data_path = fs.join(par_evaluation_output_dir, 'data.json')
             if fs.isfile(par_data_path):
@@ -76,10 +83,8 @@ class Apriori(Base):
                     data_content = json.loads(fin.read())
                 try:
                     content = self._format_content(data_content)
-                    itemsets, rules = apriori(transactions=content['content'],
-                                              min_support=numeric(params['min_support']),
-                                              min_confidence=numeric(params['min_confidence']),
-                                              max_length=numeric(params['max_length']))
+                    class_instance = create_instance(os.path.basename(script_key).split('.')[0], 'Solver')
+                    itemsets, rules = class_instance.solve(data=content['content'], params=params)
                     reformat_itemsets = {}
                     for key in itemsets.keys():
                         items = {}

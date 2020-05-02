@@ -15,6 +15,9 @@ import NBClassifier from "./nb_classifier";
 import LRClassifier from "./lr_classifier";
 import CARTRegressor from "./cart_regressor";
 import Apriori from "./apriori";
+import CustomizedAssociationRule from "./customized_association_rule";
+import CustomizedClassifier from "./customized_classifier";
+import CustomizedRegressor from "./customized_regressor";
 
 const {Item}=Form;
 
@@ -28,11 +31,11 @@ class NodeDetail extends React.Component{
 
         if(!item) return null;
 
-        const {label}=item.getModel()
+        let values =item.getModel()
 
         let Component  = null;
         let MenuComponent = FlowContextMenu;
-        switch(label) {
+        switch(values.label) {
             case '输入源':
                 Component = InputSource;
                 break;
@@ -63,6 +66,18 @@ class NodeDetail extends React.Component{
             case 'Apriori':
                 Component = Apriori;
                 break;
+        }
+        if(Component === null) {
+            switch (values.class_name) {
+                case 1:
+                    Component = CustomizedAssociationRule;
+                    break;
+                case 2:
+                    Component = CustomizedClassifier;
+                    break;
+                case 3:
+                    Component = CustomizedRegressor;
+            }
         }
         return(<div>
             <Component/>

@@ -6,8 +6,8 @@ class Component:
     def __init__(self):
         self._db = get_db()
 
-    def create(self, component_name, component_type_id, is_public, deleted=0, description=None, user_id=None):
-        component = ComponentModel(name=component_name, component_type_id=component_type_id, is_public=is_public, description=description, user_id=user_id, deleted=deleted)
+    def create(self, component_name, component_type_id, is_public=1, deleted=0, description=None, user_id=None, file_key=None):
+        component = ComponentModel(name=component_name, component_type_id=component_type_id, is_public=is_public, description=description, user_id=user_id, deleted=deleted, file_key=file_key)
         try:
             self._db.add(component)
             self._db.commit()
@@ -41,16 +41,17 @@ class Component:
                 if offset is not None:
                     query = query.offset(offset)
             rets = query.all()
-            components = map(lambda c: {
+            components = list(map(lambda c: {
                 'component_id': c.ComponentModel.id,
                 'component_name': c.ComponentModel.name,
                 'component_type_id': c.ComponentModel.component_type_id,
                 'is_public': c.ComponentModel.is_public,
                 'user_id': c.ComponentModel.user_id,
+                'file_key': c.ComponentModel.file_key,
                 'deleted': c.ComponentModel.deleted,
                 'description': c.ComponentModel.description,
                 'create_time': c.ComponentModel.create_time.strftime("%Y-%m-%d  %H:%M:%S")
-            }, rets)
+            }, rets))
         finally:
             self._db.close()
         return components

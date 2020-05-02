@@ -1,8 +1,10 @@
 import React from 'react'
 import 'antd/dist/antd.css';
 import '../static/css/ant.css';
+import $ from 'jquery'
 import {Item, ItemPanel} from "gg-editor";
-import {Button, Tree, Card} from 'antd';
+import {Button, Tree, Card, Form, Input, message, Modal, Divider,Select} from 'antd';
+import TextArea from 'antd/lib/input/TextArea';
 import 'antd/dist/antd.css';
 import styles from '../static/css/ggeditor.scss';
 import {
@@ -11,8 +13,28 @@ import {
     FrownOutlined,
     DownOutlined
 } from '@ant-design/icons';
+import {UnControlled as CodeMirror} from 'react-codemirror2'
+import 'codemirror/theme/monokai.css'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/mode/python/python'
+import 'codemirror/addon/scroll/simplescrollbars.css'
+import 'codemirror/addon/scroll/simplescrollbars'
+import 'codemirror/addon/hint/show-hint'
+import 'codemirror/addon/hint/anyword-hint'
+import 'codemirror/addon/hint/css-hint'
+import 'codemirror/addon/hint/show-hint.css'
+import 'codemirror/addon/fold/markdown-fold'
+import 'codemirror/mode/meta'
+import "codemirror/addon/fold/foldgutter.css"
+import "codemirror/addon/fold/foldcode"
+import "codemirror/addon/fold/brace-fold"
+import 'codemirror/addon/selection/active-line'
 import FlowPage from "./editor/flow";
+import association_rule from '../static/component_templates/association_rule.py';
+import classification from '../static/component_templates/classification.py';
+import regression from '../static/component_templates/regression.py';
 
+const { Option } = Select;
 
 export default class ProjectParent extends React.Component {
     render() {
@@ -52,18 +74,74 @@ export class Project extends React.Component {
 export class Component extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            components: []
+        }
+        this.new_component_modal_visible = false
+    }
+
+    getData = () => {
+        $.ajax({
+            url: '/api/component',
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            success: jsonData => {
+                let components = jsonData.data.detail
+                if(this.state.components.length) {
+                    this.setState({components: []})
+                }
+                this.setState({components: components})
+            }
+        })
+    }
+
+    componentWillMount() {
+        this.getData()
+    }
+
+    getModalMsg = (result, msg) => {
+        this.new_component_modal_visible = false
+        this.getData()
+    }
+
+    handleNewComponent = () => {
+        this.new_component_modal_visible = true
+        this.refs.newComponentModal.setInfo({
+            visible: this.new_component_modal_visible,
+        })
     }
 
     render() {
-        return (
+        let components_elements = this.state.components.map(ele => {
+            return (<Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color: '#1890ff',
+                                label: ele.component_name,
+                                task_name: ele.component_name,
+                                class_name: ele.component_type_id,
+                                status: '',
+                                description: ele.description,
+                                params: "{}"
+                            }}
+                            label={ele.component_name}
+                            children={<div>{ele.component_name}</div>}
+                        />)
+        })
+        return (<div>
+            <NewComponentModel visiable={this.new_component_modal_visible}
+                                             ref={"newComponentModal"} parent={this}/>
             <div style={{width: 150, background: "rgba(0,0,0,0)", paddingTop: 130}}>
                 <div style={{background: "#1890ff", width: 150, borderRadius: 18}}>
                     <span style={{marginLeft: 28, fontWeight: "bold", color: "#ffffff", textAlign: "center"}}>组件</span>
                     <span style={{marginLeft: '32%'}}><Button type="primary" shape="circle"
-                                                              icon={< PlusCircleOutlined/>}/></span>
+                                                              icon={< PlusCircleOutlined/>} onClick={this.handleNewComponent}/></span>
                 </div>
                 <ItemPanel className={styles["item-panel"]}>
-                    <Card>
+                    <Card style={{height: '260px', "overflow": "scroll"}}>
                         <Item
                             type={'node'}
                             size={'80*28'}
@@ -266,8 +344,180 @@ export class Component extends React.Component {
                             label={'Apriori'}
                             children={<div>Apriori</div>}
                         />
+                        <Divider style={{"margin-top": '4px', "margin-bottom": '4px'}}/>
+                        {components_elements}
                     </Card>
                 </ItemPanel>
+            </div></div>
+        );
+    }
+}
+
+class NewComponentModel extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading: false,
+            visible: props.visible,
+            python_code: ''
+        };
+        this.component_types = []
+        this.python_code = ''
+    }
+
+    getData = () => {
+        $.ajax({
+            url: '/api/component_type',
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            success: jsonData => {
+                this.component_types = jsonData.data.detail.map(ele => {
+                    return (<Option value={ele.component_type_id}>{ele.component_type_name}</Option>)
+                })
+            }
+        })
+    }
+
+    componentWillMount() {
+        this.getData()
+    }
+
+    setInfo = val => {
+        this.setState({visible: val.visible, loading: false})
+    }
+
+
+    hideModal = () => {
+        this.setState({visible: false, loading: false});
+        this.refs.form.resetFields();
+    }
+
+    setParentMsg = () => {
+        this.props.parent.getModalMsg(this, true)
+    }
+
+
+    handleCreateComponent = values => {
+        this.setState({loading: true});
+        $.ajax({
+            type: 'POST',
+            url: '/api/component/create',
+            async: false,
+            data: {
+                'component_name': values.name,
+                'description': values.description,
+                'content': this.python_code,
+                'component_type_id': values.component_type_id
+            },
+            dataType: 'json',
+            success: (jsonData) => {
+                if (jsonData.error) {
+                    message.error(jsonData.msg);
+                } else {
+                    this.setParentMsg();
+                    message.success('自定义组件添加成功')
+                }
+                this.refs.form.resetFields()
+                this.python_code = ""
+                this.setState({loading: false, visible: false});
+            }
+        });
+        this.getData()
+    }
+
+    handleOnSelectChange = val => {
+        let url = null
+        switch (val) {
+            case 1:
+                url = association_rule
+                break
+            case 2:
+                url = classification
+                break
+            case 3:
+                url = regression
+                break
+        }
+        let content = $.ajax({url:url,async:false})
+        content = content.responseText
+        this.setState({python_code: content})
+        this.python_code = content
+    }
+
+    render() {
+        return (
+            <div>
+                <Modal
+                    width="600px"
+                    height="400px"
+                    visible={this.state.visible}
+                    title="添加自定义组件"
+                    onOk={this.handleCreateComponent}
+                    onCancel={this.hideModal}
+                    footer={null}>
+                    <Form
+                        name="new-component"
+                        ref="form"
+                        className="new-component-form"
+                        onFinish={this.handleCreateComponent}>
+                        <Form.Item
+                            name="name"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input the Component Name!',
+                                },
+                            ]}>
+                            <Input placeholder="Component Name"/>
+                        </Form.Item>
+                        <Form.Item
+                            name="description"
+                            rules={[
+                                {
+                                    required: false
+                                },
+                            ]}>
+                            <TextArea placeholder="Description"/>
+                        </Form.Item>
+                        <Form.Item
+                            name="component_type_id"
+                            rules={[
+                                {
+                                    required: true
+                                }
+                            ]}>
+                            <Select
+                                style={{width: '100%'}}
+                                placeholder="Algorithm Component Type"
+                                onChange={this.handleOnSelectChange}>
+                                {this.component_types}
+                            </Select>
+                        </Form.Item>
+                        <CodeMirror
+                          value={this.state.python_code}
+                          options={{
+                            theme:'monokai',
+                            mode: 'python',
+                            styleActiveLine: true,
+                            tabSize: 4,
+                            smartIndent: true,
+                            scrollbarStyle:"overlay",
+                            extraKeys: {"Alt": "autocomplete"},
+                            lineNumbers: true
+                          }}
+                          onChange={(editor, data, value) => {
+                              this.python_code = value
+                          }}
+                        />
+                        <br/>
+                        <Form.Item style={{"textAlign": "center"}}>
+                            <Button key="submit" type="primary" htmlType="submit" loading={this.state.loading}>
+                                添加
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </Modal>
             </div>
         );
     }

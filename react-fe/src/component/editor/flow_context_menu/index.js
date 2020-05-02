@@ -14,6 +14,9 @@ import NBClassifierContextMenu from "./nb_classifier";
 import LRClassifierContextMenu from "./lr_classifier";
 import CARTRegressorContextMenu from "./cart_regressor";
 import AprioriContextMenu from "./apriori";
+import CustomizedAssociationRuleContextMenu from "./customized_association_rule";
+import CustomizedClassifierContextMenu from "./customized_classifier";
+import CustomizedRegressorContextMenu from "./customized_regressor";
 
 const {Item}=Form;
 
@@ -27,10 +30,10 @@ class FlowContextMenu extends React.Component{
 
         if(!item) return null;
 
-        const {label}=item.getModel()
+        let values =item.getModel()
 
         let MenuComponent = null;
-        switch(label) {
+        switch(values.label) {
             case '输入源':
                 MenuComponent = InputSourceContextMenu;
                 break;
@@ -61,6 +64,19 @@ class FlowContextMenu extends React.Component{
             case 'Apriori':
                 MenuComponent = AprioriContextMenu;
                 break;
+        }
+        if(MenuComponent === null) {
+            switch (values.class_name) {
+                case 1:
+                    MenuComponent = CustomizedAssociationRuleContextMenu;
+                    break;
+                case 2:
+                    MenuComponent = CustomizedClassifierContextMenu;
+                    break;
+                case 3:
+                    MenuComponent = CustomizedRegressorContextMenu;
+                    break;
+            }
         }
         return(<MenuComponent/>)
     }
