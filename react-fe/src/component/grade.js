@@ -17,6 +17,7 @@ export default class Grade extends React.Component {
     }
 
     render() {
+        $("#header_title").text('成绩记录')
        return <div>grade</div>
     }
 }

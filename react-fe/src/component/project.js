@@ -53,6 +53,7 @@ export class Project extends React.Component {
     }
 
     render() {
+        $("#header_title").text('工程')
         return (
             <div style={{width: 150, background: "rgba(0,0,0,0)"}}>
                 <div style={{background: "#1890ff", width: 150, borderRadius: 18}}>
@@ -327,6 +328,31 @@ export class Component extends React.Component {
                             }}
                             label={'CART回归树'}
                             children={<div>CART回归树</div>}
+                        />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'支持向量回归',
+                                task_name: 'SVM Regressor',
+                                status: '',
+                                selected_columns: [],
+                                target_column: '',
+                                C: 1.0,
+                                kernel: 'rbf',
+                                degree: 3,
+                                gamma: 'scale',
+                                coef0: 0.0,
+                                epsilon: 0.1,
+                                shrinking: true,
+                                tol: 0.001,
+                                cache_size: 200,
+                                max_iter: -1
+                            }}
+                            label={'支持向量回归'}
+                            children={<div>支持向量回归</div>}
                         />
                         <Item
                             type={'node'}

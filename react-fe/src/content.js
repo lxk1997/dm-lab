@@ -9,6 +9,7 @@ import Evaluation from './component/evaluation'
 import page404 from './404'
 import ExperimentalItem, {ExperimentalItemDetail, ExperimentalTaskDetail} from "./component/experimental";
 import Dataset from "./component/dataset";
+import Mine from "./component/mine";
 
 function AppContent(props) {
     return (
@@ -36,6 +37,8 @@ function AppContent(props) {
                 <Route path='/grade' exact component={Grade}/>
 
                 <Route path='/evaluation' exact component={Evaluation}/>
+
+                <Route path='/mine' exact component={Mine}/>
 
                 <Route path='*' component={page404}/>
             </Switch>

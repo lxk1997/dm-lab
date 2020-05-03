@@ -17,6 +17,7 @@ export default class Evaluation extends React.Component {
     }
 
     render() {
+        $("#header_title").text('评测管理')
        return <div>evaluation</div>
     }
 }

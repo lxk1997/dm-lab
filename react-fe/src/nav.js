@@ -17,37 +17,31 @@ const {SubMenu} = Menu;
 export default class Nav extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {
-            collapsed: false
-        }
     }
 
-    onCollapse = collapsed => {
-        this.setState({collapsed});
-    };
 
     render() {
         return (
-            <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
+            <Sider collapsed={true} style={{"background": "#29292A"}}>
                 <div className="logo"/>
-                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" style={{"background": "#29292A"}}>
                     <Menu.Item key="1">
-                        <HomeOutlined/>
+                        <HomeOutlined style={{color: '#F0F2F5'}}/>
                         <span>首页</span>
                         <Link to="/home"/>
                     </Menu.Item>
                     <Menu.Item key="2">
-                        <ExperimentOutlined/>
+                        <ExperimentOutlined style={{color: '#F0F2F5'}}/>
                         <span>实验</span>
                         <Link to="/experimental-item"/>
                     </Menu.Item>
                     <Menu.Item key="3">
-                        <ApartmentOutlined/>
+                        <ApartmentOutlined style={{color: '#F0F2F5'}}/>
                         <span>工程</span>
                         <Link to="/project"/>
                     </Menu.Item>
                     <Menu.Item key="4">
-                        <MonitorOutlined/>
+                        <MonitorOutlined style={{color: '#F0F2F5'}}/>
                         <span>任务</span>
                         <Link to="/monitor"/>
                     </Menu.Item>
@@ -55,13 +49,14 @@ export default class Nav extends React.Component {
                         key="sub_mine"
                         title={
                             <span>
-                                    <UserOutlined/>
-                                    <span>我的</span>
+                                    <UserOutlined style={{color: '#F0F2F5'}}/>
+                                    <span>用户中心</span>
                                 </span>
                         }>
-                        <Menu.Item key="5"><Link to="/clazz"/><span>班级</span></Menu.Item>
-                        <Menu.Item key="6"><Link to="/grade"/><span>成绩</span></Menu.Item>
-                        <Menu.Item key="7"><Link to="/evaluation"/><span>评测</span></Menu.Item>
+                        <Menu.Item key="5"><Link to="/mine"/><span>个人中心</span></Menu.Item>
+                        <Menu.Item key="6"><Link to="/clazz"/><span>班级管理</span></Menu.Item>
+                        <Menu.Item key="7"><Link to="/grade"/><span>成绩记录</span></Menu.Item>
+                        <Menu.Item key="8"><Link to="/evaluation"/><span>评测记录</span></Menu.Item>
                     </SubMenu>
                 </Menu>
             </Sider>

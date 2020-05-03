@@ -11,6 +11,7 @@ from dmlab_app.task.io_source.input_source import InputSource
 from dmlab_app.task.io_source.output_source import OutputSource
 from dmlab_app.task.regression.cart_regressor import CARTRegressor
 from dmlab_app.task.regression.customized import CustomizedRegressor
+from dmlab_app.task.regression.svm_regressor import SVMRegressor
 
 _tasks = [
         {
@@ -57,6 +58,11 @@ _tasks = [
             'id'        : 9,
             'name'      : 'CART Regressor',
             'method'    : CARTRegressor(),
+        },
+        {
+            'id'        : 11,
+            'name'      : 'SVM Regressor',
+            'method'    : SVMRegressor(),
         },
         {
             'id'        : 10,

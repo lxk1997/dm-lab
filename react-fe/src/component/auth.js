@@ -8,6 +8,7 @@ import {Form, Input, Button, Checkbox} from 'antd';
 import {UserOutlined, LockOutlined, MailOutlined} from '@ant-design/icons';
 import Home from "../page/home";
 import page404 from "../404";
+import loginLogo from "../static/images/login_logo.png"
 
 const {Header, Content} = Layout;
 
@@ -17,9 +18,8 @@ export default class Parend extends React.Component {
     }
 
     render() {
-        return (<Layout style={{minHeight: '100vh'}}>
-            <Header className="site-layout-background"/>
-            <Content style={{margin: "0 auto", "margin-top": "70px"}}>
+        return (<Layout style={{'height': '-webkit-fill-available'}}>
+            <Content style={{margin: "0 auto", "margin-top": "90px", 'background-color': '#F3F3F3'}}>
                 <Switch>
                     <Redirect from='/' to='/login' exact/>
                     <Route path='/login' exact component={Login}/>
@@ -61,8 +61,12 @@ export class Login extends React.Component {
     };
 
     render() {
-        return (
+        return (<div style={{"background-color": '#fff', "padding": '20px 20px 10px 20px', 'border-radius': '8px'}}>
+                <div style={{'text-align': 'center', 'margin-bottom': '25px'}}>
+                    <img src={loginLogo} width={"100%"} height={"100%"} style={{'width': '200px'}}/>
+                </div>
             <Form
+                style={{'width': '300px'}}
                 name="login"
                 className="login-form"
                 initialValues={{
@@ -109,7 +113,7 @@ export class Login extends React.Component {
                     </Button>
                     Or <a href={"/signup"}>signup now!</a>
                 </Form.Item>
-            </Form>
+            </Form></div>
         );
     }
 }
@@ -144,7 +148,12 @@ export class SignUp extends React.Component {
 
     render() {
         return (
+            <div style={{"background-color": '#fff', "padding": '20px 20px 10px 20px', 'border-radius': '8px'}}>
+                <div style={{'text-align': 'center', 'margin-bottom': '25px'}}>
+                    <img src={loginLogo} width={"100%"} height={"100%"} style={{'width': '200px'}}/>
+                </div>
             <Form
+                style={{'width': '300px'}}
                 name="signup"
                 className="signup-form"
                 initialValues={{
@@ -233,7 +242,7 @@ export class SignUp extends React.Component {
                     </Button>
                     Or <a href={"/login"}>login now!</a>
                 </Form.Item>
-            </Form>
+            </Form></div>
         );
     }
 }

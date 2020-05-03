@@ -97,7 +97,8 @@
     "markdown-it": "10.0.0",
     "gg-editor": "2.0.4",
     "react-codemirror2": "7.1.0",
-    "codemirror": "5.53.2"
+    "codemirror": "5.53.2",
+    "echarts": "^4.7.0"
   },
   "scripts": {
     "start": "node scripts/start.js",

@@ -6,6 +6,9 @@ import AppContent from "./content";
 import 'antd/dist/antd.css';
 import './static/css/ant.css';
 import {Layout, Breadcrumb, Avatar, Dropdown, Menu} from 'antd';
+import {
+    QuestionCircleFilled
+} from '@ant-design/icons';
 import Parend from "./component/auth";
 
 const {Content, Header} = Layout;
@@ -22,7 +25,7 @@ class App extends React.Component {
     }
 
     // check user login or not
-    checkLogin() {
+    checkLogin = () => {
         $.ajax({
             type: 'GET',
             url: '/api/auth/info',
@@ -34,19 +37,19 @@ class App extends React.Component {
         })
     }
 
-    handleLogout() {
+    handleLogout = () => {
         $.ajax({
             type: 'GET',
             url: '/api/auth/logout',
             async: false,
             success: resp => {
                 this.login = resp.error === 0;
-                window.location.href = '/'
+                window.location.href = '/login'
             }
         })
     }
 
-    handleMenuClick(e) {
+    handleMenuClick = e => {
         if(e.key === '2') {
             this.handleLogout()
         } else {
@@ -80,16 +83,23 @@ class App extends React.Component {
                         <Nav/>
                         <Layout className="site-layout">
                             <Header className="site-layout-background" style={{ padding: 0, textAlign: 'right' }} >
-                                <div id="components-dropdown-demo-dropdown-button" style={{"marginRight": '30px'}}>
-                                    <Dropdown overlay={menu}>
-                                    <Avatar
-                                      style={{
-                                        color: '#ffffff',
-                                        backgroundColor: '#35caca',
-                                      }}>
-                                        {this.user.user_name[0].toUpperCase()}
-                                    </Avatar>
-                                    </Dropdown>
+                                <div style={{"marginRight": '30px'}}>
+                                    <span id="header_title" style={{"font-size": '20px', 'position': 'absolute', 'margin-left': '9px', 'color': 'black', 'left': '7%' }}>首页</span>
+                                    <a style={{"marginRight": '17px', 'color': '#666666'}}>
+                                        <QuestionCircleFilled style={{'font-color': '#666666', 'margin-right': '5px'}}/>
+                                        <span style={{'font-color': '#666666'}}>帮助文档</span>
+                                    </a>
+                                    <div id="components-dropdown-demo-dropdown-button" style={{'display': 'inline'}}>
+                                        <Dropdown overlay={menu}>
+                                        <Avatar
+                                          style={{
+                                            color: '#ffffff',
+                                            backgroundColor: '#35caca',
+                                          }}>
+                                            {this.user.user_name[0].toUpperCase()}
+                                        </Avatar>
+                                        </Dropdown>
+                                    </div>
                                 </div>
                             </Header>
                             <Content style={{margin: '0 5px'}}>

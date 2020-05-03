@@ -17,6 +17,7 @@ import AprioriContextMenu from "./apriori";
 import CustomizedAssociationRuleContextMenu from "./customized_association_rule";
 import CustomizedClassifierContextMenu from "./customized_classifier";
 import CustomizedRegressorContextMenu from "./customized_regressor";
+import SVMRegressorContextMenu from "./svm_regressor";
 
 const {Item}=Form;
 
@@ -63,6 +64,9 @@ class FlowContextMenu extends React.Component{
                 break;
             case 'Apriori':
                 MenuComponent = AprioriContextMenu;
+                break;
+            case '支持向量回归':
+                MenuComponent = SVMRegressorContextMenu;
                 break;
         }
         if(MenuComponent === null) {

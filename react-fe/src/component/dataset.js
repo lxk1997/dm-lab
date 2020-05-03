@@ -99,6 +99,7 @@ export default class Dataset extends React.Component {
     }
 
     render() {
+        $("#header_title").text('')
         let pagination = {
             showQuickJumper: true,
             total: this.total,

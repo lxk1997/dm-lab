@@ -1,7 +1,8 @@
 .logo {
   height: 32px;
-  background: rgba(255, 255, 255, 0.2);
-  margin: 16px;
+  background-image: url("../images/logo.png");
+  background-size: 100% 100%;
+    margin: 16px calc((100% - 32px) / 2);
 }
 
 .gg-editor-background {
@@ -16,7 +17,7 @@
   }
 
 .login-form, .signup-form {
-  max-width: 300px;
+  width: 300px;
 }
 .login-form-forgot {
   float: right;

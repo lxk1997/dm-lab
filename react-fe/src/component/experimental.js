@@ -102,6 +102,7 @@ export default class ExperimentalItem extends React.Component {
     }
 
     render() {
+        $("#header_title").text('实验项目')
         let pagination = {
             showQuickJumper: true,
             total: this.total,
@@ -175,6 +176,7 @@ export class ExperimentalItemDetail extends React.Component {
 
 
     render() {
+        $("#header_title").text('')
         const {TabPane} = Tabs
         const renderContent = (column = 1) => (
             <Descriptions size="small" column={column}>
@@ -341,6 +343,7 @@ class ExperimentalTask extends React.Component {
     }
 
     render() {
+        $("#header_title").text('')
         let pagination = {
             showQuickJumper: true,
             total: this.total,
@@ -401,6 +404,7 @@ export class ExperimentalTaskDetail extends React.Component {
 
 
     render() {
+        $("#header_title").text('')
         const mdParser = new MarkdownIt();
         const attachments = {
           defaultFileList: [
@@ -491,6 +495,7 @@ class ScoreLeaderboard extends React.Component {
         super(props);
     }
     render() {
+        $("#header_title").text('')
         return <div>aaa</div>
     }
 }

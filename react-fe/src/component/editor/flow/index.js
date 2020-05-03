@@ -11,14 +11,14 @@ class FlowPage extends React.Component{
         return(
         <GGEditor className={styles.editor}>
             <Row className={styles.editorBd}>
-                <Col flex="0 0 160px" className={styles.editorSidebar}>
+                <Col span={3} className={styles.editorSidebar}>
                     <Project/>
                     <Component/>
                 </Col>
-                <Col flex="0 1 calc(100% - 540px)" className={styles.editorContent}>
-                    <Flow grid={grid} className={styles.flow} style={{"height": '510px', marginLeft: '4px', background: '#FEFEFE', 'border-left': '1px solid #F6C67B', 'border-right': '1px solid #DCDCDC', 'border-top': '1px solid #F6C67B', 'border-bottom': '1px solid #F6C67B'}}/>
+                <Col span={17} className={styles.editorContent} style={{marginLeft: '14px'}}>
+                    <Flow grid={grid} className={styles.flow} style={{"height": '510px', background: '#FEFEFE', 'border-left': '1px solid #F6C67B', 'border-right': '1px solid #DCDCDC', 'border-top': '1px solid #F6C67B', 'border-bottom': '1px solid #F6C67B'}}/>
                 </Col>
-                <Col flex="0 1 160px" className={styles.editorSidebar}>
+                <Col span={3} className={styles.editorSidebar}>
                     <FlowDetailPanel/>
                 </Col>
             </Row>

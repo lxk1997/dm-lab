@@ -17,6 +17,7 @@ export default class Monitor extends React.Component {
     }
 
     render() {
+        $("#header_title").text('任务队列')
        return <div>monitor</div>
     }
 }

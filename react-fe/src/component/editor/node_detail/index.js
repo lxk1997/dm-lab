@@ -18,6 +18,7 @@ import Apriori from "./apriori";
 import CustomizedAssociationRule from "./customized_association_rule";
 import CustomizedClassifier from "./customized_classifier";
 import CustomizedRegressor from "./customized_regressor";
+import SVMRegressor from "./svm_regressor";
 
 const {Item}=Form;
 
@@ -62,6 +63,9 @@ class NodeDetail extends React.Component{
                 break;
             case 'CART回归树':
                 Component = CARTRegressor;
+                break;
+            case '支持向量回归':
+                Component = SVMRegressor;
                 break;
             case 'Apriori':
                 Component = Apriori;

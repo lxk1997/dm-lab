@@ -112,6 +112,7 @@ export default class Clazz extends React.Component {
     }
 
     render() {
+        $("#header_title").text('班级管理')
         let pagination = {
             showQuickJumper: true,
             total: this.total,
@@ -358,6 +359,7 @@ export class ClazzDetail extends React.Component {
 
 
     render() {
+        $("#header_title").text('')
         const renderContent = (column = 1) => (
             <Descriptions size="small" column={column}>
                 <Descriptions.Item label="学生数">
