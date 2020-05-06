@@ -177,7 +177,7 @@ class NBClassifier extends React.Component{
                         </Select>
                     </Panel>
                 </Collapse>
-                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
                         朴素贝叶斯（Naive Bayesian Classifier）是一种基于概率的分类算法。主要功能是根据训练集生成分类算法模型。算法结果为一个朴素贝叶斯模型。

@@ -92,30 +92,26 @@ class ExperimentalTaskModel(Base):
     content = Column(Text)
     file_key = Column(String(100))
     description = Column(Text)
+    score_field = Column(JSONB)
     deleted = Column(Integer, nullable=False)
     start_time = Column(DateTime, nullable=False)
     dead_line = Column(DateTime, nullable=False)
     create_time = Column(DateTime, server_default=func.now())
 
 
-class EvaluationModel(Base):
-    __tablename__ = 'evaluation'
+class ReportModel(Base):
+    __tablename__ = 'report'
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     experimental_task_id = Column(Integer, ForeignKey('experimental_task.id', ondelete='CASCADE'), nullable=False)
-    status = Column(String(20), nullable=False)
+    task_name = Column(String, nullable=False)
     content = Column(Text)
+    file_key = Column(String(100))
+    data_id = Column(String(100), nullable=False)
+    score = Column(Numeric)
+    score_content = Column(String(100))
+    deleted = Column(Integer, nullable=False)
     create_time = Column(DateTime, server_default=func.now())
-
-
-class GradeModel(Base):
-    __tablename__ = 'grade'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    experimental_task_id = Column(Integer, ForeignKey('experimental_task.id', ondelete='CASCADE'), nullable=False)
-    score = Column(Numeric, default=0)
-    create_time = Column(DateTime, server_default=func.now())
-
 
 class DatasetModel(Base):
     __tablename__ = 'dataset'

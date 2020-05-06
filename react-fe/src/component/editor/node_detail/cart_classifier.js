@@ -373,7 +373,7 @@ class CARTClassifier extends React.Component{
                         <Switch checkedChildren="开" unCheckedChildren="关" defaultChecked={this.state.presort} onChange={this.onPreSortChange}/>
                     </Panel>
                 </Collapse>
-                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
                         CART(Classification And Regression Tree)算法是一种决策树分类方法。它采用一种二分递归分割的技术，分割方法采用基于最小距离的基尼指数估计函数，将当前的样本集分为两个子样本集，使得生成的的每个非叶子节点都有两个分支。因此，CART算法生成的决策树是结构简洁的二叉树。

@@ -357,7 +357,7 @@ class SVMClassifier extends React.Component{
                         <Input defaultValue={this.state.random_state} onChange={this.onRandomStateChange}/>
                     </Panel>
                 </Collapse>
-                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
                         SVM（支持向量机）方法是通过一个非线性映射，把样本空间映射到一个高维乃至无穷维的特征空间中使得在原来的样本空间中非线性可分的问题转化为在特征空间中的线性可分的问题。

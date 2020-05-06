@@ -133,7 +133,7 @@ class DuplicateRemoval extends React.Component{
                     </div>
                     </Panel>
                 </Collapse>
-                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
                         记录去重是去除数据表中的重复的行数据，只保留其中一行数据。

@@ -166,4 +166,7 @@ class DuplicateRemoval(Base):
         rsts = {'headers': columns, 'content': rsts}
         return rsts
 
+    def get_score(self, item_id):
+        return ''
+
 

@@ -334,3 +334,37 @@ class CARTRegressor(Base):
                 rsts.append(mp.get(val))
         rsts = {'header': column, 'content': rsts, 'names': names}
         return rsts
+
+    def get_score(self, item_id):
+        score_content = ''
+        fs = get_fs()
+        evaluation_dir = self._get_evaluation_dir(item_id)
+        evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
+        report_path = fs.join(evaluation_output_dir, 'result.json')
+        if fs.exists(report_path):
+            with fs.open(report_path, 'r') as fin:
+                report_content = fin.read()
+            json_report = json.loads(report_content)
+            score_content = 'MSE: %s,MAE: %s' % (
+            round(json_report['mse'], 2), round(json_report['mse'], 2))
+        return score_content
+
+    def calc_score(self, score_field=None, item_id=None, cnt=None, time_value=None):
+        if not score_field or not item_id:
+            return None
+        else:
+            fs = get_fs()
+            evaluation_dir = self._get_evaluation_dir(item_id)
+            evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
+            report_path = fs.join(evaluation_output_dir, 'result.json')
+            if fs.exists(report_path):
+                with fs.open(report_path, 'r') as fin:
+                    report_content = fin.read()
+                json_report = json.loads(report_content)
+                target = score_field['algorithm_target']
+                if json_report.get(target):
+                    cur_score = json_report.get(target) * 100.0
+                    finally_score = round((cur_score * score_field['result_ratio'] / 100.0 + ((cur_score * (100 - score_field['result_ratio']) / 100.0) ** (time_value))) * ((score_field['count_ratio'] / 100) ** (cnt+1)), 2)
+                    return finally_score
+                else:
+                    return 0

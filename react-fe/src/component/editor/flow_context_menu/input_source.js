@@ -64,7 +64,7 @@ class InputSourceContextMenu extends React.Component{
             data: {
                 item_id: values.id,
                 task_name: values.task_name,
-                params: JSON.stringify({dataset_name: values.dataset !== '' ? values.dataset: null})
+                params: JSON.stringify({dataset_id: values.dataset !== '' ? values.dataset: null})
             },
             success: (jsonData) => {
                 if (jsonData.error) {

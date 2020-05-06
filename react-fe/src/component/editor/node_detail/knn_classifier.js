@@ -231,7 +231,7 @@ class KNNClassifier extends React.Component{
                         <InputNumber min={0} step={1} defaultValue={this.state.leaf_size} onChange={this.onLeafSizeChange} />
                     </Panel>
                 </Collapse>
-                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
                         kNN算法的核心思想是如果一个样本在特征空间中的k个最相邻的样本中的大多数属于某一个类别，则该样本也属于这个类别，并具有这个类别上样本的特性。

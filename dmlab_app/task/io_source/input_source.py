@@ -37,10 +37,10 @@ class InputSource(Base):
         return 'evaluations/%s' % evaluation_id
 
     def _check_valid_params(self, logger, params=None):
-        if params and params.get('dataset_name'):
+        if params and params.get('dataset_id'):
             return True
         else:
-            logger.exception('params has no attribute name "dataset_name"')
+            logger.exception('params has no attribute name "dataset_id"')
             return False
 
     def get_init_infos(self, params=None):
@@ -87,9 +87,9 @@ class InputSource(Base):
 
         success = self._check_valid_params(logger, params)
         if success:
-            dataset = Dataset().query(dataset_name=params['dataset_name'])[0]
+            dataset = Dataset().query(dataset_id=params['dataset_id'])[0]
             if fs.exists(dataset['file_key']):
-                datau = DatasetUtils(dataset_name=params['dataset_name'])
+                datau = DatasetUtils(dataset_name=dataset['dataset_name'])
                 with fs.open(dataset['file_key'], 'r') as fin:
                     datau.csv2obj(fin)
                 with fs.open(data_path, 'w') as fout:
@@ -163,5 +163,8 @@ class InputSource(Base):
         else:
             offset = int(offset)
         return logs[offset:offset + limit], count, None
+
+    def get_score(self, item_id):
+        return ''
 
 

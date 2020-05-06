@@ -324,7 +324,7 @@ class SVMRegressor extends React.Component{
                         <InputNumber min={-1} step={1} defaultValue={this.state.max_iter} onChange={this.onMaxIterChange} />
                     </Panel>
                 </Collapse>
-                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
                         SVR（支持向量回归）是使用支持向量机解决回归问题。支持向量回归假设我们能容忍的f(x)与之间最多有ε的偏差，当且仅当f(x)与y的差别绝对值大于ε时，才计算损失，此时相当于以f(x)为中心，构建一个宽度为2ε的间隔带，若训练样本落入此间隔带，则认为是被预测正确的。

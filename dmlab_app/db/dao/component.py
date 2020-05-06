@@ -45,6 +45,7 @@ class Component:
                 'component_id': c.ComponentModel.id,
                 'component_name': c.ComponentModel.name,
                 'component_type_id': c.ComponentModel.component_type_id,
+                'component_type_name': c.ComponentTypeModel.name,
                 'is_public': c.ComponentModel.is_public,
                 'user_id': c.ComponentModel.user_id,
                 'file_key': c.ComponentModel.file_key,

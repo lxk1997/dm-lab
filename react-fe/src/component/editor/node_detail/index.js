@@ -19,6 +19,7 @@ import CustomizedAssociationRule from "./customized_association_rule";
 import CustomizedClassifier from "./customized_classifier";
 import CustomizedRegressor from "./customized_regressor";
 import SVMRegressor from "./svm_regressor";
+import ReportUpload from "./report_upload";
 
 const {Item}=Form;
 
@@ -69,6 +70,9 @@ class NodeDetail extends React.Component{
                 break;
             case 'Apriori':
                 Component = Apriori;
+                break;
+            case '实验提交':
+                Component = ReportUpload;
                 break;
         }
         if(Component === null) {

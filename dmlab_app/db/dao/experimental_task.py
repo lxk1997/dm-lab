@@ -6,8 +6,8 @@ class ExperimentalTask:
     def __init__(self):
         self._db = get_db()
 
-    def create(self, experimental_item_id, experimental_task_name, start_time, dead_line,  description=None, deleted=0, content=None, file_key=None):
-        experimental_task = ExperimentalTaskModel(experimental_item_id=experimental_item_id, name=experimental_task_name, description=description, deleted=deleted, start_time=start_time, dead_line=dead_line, content=content, file_key=file_key)
+    def create(self, experimental_item_id, experimental_task_name, start_time, dead_line,  description=None, deleted=0, content=None, file_key=None, score_field=None):
+        experimental_task = ExperimentalTaskModel(experimental_item_id=experimental_item_id, name=experimental_task_name, description=description, deleted=deleted, start_time=start_time, dead_line=dead_line, content=content, file_key=file_key, score_field=sort_field)
         try:
             self._db.add(experimental_task)
             self._db.commit()
@@ -58,6 +58,7 @@ class ExperimentalTask:
                 'content': et.ExperimentalTaskModel.content,
                 'file_key': et.ExperimentalTaskModel.file_key,
                 'description': et.ExperimentalTaskModel.description,
+                'score_field': et.ExperimentalTaskModel.score_field,
                 'deleted': et.ExperimentalTaskModel.deleted,
                 'create_time': et.ExperimentalTaskModel.create_time
             }, rets))
@@ -65,7 +66,7 @@ class ExperimentalTask:
             self._db.close()
         return ets
 
-    def update(self, experimental_task_id, experimental_task_name=None, start_time=None, dead_line=None, content=None, file_key=None, description=None):
+    def update(self, experimental_task_id, experimental_task_name=None, start_time=None, dead_line=None, content=None, file_key=None, score_field=None, description=None):
         flag = -1
         mp = {}
         if experimental_task_name is not None:
@@ -80,6 +81,8 @@ class ExperimentalTask:
             mp['file_key'] = file_key
         if description is not None:
             mp['description'] = description
+        if score_field is not None:
+            mp['score_field'] = score_field
         try:
             self._db.query(ExperimentalTaskModel).filter(ExperimentalTaskModel.id == experimental_task_id).update(mp)
             self._db.commit()

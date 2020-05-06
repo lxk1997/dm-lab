@@ -269,3 +269,6 @@ class CustomizedAssociationRule(Base):
                 cur_idx = numeric(item[0])
         rsts.append(rst)
         return {'content': rsts}
+
+    def get_score(self, item_id):
+        return ''

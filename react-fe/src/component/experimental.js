@@ -25,7 +25,7 @@ import {SearchOutlined, InboxOutlined, StarOutlined} from '@ant-design/icons';
 import MarkdownIt from 'markdown-it'
 import MdEditor from 'react-markdown-editor-lite'
 import 'react-markdown-editor-lite/lib/index.css';
-import {checkFetchStatus} from "../page/utils";
+import {checkFetchStatus, haveField} from "../page/utils";
 import {getId} from "./utils";
 import Dataset from "./dataset";
 
@@ -160,9 +160,6 @@ export class ExperimentalItemDetail extends React.Component {
             case 2:
                 window.history.replaceState(null, null, this.current_url + '/dataset')
                 break;
-            case 3:
-                window.history.replaceState(null, null, this.current_url + '/score-leaderboard')
-                break;
             default:
                 window.history.replaceState(null, null, this.current_url + '/experimental-task')
                 break;
@@ -217,9 +214,6 @@ export class ExperimentalItemDetail extends React.Component {
                         </TabPane>
                         <TabPane tab="实验数据" key="2">
                             <Dataset experimental_item_id={this.experimental_item_id}/>
-                        </TabPane>
-                        <TabPane tab="完成情况" key="3">
-                            <ScoreLeaderboard experimental_item_id={this.experimental_item_id}/>
                         </TabPane>
                     </Tabs>
                 }>
@@ -366,9 +360,8 @@ export class ExperimentalTaskDetail extends React.Component {
             experimental_task: [],
             searchText: '',
             searchedColumn: '',
+            score_leaderboard_modal_visible: false
         };
-        this.current_url = props.match.url
-        this.md_text = null
     }
 
     getData = () => {
@@ -402,10 +395,13 @@ export class ExperimentalTaskDetail extends React.Component {
         this.getData();
     }
 
+    handleScoreLeaderBoardDisplay = () => {
+        this.refs.scoreLeaderboardModal.setInfo({visible: true, experimental_task_id: this.experimental_task_id})
+    }
+
 
     render() {
         $("#header_title").text('')
-        const mdParser = new MarkdownIt();
         const attachments = {
           defaultFileList: [
             {
@@ -463,27 +459,20 @@ export class ExperimentalTaskDetail extends React.Component {
             );
         };
         return (<div>
+            <ScoreLeaderboard visiable={this.state.score_leaderboard_modal_visible} experimental_task_id={this.experimental_task_id} ref={"scoreLeaderboardModal"} parent={this}/>
             <PageHeader
                 tags={tag}
                 className="site-page-header-responsive"
                 onBack={() => window.history.back()}
                 title={this.state.experimental_task.experimental_task_name}
-                footer={
-                    null
-                }>
+                extra={[
+                    <Button key="1" type="primary" onClick={this.handleScoreLeaderBoardDisplay} style={{'border-radius': '4px'}}>
+                      积分榜
+                    </Button>,
+                ]}>
                 <ExperimentalTaskDetailContent extra={extraContent}>{renderContent()}</ExperimentalTaskDetailContent>
             </PageHeader>
-            <MdEditor
-                style={{"height": "300px"}}
-                value={this.state.experimental_task.content}
-                config={{
-                  view: {
-                    menu: false,
-                    md: false,
-                    html: true
-                  }
-                }}
-                renderHTML={(text) => mdParser.render(text)}/>
+            <TextArea defaultValue={this.state.experimental_task.content} disabled={true}/>
             <Upload {...attachments}/>
         </div>)
 
@@ -493,10 +482,156 @@ export class ExperimentalTaskDetail extends React.Component {
 class ScoreLeaderboard extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            visible: props.visible,
+            report_modal_visible: false,
+            experimental_task_id: props.experimental_task_id,
+            reports: []
+        }
+
+        this.columns = [
+            {
+                title: '用户',
+                dataIndex: 'user_name',
+                key: 'user_name',
+                render: (text, recode) => <a href={"/user/" + recode.user_id}>{text}</a>
+            },
+            {
+                title: '评测',
+                dataIndex: 'score_content',
+                key: 'score_content',
+            },
+            {
+                title: '提交时间',
+                dataIndex: 'create_time',
+                key: 'create_time',
+                sorter: (a, b) => a.create_time > b.create_time,
+                sortDirections: ['descend', 'ascend'],
+            },
+            {
+                title: '成绩',
+                dataIndex: 'score',
+                key: 'score',
+                sorter: (a, b) => a.score > b.score,
+                sortDirections: ['descend', 'ascend'],
+            },
+            {
+                title: '',
+                key: 'action',
+                render: (text, record) => {
+                    if(record.score !== '') {
+                      return (<span>
+                        <a style={{marginRight: 8}} href={"#"}
+                           onClick={() => this.handleDisplayReport(record)}><Tag key={'查看报告'} color={'green'}>查看报告</Tag></a>
+                    </span>)
+                    } else {
+                        return <span/>
+                    }
+                },
+            },
+        ];
+
     }
+
+    getData = () => {
+        const api = `/api/experimental-task/${this.state.experimental_task_id}/leaderboard`
+        $.ajax({
+            url: api,
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            success: jsonData => {
+                let data = jsonData.data
+                let reports = reportTableFilter(data)
+                if (this.state.reports.length > 0) {
+                    this.setState({reports: []})
+                }
+                this.setState({reports: reports})
+            }
+        })
+    }
+
+    componentWillMount = () => {
+        this.getData()
+    }
+
+    handleDisplayReport = record => {
+        let data = []
+        $.ajax({
+            type: 'GET',
+            url: `/api/component/${record.task_name}/${record.data_id}/report`,
+            async: false,
+            dataType: 'json',
+            success: (jsonData) => {
+                if (jsonData.error) {
+                    message.error('当前组件运行数据不存在')
+                } else {
+                    data = jsonData.data.detail
+                }
+            }
+        })
+        this.refs.reportModal.setInfo({visible: true, data: data});
+    }
+
+    setInfo = val => {
+        this.setState({visible: val.visible, experimental_task_id: val.experimental_task_id})
+    }
+
+    hideModal = () => {
+        this.setState({visible: false});
+    }
+
     render() {
-        $("#header_title").text('')
-        return <div>aaa</div>
+        let pagination = {
+            showQuickJumper: true,
+            defaultPageSize: 20
+        }
+        return (
+            <Modal
+                width="800px"
+                height="600px"
+                visible={this.state.visible}
+                title="积分榜"
+                onCancel={this.hideModal}
+                footer={null}>
+                <ReportModal visiable={this.state.report_modal_visible} ref={"reportModal"} parent={this}/>
+                <Table  size={"small"} pagination={pagination} ref={"table"} dataSource={this.state.reports}
+                       columns={this.columns}/>
+            </Modal>
+        );
+    }
+}
+
+class ReportModal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            visible: props.visible,
+            data: []
+        }
+    }
+
+    setInfo = val => {
+        this.setState({visible: val.visible, data: val.data})
+    }
+
+    hideModal = () => {
+        this.setState({visible: false, data: []});
+    }
+
+    render() {
+        let report_elements = reportFilter(this.state.data);
+        return (
+            <Modal
+                width="800px"
+                height="500px"
+                visible={this.state.visible}
+                title="报告"
+                onCancel={this.hideModal}
+                footer={null}>
+                <div style={{'textAlign': 'center'}}>{report_elements}</div>
+            </Modal>
+        );
     }
 }
 
@@ -531,4 +666,69 @@ function experimentalTaskTableFilter(data) {
         results.push(result)
     }
     return results
+}
+
+function reportTableFilter(data) {
+    let results = []
+    for (let idx = 0; idx < data.length; idx++) {
+        let result = {}
+        result['key'] = idx
+        result['report_id'] = haveField(data[idx], 'report_id')?data[idx].report_id: ''
+        result['experimental_task_id'] = haveField(data[idx], 'experimental_task_id')?data[idx].experimental_task_id: ''
+        result['experimental_task_name'] = haveField(data[idx], 'experimental_task_name')?data[idx].experimental_task_name: ''
+        result['task_name'] = haveField(data[idx], 'task_name')?data[idx].task_name: ''
+        result['data_id'] = haveField(data[idx], 'data_id')?data[idx].data_id: ''
+        result['user_id'] = haveField(data[idx], 'user_id')?data[idx].user_id: ''
+        result['user_name'] = haveField(data[idx], 'user_name')?data[idx].user_name: ''
+        result['content'] = haveField(data[idx], 'content')?data[idx].content: ''
+        result['file_key'] = haveField(data[idx], 'file_key')?data[idx].file_key: ''
+        result['score'] = haveField(data[idx], 'score')?data[idx].score: '暂无'
+        result['score_content'] = haveField(data[idx], 'score_content')?data[idx].score_content: ''
+        result['create_time'] = haveField(data[idx], 'create_time')?data[idx].create_time: ''
+        results.push(result)
+    }
+    return results
+}
+
+function reportFilter(data) {
+    let rsts = []
+    for(var idx = 0; idx < data.length; idx++) {
+        let element = null
+        if(data[idx].type === 'table') {
+            element = tableRender(data[idx])
+        } else if(data[idx].type === 'image') {
+            element = imageRender(data[idx])
+        }
+        rsts.push(element)
+    }
+    return rsts
+}
+
+function tableRender(data) {
+    let columns = []
+    for(let idx = 0; idx < data.data.headers.length; idx++) {
+        columns.push({
+            title: data.data.headers[idx],
+            dataIndex: data.data.headers[idx],
+            key: data.data.headers[idx],
+            align: 'center'
+        })
+    }
+    let contents = []
+    for(let idx = 0; idx < data.data.content.length; idx++) {
+        let content = {key: idx}
+        for(let idx1 = 0; idx1 < data.data.headers.length; idx1++) {
+            content[data.data.headers[idx1]] = data.data.content[idx][idx1]
+        }
+        contents.push(content)
+    }
+    return <Table style={{'margin-bottom': '5px'}} bordered size={'small'} title={() => <div style={{'textAlign': 'center'}}>{data.name}</div>}columns={columns} dataSource={contents} pagination={false}/>
+}
+
+function imageRender(data) {
+    if(data.name === 'Overview') {
+        return (<div style={{'text-align': 'center'}}><img src={data.data} width={"500px"}/><br/><span style={{'margin-bottom': '5px'}}>{data.name}</span></div>)
+    } else {
+        return (<div style={{'text-align': 'center'}}><img src={data.data} width={"680px"}/><br/><span style={{'margin-bottom': '5px'}}>{data.name}</span></div>)
+    }
 }

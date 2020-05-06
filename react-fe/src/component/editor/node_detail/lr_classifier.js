@@ -350,7 +350,7 @@ class LRClassifier extends React.Component{
                        <Input defaultValue={this.state.l1_ratio} onChange={this.onL1RatioChange}/>
                     </Panel>
                 </Collapse>
-                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
                         逻辑回归是广义线性模型的一种。广义线性模型是一般线性模型的推广，即因变量均值的函数与解释变量是线性关系，即 g(E(Y))=βX+ε。其中g 被称为连接函数。连接函数为 Logit 函数的广义线性模型就被称为逻辑回归。逻辑回归方程用解释变量预测事件发生的概率，所以可以用来处理分类问题。

@@ -7,6 +7,7 @@ from . import dataset
 from . import task
 from . import component
 from . import component_type
+from . import uploader
 
 
 def init_app(app):
@@ -19,4 +20,5 @@ def init_app(app):
     app.register_blueprint(task.bp)
     app.register_blueprint(component.bp)
     app.register_blueprint(component_type.bp)
+    app.register_blueprint(uploader.bp)
 

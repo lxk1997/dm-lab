@@ -41,6 +41,7 @@ class UserClazzRelation:
                 'teacher_id': ucr.ClazzModel.teacher_id,
                 'email': ucr.UserModel.email,
                 'clazz_id': ucr.UserClazzRelationModel.clazz_id,
+                'clazz_name': ucr.ClazzModel.name,
                 'deleted': ucr.UserClazzRelationModel.deleted,
                 'join_time': ucr.UserClazzRelationModel.join_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets))

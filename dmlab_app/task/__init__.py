@@ -9,6 +9,7 @@ from dmlab_app.task.classification.svm_classifier import SVMClassifier
 from dmlab_app.task.data_preprocessing.duplicate_removal import DuplicateRemoval
 from dmlab_app.task.io_source.input_source import InputSource
 from dmlab_app.task.io_source.output_source import OutputSource
+from dmlab_app.task.io_source.report_upload import ReportUpload
 from dmlab_app.task.regression.cart_regressor import CARTRegressor
 from dmlab_app.task.regression.customized import CustomizedRegressor
 from dmlab_app.task.regression.svm_regressor import SVMRegressor
@@ -68,6 +69,11 @@ _tasks = [
             'id'        : 10,
             'name'      : 'Apriori',
             'method'    : Apriori(),
+        },
+        {
+            'id'        : 12,
+            'name'      : 'Report Upload',
+            'method'    : ReportUpload(),
         },
     ]
 

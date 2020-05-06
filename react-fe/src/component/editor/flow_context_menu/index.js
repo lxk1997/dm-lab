@@ -18,6 +18,7 @@ import CustomizedAssociationRuleContextMenu from "./customized_association_rule"
 import CustomizedClassifierContextMenu from "./customized_classifier";
 import CustomizedRegressorContextMenu from "./customized_regressor";
 import SVMRegressorContextMenu from "./svm_regressor";
+import ReportUploadContextMenu from "./report_upload";
 
 const {Item}=Form;
 
@@ -67,6 +68,9 @@ class FlowContextMenu extends React.Component{
                 break;
             case '支持向量回归':
                 MenuComponent = SVMRegressorContextMenu;
+                break;
+            case '实验提交':
+                MenuComponent = ReportUploadContextMenu;
                 break;
         }
         if(MenuComponent === null) {

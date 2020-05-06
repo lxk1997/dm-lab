@@ -199,7 +199,7 @@ class Apriori(Base):
                 report_content = fin.read()
             json_report = json.loads(report_content)
             datau = DatasetUtils()
-            datau.set_header(['Min Support', 'Min Confidence', 'max Length'])
+            datau.set_header(['Min Support', 'Min Confidence', 'Max Length'])
             datau.set_content([[round(json_report['min_support'], 4), round(json_report['min_confidence'], 4), round(json_report['max_length'], 4)]])
             reports.append({
                 'id': cur,
@@ -264,3 +264,6 @@ class Apriori(Base):
                 cur_idx = numeric(item[0])
         rsts.append(rst)
         return {'content': rsts}
+
+    def get_score(self, item_id):
+        return ''

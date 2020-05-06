@@ -42,35 +42,26 @@ def handle_get_datasets():
     data = {}
     limit = request.args.get('limit', None)
     offset = request.args.get('offset', None)
-    dataset_name = request.args.get('dataset_name', None)
-    # experimental_item_id = request.args.get('experimental_item_id', None)
-    # if not experimental_item_id:
-    #     msg = 'Experimental Item Id required.'
-    #     error = 1
-    #     return api_response(msg, error, data)
-    # experimental_items = ExperimentalItem().query(experimental_item_id=experimental_item_id)
-    # if not experimental_items:
-    #     msg = 'Experimental Item %s does not exists.' % experimental_item_id
-    #     error = 1
-    #     return api_response(msg, error, data)
-    # experimental_item = experimental_items[0]
-    # if not UserClazzRelation().query(user_id=g.user['user_id'], clazz_id=experimental_items[0]['clazz_id']):
-    #     msg = 'Permission denied.'
-    #     error = 1
-    #     return api_response(msg, error, data)
-    # datasets = Dataset().query(experimental_item_id=experimental_item['experimental_item_id'], limit=limit, offset=offset)
-    # count = Dataset().get_count(experimental_item_id=experimental_item['experimental_item_id'])
-    if dataset_name:
-        datasets = Dataset().query(dataset_name=dataset_name)
-        if not datasets:
-            msg = 'Dataset %s does not exists.' % dataset_name
-            error = 1
-            return api_response(msg, error, data)
-    else:
-        datasets = Dataset().query()
+    experimental_item_id = request.args.get('experimental_item_id', None)
+    if not experimental_item_id:
+        msg = 'Experimental Item Id required.'
+        error = 1
+        return api_response(msg, error, data)
+    experimental_items = ExperimentalItem().query(experimental_item_id=experimental_item_id)
+    if not experimental_items:
+        msg = 'Experimental Item %s does not exists.' % experimental_item_id
+        error = 1
+        return api_response(msg, error, data)
+    experimental_item = experimental_items[0]
+    if not UserClazzRelation().query(user_id=g.user['user_id'], clazz_id=experimental_items[0]['clazz_id']):
+        msg = 'Permission denied.'
+        error = 1
+        return api_response(msg, error, data)
+    datasets = Dataset().query(experimental_item_id=experimental_item['experimental_item_id'], limit=limit, offset=offset)
+    count = Dataset().get_count(experimental_item_id=experimental_item['experimental_item_id'])
     data = {
         'detail': datasets,
-        'count': len(datasets)
+        'count': count
     }
     msg = 'ok'
     error = 0
@@ -79,28 +70,12 @@ def handle_get_datasets():
 @bp.route('/info', methods=['GET'])
 @login_required
 def handle_get_dataset_info():
-    data = {}
     limit = request.args.get('limit', None)
     offset = request.args.get('offset', None)
-    dataset_name = request.args.get('dataset_name', None)
-    # experimental_item_id = request.args.get('experimental_item_id', None)
-    # if not experimental_item_id:
-    #     msg = 'Experimental Item Id required.'
-    #     error = 1
-    #     return api_response(msg, error, data)
-    # experimental_items = ExperimentalItem().query(experimental_item_id=experimental_item_id)
-    # if not experimental_items:
-    #     msg = 'Experimental Item %s does not exists.' % experimental_item_id
-    #     error = 1
-    #     return api_response(msg, error, data)
-    # experimental_item = experimental_items[0]
-    # if not UserClazzRelation().query(user_id=g.user['user_id'], clazz_id=experimental_items[0]['clazz_id']):
-    #     msg = 'Permission denied.'
-    #     error = 1
-    #     return api_response(msg, error, data)
+    dataset_id = request.args.get('dataset_id', None)
     fs = get_fs()
-    datasets = Dataset().query(dataset_name=dataset_name, limit=limit, offset=offset)
-    datau = DatasetUtils(dataset_name=dataset_name)
+    datasets = Dataset().query(dataset_id=dataset_id, limit=limit, offset=offset)
+    datau = DatasetUtils(dataset_name='')
     with fs.open(datasets[0]['file_key'], 'r') as fin:
         datau.csv2obj(fin)
     data = {

@@ -143,4 +143,7 @@ class OutputSource(Base):
             offset = int(offset)
         return logs[offset:offset + limit], count, None
 
+    def get_score(self, item_id):
+        return ''
+
 

@@ -9,3 +9,7 @@ export function checkFetchStatus(response) {
   error.response = response
   throw error
 }
+
+export function haveField(data, field) {
+  return data.hasOwnProperty(field) && data[field] !== null && data[field] !== ''
+}

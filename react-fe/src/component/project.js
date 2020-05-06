@@ -370,6 +370,22 @@ export class Component extends React.Component {
                             label={'Apriori'}
                             children={<div>Apriori</div>}
                         />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'实验提交',
+                                task_name: 'Report Upload',
+                                status: '',
+                                clazz_id: '',
+                                experimental_item_id: '',
+                                experimental_task_id: ''
+                            }}
+                            label={'实验提交'}
+                            children={<div>实验提交</div>}
+                        />
                         <Divider style={{"margin-top": '4px', "margin-bottom": '4px'}}/>
                         {components_elements}
                     </Card>

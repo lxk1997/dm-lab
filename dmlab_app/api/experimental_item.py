@@ -39,8 +39,9 @@ def handle_get_experimental_item(experimental_item_id):
 def handle_get_experimental_items():
     limit = request.args.get('limit', None)
     offset = request.args.get('offset', None)
+    clazz_id = request.args.get('clazz_id', None)
     rsts = []
-    user_clazz_relations = UserClazzRelation().query(user_id=g.user['user_id'])
+    user_clazz_relations = UserClazzRelation().query(user_id=g.user['user_id'], clazz_id=clazz_id)
     for user_clazz_relation in user_clazz_relations:
         experimental_items = ExperimentalItem().query(clazz_id=user_clazz_relation['clazz_id'], limit=limit, offset=offset)
         rsts.extend(experimental_items)

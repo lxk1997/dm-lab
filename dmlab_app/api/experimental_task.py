@@ -8,6 +8,7 @@ from flask import Blueprint, request, g, url_for
 from .auth import login_required
 from ..db.dao.experimental_item import ExperimentalItem
 from ..db.dao.experimental_task import ExperimentalTask
+from ..db.dao.report import Report
 from ..db.dao.user_clazz_relation import UserClazzRelation
 from ..utils import api_response
 
@@ -72,3 +73,36 @@ def handle_get_experimental_tasks():
         'count': count
     }
     return api_response('ok', 0, data)
+
+
+@bp.route('/<int:experimental_task_id>/leaderboard', methods=['GET'])
+@login_required
+def handle_get_experimental_task_leaderboard(experimental_task_id):
+    experimental_tasks = ExperimentalTask().query(experimental_task_id=experimental_task_id)
+    data = {}
+    if not experimental_tasks:
+        msg = 'Experimental Task %d does not exists' % experimental_task_id
+        error = 1
+    else:
+        experimental_task = experimental_tasks[0]
+        if datetime.now() < experimental_task['start_time']:
+            status = '未开始'
+        elif datetime.now() < experimental_task['dead_line']:
+            status = '正在进行'
+        else:
+            status = '已结束'
+        experimental_task['status'] = status
+        rsts = []
+        user_clazz_relations = UserClazzRelation().query(clazz_id=experimental_task['clazz_id'])
+        for user_clazz_relation in user_clazz_relations:
+            report = Report().query(experimental_task_id=experimental_task_id, user_id=user_clazz_relation['user_id'])
+            if report:
+                rsts.append(report[0])
+            else:
+                rsts.append({'user_name': user_clazz_relation['user_name']})
+
+        data = rsts
+        msg = 'ok'
+        error = 0
+    return api_response(msg, error, data)
+

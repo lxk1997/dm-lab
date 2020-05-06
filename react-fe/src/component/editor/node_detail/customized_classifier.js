@@ -173,7 +173,7 @@ class CustomizedClassifier extends React.Component{
                         <Input defaultValue={this.state.params} onChange={this.onParamsChange} />
                     </Panel>
                 </Collapse>
-                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '100%'}}>
+                <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
                         {values.description}
