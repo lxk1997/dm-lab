@@ -327,8 +327,8 @@ class SVMRegressor(Base):
             with fs.open(report_path, 'r') as fin:
                 report_content = fin.read()
             json_report = json.loads(report_content)
-            score_content = 'MSE: %s,MAE: %s' % (
-            round(json_report['mse'], 2), round(json_report['mse'], 2))
+            score_content = 'MSE: %s,MAE: %s, R2: %s' % (
+                round(json_report['mse'], 2), round(json_report['mse'], 2), round(json_report['rsquared'], 2))
         return score_content
 
     def calc_score(self, score_field=None, item_id=None, cnt=None, time_value=None):

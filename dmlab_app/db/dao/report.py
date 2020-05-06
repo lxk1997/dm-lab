@@ -47,7 +47,7 @@ class Report:
                 'user_name': r.UserModel.username,
                 'content': r.ReportModel.content,
                 'file_key': r.ReportModel.file_key,
-                'score': float(r.ReportModel.score) if r.ReportModel.score is not None else None,
+                'score': round(float(r.ReportModel.score), 2) if r.ReportModel.score is not None else None,
                 'score_content': r.ReportModel.score_content,
                 'deleted': r.ReportModel.deleted,
                 'create_time': r.ReportModel.create_time.strftime("%Y-%m-%d  %H:%M:%S")

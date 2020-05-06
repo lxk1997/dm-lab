@@ -56,7 +56,6 @@ export default class Nav extends React.Component {
                         <Menu.Item key="5"><Link to="/mine"/><span>个人中心</span></Menu.Item>
                         <Menu.Item key="6"><Link to="/clazz"/><span>班级管理</span></Menu.Item>
                         <Menu.Item key="7"><Link to="/grade"/><span>成绩记录</span></Menu.Item>
-                        <Menu.Item key="8"><Link to="/evaluation"/><span>评测记录</span></Menu.Item>
                     </SubMenu>
                 </Menu>
             </Sider>

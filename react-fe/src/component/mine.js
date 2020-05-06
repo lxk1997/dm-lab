@@ -238,29 +238,25 @@ class MineRank extends React.Component {
     }
 
     render() {
-        let date_util = new DateUtil()
-        let date_week = date_util.getStartDayOfWeek() + ' ~ ' + date_util.getEndDayOfWeek()
-        let date_month = date_util.getStartDayOfMonth() + ' ~ ' + date_util.getEndDayOfMonth()
-        let date_quarter = date_util.getQuarter()
-        const date_week_component = (<div><span>本周评测排名</span><span style={{'font-size': '10px', 'font-weight': 'bold', 'padding-top': '4px', 'position': 'absolute', 'right': '10px'}}>{date_week}</span></div>)
-        const date_month_component = (<div><span>本月评测排名</span><span style={{'font-size': '10px', 'font-weight': 'bold', 'padding-top': '4px' , 'position': 'absolute', 'right': '10px'}}>{date_month}</span></div>)
-        const date_quarter_component = (<div><span>本季度评测排名</span><span style={{'font-size': '10px', 'font-weight': 'bold', 'padding-top': '4px', 'position': 'absolute', 'right': '10px'}}>{date_quarter}</span></div>)
+        const date_week_component = (<div><span>TTC分类任务排名</span></div>)
+        const date_month_component = (<div><span>TTC聚类任务排名</span></div>)
+        const date_quarter_component = (<div><span>TTC回归任务排名</span></div>)
         return (
             <div className="site-card-wrapper" style={{"margin": "8px"}}>
                 <Row gutter={16}>
                   <Col span={8}>
                     <Card title= {date_week_component} bordered={false}>
-                      <span style={{"font-size": '50px', 'text-align': 'center', 'color': 'green'}}>3.2%</span>
+                      <span style={{"font-size": '50px', 'text-align': 'center', 'color': 'green'}}>100%</span>
                     </Card>
                   </Col>
                   <Col span={8}>
                     <Card title={date_month_component} bordered={false}>
-                      <span style={{"font-size": '50px', 'text-align': 'center', 'color': 'green'}}>3.5%</span>
+                      <span style={{"font-size": '50px', 'text-align': 'center', 'color': 'green'}}>100%</span>
                     </Card>
                   </Col>
                   <Col span={8}>
                     <Card title={date_quarter_component} bordered={false}>
-                      <span style={{"font-size": '50px', 'text-align': 'center', 'color': 'green'}}>12.5%</span>
+                      <span style={{"font-size": '50px', 'text-align': 'center', 'color': 'green'}}>100%</span>
                     </Card>
                   </Col>
                 </Row>
@@ -270,27 +266,34 @@ class MineRank extends React.Component {
 
 class MineCommitHeatMap extends React.Component {
     constructor(props) {
-        super(props)
+        super(props);
+        this.data = []
     }
 
-    getData = ({offset = this.offset, limit = this.limit} = {}) => {
-        // this.offset = offset
-        // this.limit = limit
-        // let api = `/api/project?offset=${offset}&limit=${limit}&user_only=${true}`
-        // $.ajax({
-        //     url: api,
-        //     type: 'GET',
-        //     dataType: 'json',
-        //     async: false,
-        //     success: jsonData => {
-        //         let data = jsonData.data.detail
-        //         let projects = projectTableFilter(data)
-        //         if (this.state.projects.length > 0) {
-        //             this.setState({projects: []})
-        //         }
-        //         this.setState({projects: projects})
-        //     }
-        // })
+    getData = () => {
+        let api = `/api/mine-info/heat-map`
+        $.ajax({
+            url: api,
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            success: jsonData => {
+                let data = []
+                let today = new Date();
+                // 获取一年前的今天
+                let date = new Date(today.getFullYear()-1+'/'+(today.getMonth()+1)+'/'+today.getDate()).getTime();
+                let end = new Date().getTime();
+                let dayTime = 3600 * 24 * 1000; // 一天
+                for (var time = date; time < end; time += dayTime) {
+                    let tmp_date = echarts.format.formatTime('yyyy-MM-dd', time)
+                    data.push([
+                        tmp_date,
+                        jsonData.data.hasOwnProperty(tmp_date) ? jsonData.data[tmp_date] : 0
+                    ]);
+                }
+               this.data = data
+            }
+        })
     }
 
     componentWillMount = () => {
@@ -302,10 +305,10 @@ class MineCommitHeatMap extends React.Component {
         // 获取一年前的今天
         var date = new Date(today.getFullYear()-1+'/'+(today.getMonth()+1)+'/'+today.getDate()).getTime();
         var end = new Date().getTime();
-        let data = this.getVirtulData('2020');
+        let data = this.data;
         let option = {
             legend: {
-                top: '270',
+                top: '190',
                 left: '80',
                 tooltip: {
                     show: true,
@@ -334,10 +337,11 @@ class MineCommitHeatMap extends React.Component {
                 type: 'piecewise',
                 show: false,
                 pieces: [
-                    {min: 0, max: 5, label: '0', color: '#e2e4e6'},
-                    {min: 5, max: 10, label: '0-10', color: '#acd5f2'},
-                    {min: 10, max: 40, label: '10-20', color: '#7fa8c9'},
-                    {min: 40, label: '40+', color: '#527ba0'}
+                    {min: 0, max: 0, label: '0', color: '#EDEDED'},
+                    {min: 1, max: 9, label: '1-9', color: '#acd5f2'},
+                    {min: 10, max: 19, label: '10-19', color: '#7fa8c9'},
+                    {min: 20, max: 29, label: '20-29', color: '#527ba0'},
+                    {min: 30, label: '30+', color: '#254E77'}
                 ]
             },
             calendar: {
@@ -371,12 +375,12 @@ class MineCommitHeatMap extends React.Component {
                 }
             },
             series: [{
-                name: '0-5',
+                name: 'no commit',
                 type: 'heatmap',
                 coordinateSystem: 'calendar',
                 data: data.filter(item=>item[1]>=0 && item[1]<=5),
                 itemStyle: {
-                    color: '#e2e4e6'
+                    color: '#EDEDED'
                 },
                 emphasis: {
                     itemStyle: {
@@ -384,7 +388,7 @@ class MineCommitHeatMap extends React.Component {
                     }
                 }
             },{
-                name: '6-10',
+                name: '1-9',
                 type: 'heatmap',
                 coordinateSystem: 'calendar',
                 data: data.filter(item=>item[1]>5 && item[1]<=10),
@@ -397,7 +401,7 @@ class MineCommitHeatMap extends React.Component {
                     }
                 }
             },{
-                name: '11-40',
+                name: '10-19',
                 type: 'heatmap',
                 coordinateSystem: 'calendar',
                 data: data.filter(item=>item[1]>10 && item[1]<=40),
@@ -410,12 +414,25 @@ class MineCommitHeatMap extends React.Component {
                     }
                 }
             },{
-                name: '40+',
+                name: '20-29',
                 type: 'heatmap',
                 coordinateSystem: 'calendar',
                 data: data.filter(item=>item[1]>40),
                 itemStyle: {
                     color: '#527ba0'
+                },
+                emphasis: {
+                    itemStyle: {
+                        borderColor: '#333'
+                    }
+                }
+            },{
+                name: '30+',
+                type: 'heatmap',
+                coordinateSystem: 'calendar',
+                data: data.filter(item=>item[1]>40),
+                itemStyle: {
+                    color: '#254E77'
                 },
                 emphasis: {
                     itemStyle: {
@@ -430,22 +447,6 @@ class MineCommitHeatMap extends React.Component {
         };
         var my_heat_map = echarts.init(document.getElementById('heat_map_main'));
         my_heat_map.setOption(option)
-    }
-
-    getVirtulData = year => {
-        let today = new Date();
-        // 获取一年前的今天
-        var date = new Date(today.getFullYear()-1+'/'+(today.getMonth()+1)+'/'+today.getDate()).getTime();
-        var end = new Date().getTime();
-        var dayTime = 3600 * 24 * 1000; // 一天
-        var data = [];
-        for (var time = date; time < end; time += dayTime) {
-            data.push([
-                echarts.format.formatTime('yyyy-MM-dd', time),
-                Math.floor(Math.random() * 100)
-            ]);
-        }
-        return data;
     }
 
     render() {
