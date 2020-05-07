@@ -1,9 +1,13 @@
+import datetime
 import logging
 
 from flask import Blueprint, request, g
 
 from .auth import login_required
 from ..db.dao.clazz import Clazz
+from ..db.dao.experimental_task import ExperimentalTask
+from ..db.dao.report import Report
+from ..db.dao.user import User
 from ..db.dao.user_clazz_relation import UserClazzRelation
 from ..utils import api_response
 
@@ -101,3 +105,50 @@ def handle_delete_clazz(clazz_id):
             msg = 'ok'
             error = 0
     return api_response(msg, error, data)
+
+@bp.route('/<int:clazz_id>/leaderboard', methods=['GET'])
+@login_required
+def handle_get_clazz_leaderboard(clazz_id):
+    experimental_tasks = ExperimentalTask().query(clazz_id=clazz_id)
+    mp = {}
+    cnt = {}
+    count = 0
+    for experimental_task in experimental_tasks:
+        name_mp = {}
+        if datetime.datetime.now() < experimental_task['start_time']:
+            continue
+        else:
+            count += 1
+            reports = Report().query(experimental_task_id=experimental_task['experimental_task_id'])
+            for report in reports:
+                if name_mp.get(report['user_id']):
+                    continue
+                else:
+                    name_mp[report['user_id']] = 1
+                if report['score'] is None or report['score'] == '':
+                    report['score'] = 0
+                if mp.get(report['user_id']):
+                    mp[report['user_id']] += report['score']
+                else:
+                    mp[report['user_id']] = report['score']
+                if cnt.get(report['user_id']):
+                    cnt[report['user_id']] += 1
+                else:
+                    cnt[report['user_id']] = 1
+
+    data = []
+    mp = sorted(mp.items(), key=lambda x: x[1], reverse=True)
+    last_score = 0
+    cur = 1
+    rank = 1
+    for idx, item in enumerate(mp):
+        if idx == 0:
+            last_score = item[1]
+        if item[1] < last_score:
+            last_score = item[1]
+            rank = cur
+        cur_data = {'user_id': item[0], 'degree': '%d/%d' % (cnt[item[0]], count), 'rank': rank, 'score': round(item[1], 2), 'user_name': User().query(user_id=item[0])[0]['user_name']}
+        data.append(cur_data)
+        cur += 1
+    data = {'detail': data}
+    return api_response('ok', 0, data)

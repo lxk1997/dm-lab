@@ -222,6 +222,7 @@ export class ClazzDetail extends React.Component {
             students: [],
             searchText: '',
             searchedColumn: '',
+            score_leaderboard_modal_visible: false
         };
         this.columns = [
             {
@@ -273,6 +274,10 @@ export class ClazzDetail extends React.Component {
         })
     }
 
+     handleScoreLeaderBoardDisplay = () => {
+        this.refs.scoreLeaderboardModal.setInfo({visible: true, clazz_id: this.clazz_id})
+    }
+
     handleDeleteClazz = () => {
         $.ajax({
             type: 'DELETE',
@@ -289,7 +294,7 @@ export class ClazzDetail extends React.Component {
         })
     }
 
-    componentDidMount() {
+    componentWillMount() {
         this.getData();
     }
 
@@ -391,13 +396,17 @@ export class ClazzDetail extends React.Component {
             );
         };
         return (<div>
+            <ScoreLeaderboard visiable={this.state.score_leaderboard_modal_visible} clazz_id={this.clazz_id} ref={"scoreLeaderboardModal"} parent={this}/>
             <PageHeader
                 className="site-page-header-responsive"
                 onBack={() => window.history.back()}
                 title={this.state.clazz.clazz_name}
                 extra={[
+                    <Button key="1" type="primary" onClick={this.handleScoreLeaderBoardDisplay} style={{'border-radius': '4px'}}>
+                      排名
+                    </Button>,
                     <Popconfirm title='确定退出班级吗? 退出后对应的实验提交记录将一并删除，请谨慎选择' onConfirm={() => this.handleDeleteClazz()}>
-                            <Button key="1" type='danger'>退出</Button>
+                            <Button key="1" type='danger' style={{'border-radius': '4px'}}>退出</Button>
                         </Popconfirm>
                 ]}
                 footer={null}>
@@ -406,6 +415,89 @@ export class ClazzDetail extends React.Component {
             <Table columns={this.columns} dataSource={this.state.students} ref={"table"}/>
         </div>)
 
+    }
+}
+
+class ScoreLeaderboard extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            visible: props.visible,
+            clazz_id: props.clazz_id,
+            leaderboard: []
+        }
+
+        this.columns = [
+            {
+                title: '排名',
+                dataIndex: 'rank',
+                key: 'rank',
+                sorter: (a, b) => a.rank < b.rank,
+                sortDirections: ['ascend', 'descend'],
+            },
+            {
+                title: '用户',
+                dataIndex: 'user_name',
+                key: 'user_name'
+            },
+            {
+                title: '总分',
+                dataIndex: 'score',
+                key: 'score',
+            },
+            {
+                title: '完成度',
+                dataIndex: 'degree',
+                key: 'degree',
+            }
+        ];
+
+    }
+
+    getData = () => {
+        const api = `/api/clazz/${this.state.clazz_id}/leaderboard`
+        $.ajax({
+            url: api,
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            success: jsonData => {
+                let data = jsonData.data.detail
+                let leaderboard = leaderBoardTableFilter(data)
+                if (this.state.leaderboard.length > 0) {
+                    this.setState({leaderboard: []})
+                }
+                this.setState({leaderboard: leaderboard})
+            }
+        })
+    }
+
+    setInfo = val => {
+        this.setState({visible: val.visible, clazz_id: val.clazz_id})
+        this.getData()
+    }
+
+    hideModal = () => {
+        this.setState({visible: false});
+    }
+
+    render() {
+        let pagination = {
+            showQuickJumper: true,
+            defaultPageSize: 20
+        }
+        return (
+            <Modal
+                width="800px"
+                height="600px"
+                visible={this.state.visible}
+                title="排名"
+                onCancel={this.hideModal}
+                footer={null}>
+                <Table  size={"small"} pagination={pagination} ref={"table"} dataSource={this.state.leaderboard}
+                       columns={this.columns}/>
+            </Modal>
+        );
     }
 }
 
@@ -432,6 +524,21 @@ function studentTableFilter(data) {
         result['email'] = data[idx].email
         result['join_time'] = data[idx].join_time
         result['student_id'] = data[idx].user_id
+        results.push(result)
+    }
+    return results
+}
+
+function leaderBoardTableFilter(data) {
+    let results = []
+    for (let idx = 0; idx < data.length; idx++) {
+        let result = {}
+        result['key'] = idx
+        result['user_name'] = data[idx].user_name
+        result['user_id'] = data[idx].user_id
+        result['score'] = data[idx].score
+        result['rank'] = data[idx].rank
+        result['degree'] = data[idx].degree
         results.push(result)
     }
     return results
