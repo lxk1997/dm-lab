@@ -21,6 +21,9 @@ import CustomizedClassifier from "./customized_classifier";
 import CustomizedRegressor from "./customized_regressor";
 import SVMRegressor from "./svm_regressor";
 import ReportUpload from "./report_upload";
+import KNNRegressor from "./knn_regressor";
+import LASSORegressor from "./lasso_regressor";
+import LinearRegressor from "./linear_regressor";
 
 const {Item}=Form;
 
@@ -77,6 +80,15 @@ class NodeDetail extends React.Component{
                 break;
             case '支持向量回归':
                 Component = SVMRegressor;
+                break;
+            case '最近邻回归':
+                Component = KNNRegressor;
+                break;
+            case 'LASSO回归':
+                Component = LASSORegressor;
+                break;
+            case '线性回归':
+                Component = LinearRegressor;
                 break;
             case 'Apriori':
                 Component = Apriori;

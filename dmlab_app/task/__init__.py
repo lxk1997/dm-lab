@@ -12,6 +12,9 @@ from dmlab_app.task.io_source.output_source import OutputSource
 from dmlab_app.task.io_source.report_upload import ReportUpload
 from dmlab_app.task.regression.cart_regressor import CARTRegressor
 from dmlab_app.task.regression.customized import CustomizedRegressor
+from dmlab_app.task.regression.knn_regressor import KNNRegressor
+from dmlab_app.task.regression.lasso_Regressor import LASSORegressor
+from dmlab_app.task.regression.linear_regressor import LinearRegressor
 from dmlab_app.task.regression.svm_regressor import SVMRegressor
 
 _tasks = [
@@ -61,19 +64,34 @@ _tasks = [
             'method'    : CARTRegressor(),
         },
         {
-            'id'        : 11,
-            'name'      : 'SVM Regressor',
-            'method'    : SVMRegressor(),
-        },
-        {
             'id'        : 10,
             'name'      : 'Apriori',
             'method'    : Apriori(),
         },
         {
+            'id'        : 11,
+            'name'      : 'SVM Regressor',
+            'method'    : SVMRegressor(),
+        },
+        {
             'id'        : 12,
             'name'      : 'Report Upload',
             'method'    : ReportUpload(),
+        },
+        {
+            'id'        : 13,
+            'name'      : 'KNN Regressor',
+            'method'    : KNNRegressor(),
+        },
+        {
+            'id'        : 14,
+            'name'      : 'LASSO Regressor',
+            'method'    : LASSORegressor(),
+        },
+        {
+            'id'        : 15,
+            'name'      : 'Linear Regressor',
+            'method'    : LinearRegressor(),
         },
     ]
 

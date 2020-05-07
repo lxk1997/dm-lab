@@ -154,7 +154,7 @@ class SVMRegressor(Base):
                     plt.legend(loc='lower right', borderaxespad=0., fontsize='xx-small')
                     plt.title('Fitting Model(len=%d)' % len(feature_test))
                     plt.xlabel('Index')
-                    plt.ylabel(target_rsts['header'])
+                    plt.ylabel('Target')
                     plt.tight_layout()
 
                     plt.savefig(fs.abs_path(overview_png), bbox_inches='tight')

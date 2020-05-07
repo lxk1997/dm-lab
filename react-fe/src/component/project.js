@@ -602,6 +602,69 @@ export class Component extends React.Component {
                             shape={'flow-rect'}
                             model={{
                                 color:'#1890ff',
+                                label:'最近邻回归',
+                                task_name: 'KNN Regressor',
+                                status: '',
+                                selected_columns: [],
+                                target_column: '',
+                                n_neighbors: 5,
+                                weights: 'uniform',
+                                p: 2,
+                                algorithm: 'auto',
+                                leaf_size: 30,
+                                metric: 'minkowski'
+                            }}
+                            label={'最近邻回归'}
+                            children={<div>最近邻回归</div>}
+                        />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'LASSO回归',
+                                task_name: 'LASSO Regressor',
+                                status: '',
+                                selected_columns: [],
+                                target_column: '',
+                                alpha: 1.0,
+                                fit_intercept: true,
+                                max_iter: 500,
+                                normalize: false,
+                                precompute: false,
+                                tol: 0.001,
+                                warm_start: false,
+                                positive: false,
+                                selection: 'cyclic',
+                                random_state: 'None'
+                            }}
+                            label={'LASSO回归'}
+                            children={<div>LASSO回归</div>}
+                        />
+                         <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'线性回归',
+                                task_name: 'Linear Regressor',
+                                status: '',
+                                selected_columns: [],
+                                target_column: '',
+                                fit_intercept: true,
+                                normalize: false
+                            }}
+                            label={'线性回归'}
+                            children={<div>线性回归</div>}
+                        />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
                                 label:'Apriori',
                                 task_name: 'Apriori',
                                 status: '',

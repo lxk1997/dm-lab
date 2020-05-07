@@ -19,6 +19,9 @@ import CustomizedClassifierContextMenu from "./customized_classifier";
 import CustomizedRegressorContextMenu from "./customized_regressor";
 import SVMRegressorContextMenu from "./svm_regressor";
 import ReportUploadContextMenu from "./report_upload";
+import KNNRegressorContextMenu from "./knn_regressor";
+import LASSORegressorContextMenu from "./lasso_regressor";
+import LinearRegressorContextMenu from "./linear_regressor";
 
 const {Item}=Form;
 
@@ -68,6 +71,15 @@ class FlowContextMenu extends React.Component{
                 break;
             case '支持向量回归':
                 MenuComponent = SVMRegressorContextMenu;
+                break;
+            case '最近邻回归':
+                MenuComponent = KNNRegressorContextMenu;
+                break;
+            case 'LASSO回归':
+                MenuComponent = LASSORegressorContextMenu;
+                break;
+            case '线性回归':
+                MenuComponent = LinearRegressorContextMenu;
                 break;
             case '实验提交':
                 MenuComponent = ReportUploadContextMenu;

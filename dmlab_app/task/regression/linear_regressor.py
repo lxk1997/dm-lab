@@ -17,13 +17,13 @@ from ...db.dao.user_clazz_relation import UserClazzRelation
 from ...filesystem import get_fs, get_tmp_dir
 
 from sklearn.model_selection import train_test_split
-from sklearn import tree, metrics
+from sklearn import metrics, linear_model
 import pydotplus
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 import numpy as np
-from ...utils import NpEncoder, numeric, create_instance
+from ...utils import NpEncoder, numeric
 
 matplotlib.use('Agg')
 
@@ -33,7 +33,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class CustomizedRegressor(Base):
+class LinearRegressor(Base):
     component_id = 1
     menu_info_names = [{'name': "重命名"},
                        {'name': '删除'},
@@ -65,9 +65,6 @@ class CustomizedRegressor(Base):
         elif not params.get('target_column'):
             logger.exception('params has no attribute name "target_column"')
             return False
-        elif not params.get('script_key'):
-            logger.exception('params has no attribute name "script_key"')
-            return False
         else:
             return True
 
@@ -93,13 +90,8 @@ class CustomizedRegressor(Base):
         success = self._check_valid_params(logger, params)
         selected_columns = params['selected_columns']
         target_column = params['target_column']
-        script_key = params['script_key']
-        par_evaluation_dir = self._get_evaluation_dir(params['parent_id'])
-        params.pop('script_key')
-        params.pop('parent_id')
-        params.pop('selected_columns')
-        params.pop('target_column')
         if success:
+            par_evaluation_dir = self._get_evaluation_dir(params['parent_id'])
             par_evaluation_output_dir = fs.join(par_evaluation_dir, 'outputs')
             par_data_path = fs.join(par_evaluation_output_dir, 'data.json')
             if fs.isfile(par_data_path):
@@ -112,9 +104,10 @@ class CustomizedRegressor(Base):
                                                                                               target_rsts['content'],
                                                                                               test_size=0.33,
                                                                                               random_state=42)
-                    class_instance = create_instance(os.path.basename(script_key).split('.')[0], 'Solver')
-                    class_instance.fit(feature_train, target_train, params)
-                    prediction_test = class_instance.predict(feature_test)
+                    dt_model = linear_model.LinearRegression(fit_intercept=numeric(params['fit_intercept']),
+                                                             normalize=numeric(params['normalize']))
+                    dt_model.fit(feature_train, target_train)
+                    prediction_test = dt_model.predict(feature_test)
                     mse = metrics.mean_squared_error(target_test, prediction_test)
                     rmse = np.sqrt(metrics.mean_squared_error(target_test, prediction_test))
                     mae = metrics.mean_absolute_error(target_test, prediction_test)
@@ -327,7 +320,7 @@ class CustomizedRegressor(Base):
                 report_content = fin.read()
             json_report = json.loads(report_content)
             score_content = 'MSE: %s,MAE: %s, R2: %s' % (
-            round(json_report['mse'], 2), round(json_report['mse'], 2), round(json_report['rsquared'], 2))
+                round(json_report['mse'], 2), round(json_report['mse'], 2), round(json_report['rsquared'], 2))
         return score_content
 
     def calc_score(self, score_field=None, item_id=None, cnt=None, time_value=None):
