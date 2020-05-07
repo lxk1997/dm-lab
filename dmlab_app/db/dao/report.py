@@ -23,7 +23,7 @@ class Report:
 
     def query(self, report_id=None, experimental_task_id=None, user_id=None, deleted=0, limit=None, offset=None):
         try:
-            query = self._db.query(ReportModel, UserModel, ExperimentalTaskModel).filter(ReportModel.user_id==UserModel.id, ReportModel.experimental_task_id==ExperimentalTaskModel.id, ExperimentalTaskModel.deleted == 0)
+            query = self._db.query(ReportModel, UserModel, ExperimentalTaskModel, ExperimentalItemModel, ClazzModel).filter(ReportModel.user_id==UserModel.id, ReportModel.experimental_task_id==ExperimentalTaskModel.id, ExperimentalTaskModel.deleted == 0, ExperimentalTaskModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id)
             if report_id is not None:
                 query = query.filter(ReportModel.id == report_id)
             if experimental_task_id is not None:
@@ -41,6 +41,10 @@ class Report:
                 'report_id': r.ReportModel.id,
                 'experimental_task_id': r.ExperimentalTaskModel.id,
                 'experimental_task_name': r.ExperimentalTaskModel.name,
+                'experimental_item_id': r.ExperimentalItemModel.id,
+                'experimental_item_name': r.ExperimentalItemModel.name,
+                'clazz_id': r.ClazzModel.id,
+                'clazz_name': r.ClazzModel.name,
                 'task_name': r.ReportModel.task_name,
                 'data_id': r.ReportModel.data_id,
                 'user_id': r.ReportModel.user_id,

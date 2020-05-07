@@ -58,7 +58,13 @@ class ReportUploadContextMenu extends React.Component{
             let par_values = par_item.getModel()
             parent_task_name = par_values.task_name;
         }
-        this.refs.uploadModal.setInfo({visible: true, parent_id: parent_id, parent_task_name: parent_task_name, clazz_id: values.clazz_id === '' ? null : values.clazz_id, experimental_item_id: values.experimental_item_id === '' ? null : values.experimental_item_id, experimental_task_id: values.experimental_task_id === '' ? null : values.experimental_task_id, item_id: values.id, task_name: values.task_name});
+        let project_id = $('#project_id').text()
+        if(project_id !== '') {
+            project_id = Number.parseInt(project_id)
+        } else {
+            project_id = null
+        }
+        this.refs.uploadModal.setInfo({visible: true, parent_id: parent_id, parent_task_name: parent_task_name, project_id: project_id, item_id: values.id, task_name: values.task_name});
     }
 
     update = val => {
@@ -151,16 +157,14 @@ class UploadReport extends React.Component {
             visible: props.visible,
             parent_id: null,
             parent_task_name: null,
-            clazz_id: null,
-            experimental_item_id: null,
-            experimental_task_id: null,
+            project_id: null,
             item_id: null,
             task_name: null
         };
     }
 
     setInfo = val => {
-        this.setState({visible: val.visible, parent_id: val.parent_id, parent_task_name: val.parent_task_name, clazz_id: val.clazz_id, experimental_item_id: val.experimental_item_id, experimental_task_id: val.experimental_task_id, item_id: val.item_id, task_name: val.task_name})
+        this.setState({visible: val.visible, parent_id: val.parent_id, parent_task_name: val.parent_task_name, project_id: val.project_id, item_id: val.item_id, task_name: val.task_name})
     }
 
 
@@ -187,9 +191,7 @@ class UploadReport extends React.Component {
                     params: JSON.stringify({
                         parent_id: this.state.parent_id,
                         parent_task_name: this.state.parent_task_name,
-                        clazz_id: this.state.clazz_id,
-                        experimental_item_id: this.state.experimental_item_id,
-                        experimental_task_id: this.state.experimental_task_id,
+                        project_id: this.state.project_id,
                         content: vals.content,
                         file_key: this.dataset_file_path
                     })

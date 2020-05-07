@@ -17,11 +17,7 @@ class InputSource extends React.Component{
         this.state = {
             datasets: [],
             dataset_columns: [],
-            clazz_id: '',
-            experimental_item_id: '',
             dataset_id: '',
-            clazz_options: [],
-            experimental_item_options: [],
             dataset_options: []
         }
         this.columns = [
@@ -47,50 +43,12 @@ class InputSource extends React.Component{
     }
 
     getFirstData(){
+        let project_id = $('#project_id').text()
+        if(project_id !== '') {
+            project_id = Number.parseInt(project_id)
+        }
         $.ajax({
-            url: `/api/clazz`,
-            async: false,
-            type: 'GET',
-            dataType: 'json',
-            success: jsonData => {
-                if(this.state.clazz_options.length || this.state.experimental_item_options.length || this.state.dataset_options.length) {
-                    this.setState({clazz_options: [], experimental_item_options: [], dataset_options: []})
-                }
-                let data = jsonData.data.detail.map(ele => {
-                    return <Option value={ele.clazz_id}>{ele.clazz_name}</Option>
-                })
-                this.setState({clazz_options: data})
-            }
-        })
-    }
-
-    componentWillMount(){
-        this.getFirstData()
-    }
-
-    onClazzChange = val => {
-        this.setState({clazz_id: val})
-        $.ajax({
-            url: `/api/experimental-item?clazz_id=${val}`,
-            async: false,
-            type: 'GET',
-            dataType: 'json',
-            success: jsonData => {
-                if(this.state.experimental_item_options.length || this.state.dataset_options.length) {
-                    this.setState({experimental_item_options: [], dataset_options: []})
-                }
-                let data = jsonData.data.detail.map(ele => {
-                    return <Option value={ele.experimental_item_id}>{ele.experimental_item_name}</Option>
-                })
-                this.setState({experimental_item_options: data})
-            }
-        })
-    }
-
-    onExperimentalItemChange = val => {
-        this.setState({experimental_item_id: val})
-        $.ajax({
-            url: `/api/dataset?experimental_item_id=${val}`,
+            url: `/api/dataset?project_id=${project_id}`,
             async: false,
             type: 'GET',
             dataType: 'json',
@@ -98,13 +56,16 @@ class InputSource extends React.Component{
                 if(this.state.dataset_options.length) {
                     this.setState({dataset_options: []})
                 }
-                let data = jsonData.data.detail
-                data = data.map(ele => {
+                let data = jsonData.data.detail.map(ele => {
                     return <Option value={ele.dataset_id}>{ele.dataset_name}</Option>
                 })
                 this.setState({dataset_options: data})
             }
         })
+    }
+
+    componentWillMount(){
+        this.getFirstData()
     }
 
     onDatasetChange = val => {
@@ -153,23 +114,6 @@ class InputSource extends React.Component{
         const item=getSelected()[0]
 
         if(!item) return null;
-        let clazz_select = (<Select showSearch style={{ width: 130 }} placeholder="选择所在班级" onChange={this.onClazzChange}>
-                             {this.state.clazz_options}
-                         </Select>)
-        if(this.state.clazz_id !== '') {
-            clazz_select = (<Select showSearch style={{ width: 130 }} defaultValue={this.state.clazz_id} onChange={this.onClazzChange}>
-                             {this.state.clazz_options}
-                         </Select>)
-        }
-
-        let experimental_item_select = (<Select showSearch style={{ width: 130 }} placeholder="选择实验项目" onChange={this.onExperimentalItemChange}>
-                             {this.state.experimental_item_options}
-                         </Select>)
-        if(this.state.experimental_item_id !== '') {
-            experimental_item_select = (<Select showSearch style={{ width: 130 }} defaultValue={this.state.experimental_item_id} onChange={this.onExperimentalItemChange}>
-                             {this.state.experimental_item_options}
-                         </Select>)
-        }
 
         let dataset_select = (<Select showSearch style={{ width: 130 }} placeholder="选择数据集" onChange={this.onDatasetChange}>
                              {this.state.dataset_options}
@@ -187,10 +131,6 @@ class InputSource extends React.Component{
             <div>
                 <Collapse defaultActiveKey={['1']} accordion expandIconPosition={'right'} style={{'margin-bottom': '45px'}}>
                     <Panel header="字段属性" key="1">
-                        <div>班级</div>
-                        {clazz_select}
-                        <div>实验项目</div>
-                        {experimental_item_select}
                         <div>数据集</div>
                         {dataset_select}
                         <div>字段信息</div>

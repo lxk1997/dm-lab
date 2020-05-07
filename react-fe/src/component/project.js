@@ -2,6 +2,7 @@ import React from 'react'
 import 'antd/dist/antd.css';
 import '../static/css/ant.css';
 import $ from 'jquery'
+import {withPropsAPI} from 'gg-editor';
 import {Item, ItemPanel} from "gg-editor";
 import {Button, Tree, Card, Form, Input, message, Modal, Divider,Select} from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
@@ -50,27 +51,268 @@ export default class ProjectParent extends React.Component {
 export class Project extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            projects: [],
+        }
+        this.project = null;
+        this.new_project_modal_visible = false
+    }
+
+    getModalMsg = val => {
+        this.getData()
+    }
+
+    onProjectSelect = (selectedKeys, info) => {
+        this.project = selectedKeys.length?selectedKeys[0]:null
+        if(this.project === -1) {
+            this.project = null
+        }
+        $('#project_id').text(this.project)
+    }
+
+    getData = () => {
+        $.ajax({
+            url: '/api/project',
+            async: false,
+            type: 'GET',
+            dataType: 'json',
+            success: jsonData => {
+                let data = jsonData.data.detail
+                let projects = treeProjectFilter(data)
+                if(this.state.projects.length) {
+                    this.setState({projects: []})
+                }
+                this.setState({projects: projects})
+            }
+        })
+    }
+
+    componentWillMount() {
+        this.getData()
+    }
+
+    handleCreateProject = () => {
+        this.refs.newProjectModal.setInfo({visible: true})
     }
 
     render() {
         $("#header_title").text('工程')
         return (
+            <div>
+            <NewProjectModal ref={'newProjectModal'} visible={this.new_project_modal_visible} parent={this}/>
             <div style={{width: 150, background: "rgba(0,0,0,0)"}}>
                 <div style={{background: "#1890ff", width: 150, borderRadius: 18}}>
                     <span style={{marginLeft: 28, fontWeight: "bold", color: "#ffffff", textAlign: "center"}}>工程</span>
                     <span style={{marginLeft: '32%'}}><Button type="primary" shape="circle"
-                                                              icon={< PlusCircleOutlined/>}/></span>
+                                                              icon={< PlusCircleOutlined/>} onClick={this.handleCreateProject}/></span>
                 </div>
                 <Tree
-                    style={{background: "rgba(0,0,0,0.048)", maxHeight: 200, width: 150, paddingTop: 8}}
-                    defaultSelectedKeys={['0-0-0']}
+                    style={{background: "#EFF3F5", width: 150, paddingTop: 8,height: '180px', "overflow": "scroll"}}
                     switcherIcon={< DownOutlined/>}
-                    treeData={treeData}
+                    onSelect={this.onProjectSelect}
+                    treeData={this.state.projects}
                 />
+            </div></div>
+        );
+    }
+}
+
+class NewProjectModal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading: false,
+            visible: false,
+            clazz_options: [],
+            experimental_item_options: [],
+            experimental_task_options: [],
+        };
+        this.clazz_id = null
+        this.experimental_item_id = null
+        this.experimenatl_task = null
+    }
+
+    getData = () => {
+        $.ajax({
+            url: `/api/clazz`,
+            async: false,
+            type: 'GET',
+            dataType: 'json',
+            success: jsonData => {
+                if(this.state.clazz_options.length || this.state.experimental_item_options.length || this.state.experimental_task_options.length) {
+                    this.setState({clazz_options: [], experimental_item_options: [], experimental_task_options: []})
+                }
+                let data = jsonData.data.detail.map(ele => {
+                    return <Option value={ele.clazz_id}>{ele.clazz_name}</Option>
+                })
+                this.setState({clazz_options: data})
+            }
+        })
+    }
+
+    componentWillMount() {
+        this.getData()
+    }
+
+    setInfo = val => {
+        this.setState({visible: val.visible})
+    }
+
+    onClazzChange = val => {
+        this.clazz_id = val
+        $.ajax({
+            url: `/api/experimental-item?clazz_id=${val}`,
+            async: false,
+            type: 'GET',
+            dataType: 'json',
+            success: jsonData => {
+                if(this.state.experimental_item_options.length || this.state.experimental_task_options.length) {
+                    this.setState({experimental_item_options: [], experimental_task_options: []})
+                }
+                let data = jsonData.data.detail.map(ele => {
+                    return <Option value={ele.experimental_item_id}>{ele.experimental_item_name}</Option>
+                })
+                this.setState({experimental_item_options: data})
+            }
+        })
+    }
+
+    onExperimentalItemChange = val => {
+        this.experimental_item_id = val
+        $.ajax({
+            url: `/api/experimental-task?experimental_item_id=${val}`,
+            async: false,
+            type: 'GET',
+            dataType: 'json',
+            success: jsonData => {
+                if(this.state.experimental_task_options.length) {
+                    this.setState({experimental_task_options: []})
+                }
+                let data = jsonData.data.detail.filter(ele => {
+                    return ele.status === '正在进行'
+                })
+                data = data.map(ele => {
+                    return <Option value={ele.experimental_task_id}>{ele.experimental_task_name}</Option>
+                })
+                this.setState({experimental_task_options: data})
+            }
+        })
+    }
+
+    hideModal = () => {
+        this.setState({visible: false, loading: false});
+        this.refs.form.resetFields();
+    }
+
+    setParentMsg = () => {
+        this.props.parent.getModalMsg(this, true)
+    }
+
+    handleCreateProject = values => {
+        this.setState({loading: true});
+        $.ajax({
+            type: 'POST',
+            url: '/api/project/create',
+            async: false,
+            data: {
+                'experimental_item_id': values.experimental_item_id,
+                'name': values.name,
+                'experimental_task_id': values.experimental_task_id,
+                'clazz_id': values.clazz_id
+            },
+            dataType: 'json',
+            success: (jsonData) => {
+                if (jsonData.error) {
+                    message.error(jsonData.msg);
+                } else {
+                    this.setParentMsg();
+                    message.success('工程创建成功')
+                }
+                this.refs.form.resetFields()
+                this.setState({loading: false, visible: false, score_field: false});
+            }
+        });
+    }
+
+    render() {
+        let clazz_select = (<Select showSearch style={{ width: 300 }} placeholder="选择所在班级" onChange={this.onClazzChange}>
+                             {this.state.clazz_options}
+                         </Select>)
+
+        let experimental_item_select = (<Select showSearch style={{ width: 300 }} placeholder="选择实验项目" onChange={this.onExperimentalItemChange}>
+                             {this.state.experimental_item_options}
+                         </Select>)
+
+        let experimental_task_select = (<Select showSearch style={{ width: 300 }} placeholder="选择实验任务">
+                             {this.state.experimental_task_options}
+                         </Select>)
+
+        return (
+            <div>
+                <Modal
+                    width={'347px'}
+                    visible={this.state.visible}
+                    title="创建工程"
+                    onOk={this.handleCreateProject}
+                    onCancel={this.hideModal}
+                    footer={null}>
+                    <Form
+                        name="new-project"
+                        ref="form"
+                        className="new-project-form"
+                        onFinish={this.handleCreateProject}>
+                        <Form.Item
+                            name="name"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input the Project Name!',
+                                },
+                            ]}>
+                            <Input placeholder="Project Name" style={{'width': 300}}/>
+                        </Form.Item>
+                        <Form.Item
+                            name="clazz_id"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please select the class!',
+                                },
+                            ]}>
+                            {clazz_select}
+                        </Form.Item>
+                        <Form.Item
+                            name="experimental_item_id"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please select the Experimental Item!',
+                                },
+                            ]}>
+                            {experimental_item_select}
+                        </Form.Item>
+                        <Form.Item
+                            name="experimental_task_id"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please select the Experimental Task!',
+                                },
+                            ]}>
+                            {experimental_task_select}
+                        </Form.Item>
+                        <Form.Item style={{"textAlign": "center"}}>
+                            <Button key="submit" type="primary" htmlType="submit" loading={this.state.loading}>
+                                创建
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </Modal>
             </div>
         );
     }
 }
+
 
 export class Component extends React.Component {
     constructor(props) {
@@ -135,14 +377,14 @@ export class Component extends React.Component {
         return (<div>
             <NewComponentModel visiable={this.new_component_modal_visible}
                                              ref={"newComponentModal"} parent={this}/>
-            <div style={{width: 150, background: "rgba(0,0,0,0)", paddingTop: 130}}>
+            <div style={{width: 150, background: "rgba(0,0,0,0)", paddingTop: 30}}>
                 <div style={{background: "#1890ff", width: 150, borderRadius: 18}}>
                     <span style={{marginLeft: 28, fontWeight: "bold", color: "#ffffff", textAlign: "center"}}>组件</span>
                     <span style={{marginLeft: '32%'}}><Button type="primary" shape="circle"
                                                               icon={< PlusCircleOutlined/>} onClick={this.handleNewComponent}/></span>
                 </div>
-                <ItemPanel className={styles["item-panel"]}>
-                    <Card style={{height: '260px', "overflow": "scroll"}}>
+                <ItemPanel className={styles["item-panel"]} style={{background: "#EFF3F5"}}>
+                    <Card style={{height: '220px', "overflow": "scroll", background: "#EFF3F5"}}>
                         <Item
                             type={'node'}
                             size={'80*28'}
@@ -386,7 +628,7 @@ export class Component extends React.Component {
                             label={'实验提交'}
                             children={<div>实验提交</div>}
                         />
-                        <Divider style={{"margin-top": '4px', "margin-bottom": '4px'}}/>
+                        <Divider style={{"margin-top": '4px', "margin-bottom": '4px', background: '#deebf5', height:'2px'}}/>
                         {components_elements}
                     </Card>
                 </ItemPanel>
@@ -565,23 +807,18 @@ class NewComponentModel extends React.Component {
     }
 }
 
-const treeData = [
-    {
+function treeProjectFilter(data) {
+    let children = []
+    for(let idx = 0; idx < data.length; idx++) {
+        children.push({title: data[idx].project_name, key: data[idx].project_id})
+    }
+    let rsts = [{
         title: '我的工程',
-        key: '0-0',
-        children: [
-            {
-                title: 'test1',
-                key: '0-0-0',
-            },
-            {
-                title: 'test2',
-                key: '0-0-1',
-                icon: ({selected}) => (selected ? <FrownFilled/> : <FrownOutlined/>),
-            },
-        ],
-    },
-];
+        key: '-1',
+        children: children,
+    }]
+    return rsts
+}
 
 
 

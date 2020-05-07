@@ -8,6 +8,7 @@ from flask import g
 from ..base import Base
 from ...db.dao.component import Component
 from ...db.dao.experimental_task import ExperimentalTask
+from ...db.dao.project import Project
 from ...db.dao.report import Report
 from ...filesystem import get_fs
 
@@ -36,14 +37,8 @@ class ReportUpload(Base):
         elif not params.get('parent_id'):
             logger.exception('params has no attribute name "parent_id"')
             return False
-        elif not params.get('clazz_id'):
-            logger.exception('params has no attribute name "clazz_id"')
-            return False
-        elif not params.get('experimental_item_id'):
-            logger.exception('params has no attribute name "experimental_item_id"')
-            return False
-        elif not params.get('experimental_task_id'):
-            logger.exception('params has no attribute name "experimental_task_id"')
+        elif not params.get('project_id'):
+            logger.exception('params has no attribute name "project_id"')
             return False
         elif not params.get('parent_task_name'):
             logger.exception('params has no attribute name "parent_task_name"')
@@ -72,9 +67,9 @@ class ReportUpload(Base):
         file_key = params.get('file_key')
         parent_id = params['parent_id']
         parent_task_name = params['parent_task_name']
-        clazz_id = params['clazz_id']
-        experimental_item_id = params['experimental_item_id']
-        experimental_task_id = params['experimental_task_id']
+        project_id = params['project_id']
+        project = Project().query(project_id=project_id)[0]
+        experimental_task_id = project['experimental_task_id']
         from dmlab_app.task import get_task_method, get_customized_task_method
         task_method = get_task_method(parent_task_name)
         if not task_method:

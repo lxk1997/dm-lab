@@ -70,7 +70,7 @@ export default class Grade extends React.Component {
 
     getData() {
         $.ajax({
-            url: '/api/report',
+            url: '/api/report/mine',
             type: 'GET',
             async: false,
             dataType: 'json',

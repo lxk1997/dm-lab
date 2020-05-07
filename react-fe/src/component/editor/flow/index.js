@@ -7,9 +7,14 @@ import 'antd/dist/antd.css';
 import {Component, Project} from "../../project";
 
 class FlowPage extends React.Component{
+    constructor(props) {
+        super(props);
+    }
+
     render(){
         return(
         <GGEditor className={styles.editor}>
+            <span style={{'display': 'none'}} id={'project_id'}/>
             <Row className={styles.editorBd}>
                 <Col span={3} className={styles.editorSidebar}>
                     <Project/>

@@ -6,6 +6,7 @@ from flask import Blueprint, request, g
 from .auth import login_required
 from ..db.dao.dataset import Dataset
 from ..db.dao.experimental_item import ExperimentalItem
+from ..db.dao.project import Project
 from ..db.dao.user_clazz_relation import UserClazzRelation
 from ..filesystem import get_fs
 from ..task.dataset_utils import DatasetUtils
@@ -43,6 +44,14 @@ def handle_get_datasets():
     limit = request.args.get('limit', None)
     offset = request.args.get('offset', None)
     experimental_item_id = request.args.get('experimental_item_id', None)
+    project_id = request.args.get('project_id', None)
+    if project_id:
+        projects = Project().query(project_id=project_id)
+        if not projects:
+            msg = 'Current Project does not exists.'
+            error = 1
+            return api_response(msg, error, data)
+        experimental_item_id = projects[0]['experimental_item_id']
     if not experimental_item_id:
         msg = 'Experimental Item Id required.'
         error = 1

@@ -1,9 +1,10 @@
 import React from 'react';
-import {Card,Form,Input,InputNumber} from 'antd';
+import {Card,Form,Input,InputNumber, message} from 'antd';
 import ColorPicker from 'rc-color-picker';
 import 'rc-color-picker/assets/index.css';
 import {withPropsAPI} from 'gg-editor';
 import 'antd/dist/antd.css';
+import $ from 'jquery'
 import InputSource from "./input_source";
 import OutputSource from "./output_source";
 import DuplicateRemoval from "./duplicate_removal";
@@ -24,6 +25,15 @@ import ReportUpload from "./report_upload";
 const {Item}=Form;
 
 class NodeDetail extends React.Component{
+
+    componentWillMount() {
+        this.success = true
+        let t = $('#project_id').text()
+        if(t === '') {
+            message.warning('请先选择工程')
+            this.success = false
+        }
+    }
 
     render(){
         const {propsAPI}=this.props;
@@ -87,10 +97,14 @@ class NodeDetail extends React.Component{
                     Component = CustomizedRegressor;
             }
         }
-        return(<div>
-            <Component/>
-            <MenuComponent/></div>
-        )
+        if(this.success) {
+            return(<div>
+                <Component/>
+                <MenuComponent/></div>
+            )
+        } else {
+            return <div/>
+        }
     }
 }
 

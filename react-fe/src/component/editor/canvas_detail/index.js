@@ -1,64 +1,69 @@
 import React from 'react';
-import {Row,Col,Button,Card,Upload,Modal} from 'antd';
+import {Row,Col,Button,Card,Upload,Modal, Collapse} from 'antd';
 import {withPropsAPI} from 'gg-editor';
 import 'antd/dist/antd.css';
+import $ from 'jquery'
+
+const { Panel } = Collapse;
 
 class CanvasDetail extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+            project: null
+        }
+        this.project_id = null
+    }
 
-    handleSave=()=>{
-        const {propsAPI}=this.props;
-        const {save}=propsAPI;
-
-        const data=JSON.stringify(save());
-        Modal.info({
-            title:"请复制以下数据",
-            content:data,
-            okText:"复制",
-            onOk(){
-                const oInput=document.createElement('input');
-                oInput.value=data;
-                document.body.appendChild(oInput);
-                oInput.select();
-                document.execCommand("Copy");
-                document.body.removeChild(oInput);
+    getData = () => {
+        $.ajax({
+            url: `/api/project/${this.project_id}`,
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            success: jsonData => {
+                this.setState({project: jsonData.data})
             }
         })
-    };
+    }
 
-    handleImport=(ev)=>{
-        const {propsAPI}=this.props;
-        const {read}=propsAPI;
-        let reader=new FileReader();
-        let file=ev.fileList[0].originFileObj;
-        console.log(file);
-        reader.readAsText(file);
-        reader.onloadend=(ev)=>{
-            console.log(ev.target.result);
-            read(JSON.parse(ev.target.result));
+    componentWillMount() {
+        let project_id = $("#project_id").text()
+        if(project_id !== '') {
+            this.project_id = Number.parseInt(project_id)
+            this.getData()
         }
 
-    };
+        $("#project_id").bind('DOMNodeInserted',e => {
+            let project_id = $("#project_id").text()
+            if(project_id !== '') {
+                this.project_id = Number.parseInt(project_id)
+                this.getData()
+            }
+        });
+
+    }
 
     render(){
-
-
-        return (
-            <Card
-                title={"画布属性"}
-            >
-                <Row>
-                    <Col span={12}>
-                        <Button onClick={this.handleSave}>保存数据</Button>
-                    </Col>
-                    <Col span={12}>
-                        <Upload type={"file"} accept={".json"} onChange={this.handleImport}>
-                            <Button>导入数据</Button>
-                        </Upload>
-                    </Col>
-                </Row>
-            </Card>
-
-        )
+        if(this.project_id === null) {
+            return <Card/>
+        } else {
+            return (<div>
+                <Collapse defaultActiveKey={['1']} accordion expandIconPosition={'right'}>
+                    <Panel header="工程信息" key="1" style={{'overflow-x': 'scroll'}}>
+                        <div style={{'color': '#ccc'}}>名称</div>
+                        <div>{this.state.project.project_name}</div>
+                        <div style={{'color': '#ccc'}}>班级</div>
+                        <div>{this.state.project.clazz_name}</div>
+                        <div style={{'color': '#ccc'}}>实验项目</div>
+                        <div>{this.state.project.experimental_item_name}</div>
+                        <div style={{'color': '#ccc'}}>实验任务</div>
+                        <div>{this.state.project.experimental_task_name}</div>
+                        <div style={{'color': '#ccc'}}>创建时间</div>
+                        <div>{this.state.project.create_time}</div>
+                    </Panel></Collapse>
+            </div>)
+        }
     }
 }
 

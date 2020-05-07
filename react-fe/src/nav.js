@@ -42,7 +42,7 @@ export default class Nav extends React.Component {
                     </Menu.Item>
                     <Menu.Item key="4">
                         <MonitorOutlined style={{color: '#F0F2F5'}}/>
-                        <span>任务</span>
+                        <span>队列</span>
                         <Link to="/monitor"/>
                     </Menu.Item>
                     <SubMenu

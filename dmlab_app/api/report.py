@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 bp = Blueprint('api_report', __name__, url_prefix='/api/report')
 
 
-@bp.route('', methods=['GET'])
+@bp.route('/mine', methods=['GET'])
 @login_required
-def handle_get_reports():
+def handle_get_mine_reports():
     reports = Report().query(user_id=g.user['user_id'])
     data = []
     mp = {}
@@ -51,4 +51,12 @@ def handle_get_reports():
                 report['rank'] = '%d/%d' % (rank, UserClazzRelation().get_count(clazz_id=experimental_task['clazz_id']))
             data.append(report)
     data = {'detail': data}
+    return api_response('ok', 0, data)
+
+
+@bp.route('', methods=['GET'])
+@login_required
+def handle_get_reports():
+    reports = Report().query(limit=1024)
+    data = {'detail': reports}
     return api_response('ok', 0, data)
