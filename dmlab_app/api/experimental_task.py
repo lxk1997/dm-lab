@@ -98,8 +98,6 @@ def handle_get_experimental_task_leaderboard(experimental_task_id):
             report = Report().query(experimental_task_id=experimental_task_id, user_id=user_clazz_relation['user_id'])
             if report:
                 rsts.append(report[0])
-            else:
-                rsts.append({'user_name': user_clazz_relation['user_name']})
 
         data = rsts
         msg = 'ok'

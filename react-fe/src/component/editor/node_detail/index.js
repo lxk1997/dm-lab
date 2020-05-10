@@ -24,6 +24,7 @@ import ReportUpload from "./report_upload";
 import KNNRegressor from "./knn_regressor";
 import LASSORegressor from "./lasso_regressor";
 import LinearRegressor from "./linear_regressor";
+import KMeansCluster from "./k_means_cluster";
 
 const {Item}=Form;
 
@@ -89,6 +90,9 @@ class NodeDetail extends React.Component{
                 break;
             case '线性回归':
                 Component = LinearRegressor;
+                break;
+            case 'K-Means':
+                Component = KMeansCluster;
                 break;
             case 'Apriori':
                 Component = Apriori;

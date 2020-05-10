@@ -80,3 +80,24 @@ def handle_get_project(project_id):
         error = 1
         return api_response(msg, error)
     return api_response('ok', 0, projects[0])
+
+
+@bp.route('/<int:project_id>', methods=['POST'])
+@login_required
+def handle_update_project(project_id):
+    content = request.form.get('content', None)
+    if content:
+        content = json.loads(content)
+    projects = Project().query(project_id=project_id, user_id=g.user['user_id'])
+    if not projects:
+        msg = 'Project %d does not exists.' % project_id
+        error = 1
+        return api_response(msg, error)
+    row = Project().update(project_id=project_id, content=content)
+    if row:
+        msg = 'ok'
+        error = 0
+    else:
+        msg = 'fail'
+        error = 1
+    return api_response(msg, error)

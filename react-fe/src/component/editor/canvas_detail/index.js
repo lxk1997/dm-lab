@@ -1,5 +1,5 @@
 import React from 'react';
-import {Row,Col,Button,Card,Upload,Modal, Collapse} from 'antd';
+import {Row,Col,Button,Card,Upload,Modal, Collapse, message} from 'antd';
 import {withPropsAPI} from 'gg-editor';
 import 'antd/dist/antd.css';
 import $ from 'jquery'
@@ -16,30 +16,29 @@ class CanvasDetail extends React.Component{
     }
 
     getData = () => {
-        $.ajax({
-            url: `/api/project/${this.project_id}`,
-            type: 'GET',
-            dataType: 'json',
-            async: false,
-            success: jsonData => {
-                this.setState({project: jsonData.data})
-            }
-        })
+        let project = $('#project_id').text()
+        if(project!=='') {
+            this.project_id = Number.parseInt(project)
+            $.ajax({
+                url: `/api/project/${this.project_id}`,
+                type: 'GET',
+                dataType: 'json',
+                async: false,
+                success: jsonData => {
+                    this.setState({project: jsonData.data})
+                }
+            })
+        }
     }
 
-    componentWillMount() {
-        let project_id = $("#project_id").text()
-        if(project_id !== '') {
-            this.project_id = Number.parseInt(project_id)
-            this.getData()
-        }
 
+    componentWillMount() {
+        this.getData()
         $("#project_id").bind('DOMNodeInserted',e => {
-            let project_id = $("#project_id").text()
-            if(project_id !== '') {
-                this.project_id = Number.parseInt(project_id)
-                this.getData()
-            }
+            this.getData()
+            const {propsAPI}=this.props;
+            const {read}=propsAPI;
+            read({})
         });
 
     }

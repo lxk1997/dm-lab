@@ -665,6 +665,28 @@ export class Component extends React.Component {
                             shape={'flow-rect'}
                             model={{
                                 color:'#1890ff',
+                                label:'K-Means',
+                                task_name: 'K-Means',
+                                status: '',
+                                selected_columns: [],
+                                n_clusters: 8,
+                                init: 'k-means++',
+                                n_init: 10,
+                                max_iter: 300,
+                                tol: 0.0001,
+                                precompute_distances: 'auto',
+                                random_state: 'None',
+                                algorithm: 'auto'
+                            }}
+                            label={'K-Means'}
+                            children={<div>K-Means</div>}
+                        />
+                        <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
                                 label:'Apriori',
                                 task_name: 'Apriori',
                                 status: '',
