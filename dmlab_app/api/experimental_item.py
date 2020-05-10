@@ -1,10 +1,12 @@
 import logging
+from datetime import datetime
 
 from flask import Blueprint, request, g
 
 from .auth import login_required
 from ..db.dao.clazz import Clazz
 from ..db.dao.experimental_item import ExperimentalItem
+from ..db.dao.experimental_task import ExperimentalTask
 from ..db.dao.user_clazz_relation import UserClazzRelation
 from ..utils import api_response
 
@@ -45,6 +47,21 @@ def handle_get_experimental_items():
     for user_clazz_relation in user_clazz_relations:
         experimental_items = ExperimentalItem().query(clazz_id=user_clazz_relation['clazz_id'], limit=limit, offset=offset)
         rsts.extend(experimental_items)
+    for rst in rsts:
+        pre = 0
+        now = 0
+        last = 0
+        experimental_tasks = ExperimentalTask().query(experimental_item_id=rst['experimental_item_id'])
+        for experimental_task in experimental_tasks:
+            if datetime.now() < experimental_task['start_time']:
+                pre += 1
+            elif datetime.now() < experimental_task['dead_line']:
+                now += 1
+            else:
+                last += 1
+        rst['pre'] = pre
+        rst['now'] = now
+        rst['last'] = last
     data = {
         'detail': rsts,
         'count': len(rsts)

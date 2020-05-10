@@ -1,7 +1,7 @@
 from sqlalchemy import func
 
 from ..db import get_db
-from ..models import ClazzModel, UserClazzRelationModel
+from ..models import ClazzModel, UserClazzRelationModel, UserModel
 
 
 class Clazz:
@@ -23,7 +23,7 @@ class Clazz:
 
     def query(self, clazz_id=None, clazz_name=None, teacher_id=None, invite_code=None, deleted=0, description=None, limit=None, offset=None):
         try:
-            query = self._db.query(ClazzModel)
+            query = self._db.query(ClazzModel, UserModel).filter(ClazzModel.teacher_id == UserModel.id)
             if clazz_id is not None:
                 query = query.filter(ClazzModel.id == clazz_id)
             if clazz_name is not None:
@@ -42,12 +42,13 @@ class Clazz:
                     query = query.offset(offset)
             rets = query.all()
             clazzes = list(map(lambda c: {
-                'clazz_id': c.id,
-                'clazz_name': c.name,
-                'teacher_id': c.teacher_id,
-                'deleted': c.deleted,
-                'description': c.description,
-                'create_time': c.create_time.strftime("%Y-%m-%d  %H:%M:%S")
+                'clazz_id': c.ClazzModel.id,
+                'clazz_name': c.ClazzModel.name,
+                'teacher_id': c.ClazzModel.teacher_id,
+                'teacher_name': c.UserModel.username,
+                'deleted': c.ClazzModel.deleted,
+                'description': c.ClazzModel.description,
+                'create_time': c.ClazzModel.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets))
         finally:
             self._db.close()

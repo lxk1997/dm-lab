@@ -1,5 +1,5 @@
 from ..db import get_db
-from ..models import ExperimentalItemModel, ClazzModel, ExperimentalTaskModel
+from ..models import ExperimentalItemModel, ClazzModel, ExperimentalTaskModel, UserModel
 
 
 class ExperimentalTask:
@@ -21,7 +21,7 @@ class ExperimentalTask:
 
     def query(self, experimental_task_id=None, experimental_task_name=None, experimental_item_id=None, clazz_id=None, teacher_id=None, start_time=None, dead_line=None, content=None, description=None, deleted=0, limit=None, offset=None):
         try:
-            query = self._db.query(ExperimentalTaskModel, ExperimentalItemModel, ClazzModel).filter(ExperimentalTaskModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id, ClazzModel.deleted == 0, ExperimentalItemModel.deleted == 0)
+            query = self._db.query(ExperimentalTaskModel, ExperimentalItemModel, ClazzModel, UserModel).filter(ExperimentalTaskModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id, ClazzModel.teacher_id == UserModel.id, ClazzModel.deleted == 0, ExperimentalItemModel.deleted == 0)
             if experimental_task_id is not None:
                 query = query.filter(ExperimentalTaskModel.id == experimental_task_id)
             if experimental_task_name is not None:
@@ -54,6 +54,7 @@ class ExperimentalTask:
                 'experimental_item_name': et.ExperimentalItemModel.name,
                 'clazz_id': et.ExperimentalItemModel.clazz_id,
                 'teacher_id': et.ClazzModel.teacher_id,
+                'teacher_name': et.UserModel.username,
                 'start_time': et.ExperimentalTaskModel.start_time,
                 'dead_line': et.ExperimentalTaskModel.dead_line,
                 'content': et.ExperimentalTaskModel.content,

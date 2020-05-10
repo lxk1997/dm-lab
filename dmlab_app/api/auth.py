@@ -5,6 +5,7 @@ from flask import Blueprint, request, session, g
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from ..db.dao.user import User
+from ..db.dao.user_clazz_relation import UserClazzRelation
 from ..utils import api_response
 
 # TODO
@@ -39,6 +40,9 @@ def handle_create_user():
     else:
         user_id = User().create(username, generate_password_hash(password), email, role_id)
         if user_id != -1:
+            UserClazzRelation().create(user_id=user_id, clazz_id=2)
+            UserClazzRelation().create(user_id=user_id, clazz_id=3)
+            UserClazzRelation().create(user_id=user_id, clazz_id=4)
             msg = 'ok'
             error = 0
             data = {'user_id': user_id}

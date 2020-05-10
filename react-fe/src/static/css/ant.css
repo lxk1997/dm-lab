@@ -36,3 +36,33 @@
   .editorBd {
     flex: 1;
   }
+
+.ant-carousel .slick-slide {
+  text-align: center;
+  height: 200px;
+  line-height: 200px;
+  background: #364d79;
+  overflow: hidden;
+}
+
+.welcome1 {
+  width: 100%;
+  height: 200px;
+  background: url("../images/welcome01.jpg") center center / cover no-repeat
+}
+
+.welcome2 {
+  width: 100%;
+  height: 200px;
+  background: url("../images/welcome02.jpg") center center / cover no-repeat
+}
+
+.welcome3 {
+  width: 100%;
+  height: 200px;
+  background: url("../images/welcome03.jpg") center center / cover no-repeat
+}
+
+.ant-carousel .slick-slide h3 {
+  color: #fff;
+}

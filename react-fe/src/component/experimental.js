@@ -17,7 +17,10 @@ import {
     Tabs,
     DatePicker,
     Upload,
-    Tag
+    Tag,
+    List,
+    Card,
+    Avatar
 } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import Highlighter from 'react-highlight-words';
@@ -77,7 +80,7 @@ export default class ExperimentalItem extends React.Component {
     getData = ({offset = this.offset, limit = this.limit} = {}) => {
         this.offset = offset
         this.limit = limit
-        const api = `/api/experimental-item?offset=${offset}&limit=${limit}`
+        const api = `/api/experimental-item`
         fetch(api)
             .then(checkFetchStatus)
             .then(resp => resp.json())
@@ -103,17 +106,73 @@ export default class ExperimentalItem extends React.Component {
 
     render() {
         $("#header_title").text('实验项目')
+        let CartText = ({item}) => {
+            let id_icon = (<span style={{borderRadius: 4, background: '#81b3ff', marginRight: "12px"}}>
+                  <span style={{margin: "4px 0 4px 4px"}}>
+                  <span
+                      style={{
+                          borderTopLeftRadius: 4,
+                          borderBottomLeftRadius: 4,
+                          color: 'white',
+                          marginRight: '3px',
+                          fontSize: '13px'
+                      }}>
+                    ID
+                  </span>
+                  <span style={{
+                      borderTopRightRadius: 4,
+                      borderBottomRightRadius: 4,
+                      background: '#E3EEFC',
+                      color: '#81b3ff',
+                      paddingLeft: '3px',
+                      paddingRight: '4px'
+                  }}>
+                      {item.experimental_item_id}
+                  </span>
+                  </span>
+            </span>)
+            let title = (<div>
+                <div><span>{id_icon}</span><a href={"/experimental-item/" + item.experimental_item_id} style={{color: 'black'}}>{item.experimental_item_name}</a><span
+                    style={{position: "absolute", right: "20px"}}><span><Avatar style={{
+                    color: '#ffffff',
+                    backgroundColor: '#35caca',
+                }} size={20}>{item.teacher_name[0]}</Avatar></span><span
+                    style={{fontSize: '15px', marginRight: '5px'}}>{item.teacher_name}</span><span
+                    style={{color: '#C0C0C0', fontSize: '15px'}}>{item.time}</span></span></div>
+                <div style={{color: '#C0C0C0', marginTop: '5px'}}>{item.description}</div>
+            </div>);
+            let content = (
+                <div>
+                    <span>
+                        <span style={{color: '#C0C0C0', fontSize: '13px'}}>未开始: </span>
+                        <span>{item.pre}</span>
+                        <span style={{color: '#C0C0C0', fontSize: '13px', marginLeft: '15px'}}>正在进行: </span>
+                        <span>{item['now']}</span>
+                        <span style={{color: '#C0C0C0', fontSize: '13px', marginLeft: '15px'}}>已结束: </span>
+                        <span>{item.last}</span>
+                        <span style={{color: '#C0C0C0', fontSize: '13px', marginLeft: '15px'}}>班级: </span>
+                        <span>{item.clazz_name}</span>
+                    </span>
+                    <span style={{position: "absolute", right: "20px"}}/>
+                </div>)
+            return (<Card title={title}>{content}</Card>)
+        };
         let pagination = {
             showQuickJumper: true,
-            total: this.total,
-            current: this.current,
-            onChange: this.handleChangePage,
             defaultPageSize: 20
         }
         return (
             <div>
-                <Table pagination={pagination} ref={"table"} dataSource={this.state.experimental_items}
-                       columns={this.columns}/>
+                <List
+                    grid={{gutter: 16, column: 1}}
+                    dataSource={this.state.experimental_items}
+                    pagination={pagination}
+                    renderItem={item => (
+                        <List.Item>
+                            <CartText item={item}/>
+                        </List.Item>
+                    )}
+                />
             </div>)
     }
 }
@@ -338,17 +397,90 @@ class ExperimentalTask extends React.Component {
 
     render() {
         $("#header_title").text('')
+        let Status = ({item}) => {
+                    let color = ""
+                    switch (item.status) {
+                        case "未开始":
+                            color = "green"
+                            break
+                        case "正在进行":
+                            color = "blue"
+                            break
+                        default:
+                            color = 'gray'
+                            break
+                    }
+                    return (
+                        <span>
+                            <Tag color={color} key={item.status}>
+                              {item.status}
+                            </Tag>
+                        </span>
+                    );
+                }
+        let CartText = ({item}) => {
+            let id_icon = (<span style={{borderRadius: 4, background: '#81b3ff', marginRight: "12px"}}>
+                  <span style={{margin: "4px 0 4px 4px"}}>
+                  <span
+                      style={{
+                          borderTopLeftRadius: 4,
+                          borderBottomLeftRadius: 4,
+                          color: 'white',
+                          marginRight: '3px',
+                          fontSize: '13px'
+                      }}>
+                    ID
+                  </span>
+                  <span style={{
+                      borderTopRightRadius: 4,
+                      borderBottomRightRadius: 4,
+                      background: '#E3EEFC',
+                      color: '#81b3ff',
+                      paddingLeft: '3px',
+                      paddingRight: '4px'
+                  }}>
+                      {item.experimental_task_id}
+                  </span>
+                  </span>
+            </span>)
+            let title = (<div>
+                <div><span>{id_icon}</span><a href={"/experimental-task/" + item.experimental_task_id} style={{color: 'black', 'margin-right': '20px'}}>{item.experimental_task_name}</a><Status item={item}/><span
+                    style={{position: "absolute", right: "20px"}}><span><Avatar style={{
+                    color: '#ffffff',
+                    backgroundColor: '#35caca',
+                }} size={20}>{item.teacher_name[0]}</Avatar></span><span
+                    style={{fontSize: '15px', marginRight: '5px'}}>{item.teacher_name}</span><span
+                    style={{color: '#C0C0C0', fontSize: '15px'}}>{item.time}</span></span></div>
+                <div style={{color: '#C0C0C0', marginTop: '5px'}}>{item.description}</div>
+            </div>);
+            let content = (
+                <div>
+                    <span>
+                        <span style={{color: '#C0C0C0', fontSize: '13px'}}>开始时间: </span>
+                        <span>{item.start_time}</span>
+                        <span style={{color: '#C0C0C0', fontSize: '13px', marginLeft: '15px'}}>结束时间: </span>
+                        <span>{item['dead_line']}</span>
+                    </span>
+                    <span style={{position: "absolute", right: "20px"}}/>
+                </div>)
+            return (<Card title={title}>{content}</Card>)
+        };
         let pagination = {
             showQuickJumper: true,
-            total: this.total,
-            current: this.current,
-            onChange: this.handleChangePage,
             defaultPageSize: 20
         }
         return (
             <div>
-                <Table pagination={pagination} ref={"table"} dataSource={this.state.experimental_tasks}
-                       columns={this.columns}/>
+                <List
+                    grid={{gutter: 16, column: 1}}
+                    dataSource={this.state.experimental_tasks}
+                    pagination={pagination}
+                    renderItem={item => (
+                        <List.Item>
+                            <CartText item={item}/>
+                        </List.Item>
+                    )}
+                />
             </div>)
     }
 }
@@ -403,20 +535,20 @@ export class ExperimentalTaskDetail extends React.Component {
     render() {
         $("#header_title").text('')
         const attachments = {
-          defaultFileList: [
-            {
-              uid: '1',
-              name: this.state.experimental_task.file_name,
-              status: 'done',
-              response: '200',
-              url: this.state.experimental_task.file_path
+            defaultFileList: [
+                {
+                    uid: '1',
+                    name: this.state.experimental_task.file_name,
+                    status: 'done',
+                    response: '200',
+                    url: this.state.experimental_task.file_path
+                },
+            ],
+            showUploadList: {
+                showDownloadIcon: true,
+                downloadIcon: 'download ',
+                showRemoveIcon: false
             },
-          ],
-          showUploadList: {
-            showDownloadIcon: true,
-            downloadIcon: 'download ',
-            showRemoveIcon: false
-          },
         };
         let tag = null;
         switch (this.state.experimental_task.status) {
@@ -431,13 +563,13 @@ export class ExperimentalTaskDetail extends React.Component {
         }
         const renderContent = (column = 1) => (
             <Descriptions size="small" column={column}>
-              <Descriptions.Item label="创建时间">{this.state.experimental_task.create_time}</Descriptions.Item>
-              <Descriptions.Item label="开始时间">{this.state.experimental_task.start_time}</Descriptions.Item>
-              <Descriptions.Item label="结束时间">{this.state.experimental_task.dead_line}</Descriptions.Item>
-              <Descriptions.Item label="描述">
-                  {this.state.experimental_task.description}
-              </Descriptions.Item>
-          </Descriptions>
+                <Descriptions.Item label="创建时间">{this.state.experimental_task.create_time}</Descriptions.Item>
+                <Descriptions.Item label="开始时间">{this.state.experimental_task.start_time}</Descriptions.Item>
+                <Descriptions.Item label="结束时间">{this.state.experimental_task.dead_line}</Descriptions.Item>
+                <Descriptions.Item label="描述">
+                    {this.state.experimental_task.description}
+                </Descriptions.Item>
+            </Descriptions>
         );
         const extraContent = (
             <div
@@ -459,15 +591,18 @@ export class ExperimentalTaskDetail extends React.Component {
             );
         };
         return (<div>
-            <ScoreLeaderboard visiable={this.state.score_leaderboard_modal_visible} experimental_task_id={this.experimental_task_id} ref={"scoreLeaderboardModal"} parent={this}/>
+            <ScoreLeaderboard visiable={this.state.score_leaderboard_modal_visible}
+                              experimental_task_id={this.experimental_task_id} ref={"scoreLeaderboardModal"}
+                              parent={this}/>
             <PageHeader
                 tags={tag}
                 className="site-page-header-responsive"
                 onBack={() => window.history.back()}
                 title={this.state.experimental_task.experimental_task_name}
                 extra={[
-                    <Button key="1" type="primary" onClick={this.handleScoreLeaderBoardDisplay} style={{'border-radius': '4px'}}>
-                      积分榜
+                    <Button key="1" type="primary" onClick={this.handleScoreLeaderBoardDisplay}
+                            style={{'border-radius': '4px'}}>
+                        积分榜
                     </Button>,
                 ]}>
                 <ExperimentalTaskDetailContent extra={extraContent}>{renderContent()}</ExperimentalTaskDetailContent>
@@ -519,8 +654,8 @@ class ScoreLeaderboard extends React.Component {
                 title: '',
                 key: 'action',
                 render: (text, record) => {
-                    if(record.score !== '') {
-                      return (<span>
+                    if (record.score !== '') {
+                        return (<span>
                         <a style={{marginRight: 8}} href={"#"}
                            onClick={() => this.handleDisplayReport(record)}><Tag key={'查看报告'} color={'green'}>查看报告</Tag></a>
                     </span>)
@@ -595,7 +730,7 @@ class ScoreLeaderboard extends React.Component {
                 onCancel={this.hideModal}
                 footer={null}>
                 <ReportModal visiable={this.state.report_modal_visible} ref={"reportModal"} parent={this}/>
-                <Table  size={"small"} pagination={pagination} ref={"table"} dataSource={this.state.reports}
+                <Table size={"small"} pagination={pagination} ref={"table"} dataSource={this.state.reports}
                        columns={this.columns}/>
             </Modal>
         );
@@ -640,12 +775,17 @@ function experimentalItemTableFilter(data) {
     for (let idx = 0; idx < data.length; idx++) {
         let result = {}
         result['key'] = idx
-        result['name'] = data[idx].experimental_item_name
+        result['experimental_item_name'] = data[idx].experimental_item_name
         result['clazz_name'] = data[idx].clazz_name
         result['clazz_id'] = data[idx].clazz_id
+        result['teacher_id'] = data[idx].teacher_id
+        result['teacher_name'] = data[idx].teacher_name
+        result['pre'] = data[idx].pre
+        result['now'] = data[idx]['now']
+        result['last'] = data[idx].last
         result['time'] = data[idx].create_time
         result['experimental_item_id'] = data[idx].experimental_item_id
-        result['description'] = data[idx].description
+        result['description'] = data[idx].description === '' || data[idx].description === null ? "暂无描述" : data[idx].description
         results.push(result)
     }
     return results
@@ -656,13 +796,16 @@ function experimentalTaskTableFilter(data) {
     for (let idx = 0; idx < data.length; idx++) {
         let result = {}
         result['key'] = idx
-        result['name'] = data[idx].experimental_task_name
+        result['experimental_task_name'] = data[idx].experimental_task_name
         result['time'] = data[idx].create_time
         result['start_time'] = data[idx].start_time
         result['dead_line'] = data[idx].dead_line
+        result['teacher_id'] = data[idx].teacher_id
+        result['teacher_name'] = data[idx].teacher_name
         result['experimental_item_id'] = data[idx].experimental_item_id
         result['experimental_task_id'] = data[idx].experimental_task_id
         result['status'] = data[idx].status
+        result['description'] = data[idx].description === '' || data[idx].description === null ? "暂无描述" : data[idx].description
         results.push(result)
     }
     return results
@@ -673,18 +816,18 @@ function reportTableFilter(data) {
     for (let idx = 0; idx < data.length; idx++) {
         let result = {}
         result['key'] = idx
-        result['report_id'] = haveField(data[idx], 'report_id')?data[idx].report_id: ''
-        result['experimental_task_id'] = haveField(data[idx], 'experimental_task_id')?data[idx].experimental_task_id: ''
-        result['experimental_task_name'] = haveField(data[idx], 'experimental_task_name')?data[idx].experimental_task_name: ''
-        result['task_name'] = haveField(data[idx], 'task_name')?data[idx].task_name: ''
-        result['data_id'] = haveField(data[idx], 'data_id')?data[idx].data_id: ''
-        result['user_id'] = haveField(data[idx], 'user_id')?data[idx].user_id: ''
-        result['user_name'] = haveField(data[idx], 'user_name')?data[idx].user_name: ''
-        result['content'] = haveField(data[idx], 'content')?data[idx].content: ''
-        result['file_key'] = haveField(data[idx], 'file_key')?data[idx].file_key: ''
-        result['score'] = haveField(data[idx], 'score')?data[idx].score: '暂无'
-        result['score_content'] = haveField(data[idx], 'score_content')?data[idx].score_content: ''
-        result['create_time'] = haveField(data[idx], 'create_time')?data[idx].create_time: ''
+        result['report_id'] = haveField(data[idx], 'report_id') ? data[idx].report_id : ''
+        result['experimental_task_id'] = haveField(data[idx], 'experimental_task_id') ? data[idx].experimental_task_id : ''
+        result['experimental_task_name'] = haveField(data[idx], 'experimental_task_name') ? data[idx].experimental_task_name : ''
+        result['task_name'] = haveField(data[idx], 'task_name') ? data[idx].task_name : ''
+        result['data_id'] = haveField(data[idx], 'data_id') ? data[idx].data_id : ''
+        result['user_id'] = haveField(data[idx], 'user_id') ? data[idx].user_id : ''
+        result['user_name'] = haveField(data[idx], 'user_name') ? data[idx].user_name : ''
+        result['content'] = haveField(data[idx], 'content') ? data[idx].content : ''
+        result['file_key'] = haveField(data[idx], 'file_key') ? data[idx].file_key : ''
+        result['score'] = haveField(data[idx], 'score') ? data[idx].score : '暂无'
+        result['score_content'] = haveField(data[idx], 'score_content') ? data[idx].score_content : ''
+        result['create_time'] = haveField(data[idx], 'create_time') ? data[idx].create_time : ''
         results.push(result)
     }
     return results
@@ -692,11 +835,11 @@ function reportTableFilter(data) {
 
 function reportFilter(data) {
     let rsts = []
-    for(var idx = 0; idx < data.length; idx++) {
+    for (var idx = 0; idx < data.length; idx++) {
         let element = null
-        if(data[idx].type === 'table') {
+        if (data[idx].type === 'table') {
             element = tableRender(data[idx])
-        } else if(data[idx].type === 'image') {
+        } else if (data[idx].type === 'image') {
             element = imageRender(data[idx])
         }
         rsts.push(element)
@@ -706,7 +849,7 @@ function reportFilter(data) {
 
 function tableRender(data) {
     let columns = []
-    for(let idx = 0; idx < data.data.headers.length; idx++) {
+    for (let idx = 0; idx < data.data.headers.length; idx++) {
         columns.push({
             title: data.data.headers[idx],
             dataIndex: data.data.headers[idx],
@@ -715,20 +858,24 @@ function tableRender(data) {
         })
     }
     let contents = []
-    for(let idx = 0; idx < data.data.content.length; idx++) {
+    for (let idx = 0; idx < data.data.content.length; idx++) {
         let content = {key: idx}
-        for(let idx1 = 0; idx1 < data.data.headers.length; idx1++) {
+        for (let idx1 = 0; idx1 < data.data.headers.length; idx1++) {
             content[data.data.headers[idx1]] = data.data.content[idx][idx1]
         }
         contents.push(content)
     }
-    return <Table style={{'margin-bottom': '5px'}} bordered size={'small'} title={() => <div style={{'textAlign': 'center'}}>{data.name}</div>}columns={columns} dataSource={contents} pagination={false}/>
+    return <Table style={{'margin-bottom': '5px'}} bordered size={'small'}
+                  title={() => <div style={{'textAlign': 'center'}}>{data.name}</div>} columns={columns}
+                  dataSource={contents} pagination={false}/>
 }
 
 function imageRender(data) {
-    if(data.name === 'Overview') {
-        return (<div style={{'text-align': 'center'}}><img src={data.data} width={"500px"}/><br/><span style={{'margin-bottom': '5px'}}>{data.name}</span></div>)
+    if (data.name === 'Overview') {
+        return (<div style={{'text-align': 'center'}}><img src={data.data} width={"500px"}/><br/><span
+            style={{'margin-bottom': '5px'}}>{data.name}</span></div>)
     } else {
-        return (<div style={{'text-align': 'center'}}><img src={data.data} width={"680px"}/><br/><span style={{'margin-bottom': '5px'}}>{data.name}</span></div>)
+        return (<div style={{'text-align': 'center'}}><img src={data.data} width={"680px"}/><br/><span
+            style={{'margin-bottom': '5px'}}>{data.name}</span></div>)
     }
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import 'antd/dist/antd.css';
 import $ from 'jquery'
-import {Button, Descriptions, Form, Input, message, Modal, PageHeader, Popconfirm, Table} from 'antd';
+import {Button, Descriptions, Form, Input, message, Modal, PageHeader, Popconfirm, Table, List, Card, Avatar} from 'antd';
 import Highlighter from 'react-highlight-words';
 import {SearchOutlined} from '@ant-design/icons';
 import {checkFetchStatus} from "../page/utils";
@@ -87,7 +87,7 @@ export default class Clazz extends React.Component {
     getData = ({offset = this.offset, limit = this.limit} = {}) => {
         this.offset = offset
         this.limit = limit
-        const api = `/api/clazz?offset=${offset}&limit=${limit}`
+        const api = `/api/clazz`
         fetch(api)
             .then(checkFetchStatus)
             .then(resp => resp.json())
@@ -113,17 +113,70 @@ export default class Clazz extends React.Component {
 
     render() {
         $("#header_title").text('班级管理')
+        let CartText = ({item}) => {
+            let id_icon = (<span style={{borderRadius: 4, background: '#81b3ff', marginRight: "12px"}}>
+                  <span style={{margin: "4px 0 4px 4px"}}>
+                  <span
+                      style={{
+                          borderTopLeftRadius: 4,
+                          borderBottomLeftRadius: 4,
+                          color: 'white',
+                          marginRight: '3px',
+                          fontSize: '13px'
+                      }}>
+                    ID
+                  </span>
+                  <span style={{
+                      borderTopRightRadius: 4,
+                      borderBottomRightRadius: 4,
+                      background: '#E3EEFC',
+                      color: '#81b3ff',
+                      paddingLeft: '3px',
+                      paddingRight: '4px'
+                  }}>
+                      {item.clazz_id}
+                  </span>
+                  </span>
+            </span>)
+            let title = (<div>
+                <div><span>{id_icon}</span><a href={"/clazz/" + item.clazz_id} style={{color: 'black'}}>{item.clazz_name}</a><span
+                    style={{position: "absolute", right: "20px"}}><span><Avatar style={{
+                    color: '#ffffff',
+                    backgroundColor: '#35caca',
+                }} size={20}>{item.teacher_name[0]}</Avatar></span><span
+                    style={{fontSize: '15px', marginRight: '5px'}}>{item.teacher_name}</span><span
+                    style={{color: '#C0C0C0', fontSize: '15px'}}>{item.time}</span></span></div>
+                <div style={{color: '#C0C0C0', marginTop: '5px'}}>{item.description}</div>
+            </div>);
+            let content = (
+                <div>
+                    <span>
+                        <span style={{color: '#C0C0C0', fontSize: '13px'}}>人数: </span>
+                        <span>{item.count}</span>
+                    </span>
+                    <span style={{position: "absolute", right: "20px"}}><Popconfirm title='确定退出班级吗? 退出后对应的实验提交记录将一并删除，请谨慎选择' onConfirm={() => this.handleDeleteClazz(item)}>
+                            <a style={{"color": "red"}}>退出</a>
+                        </Popconfirm></span>
+                </div>)
+            return (<Card title={title}>{content}</Card>)
+        };
         let pagination = {
             showQuickJumper: true,
-            total: this.total,
-            current: this.current,
-            onChange: this.handleChangePage,
             defaultPageSize: 20
         }
         return (
             <div>
                 <JoinClazzModal parent={this}/>
-                <Table pagination={pagination} ref={"table"} dataSource={this.state.clazzes} columns={this.columns}/>
+                <List
+                    grid={{gutter: 16, column: 1}}
+                    dataSource={this.state.clazzes}
+                    pagination={pagination}
+                    renderItem={item => (
+                        <List.Item>
+                            <CartText item={item}/>
+                        </List.Item>
+                    )}
+                />
             </div>)
     }
 }
@@ -506,10 +559,12 @@ function clazzTableFilter(data) {
     for (let idx = 0; idx < data.length; idx++) {
         let result = {}
         result['key'] = idx
-        result['name'] = data[idx].clazz_name
+        result['clazz_name'] = data[idx].clazz_name
         result['count'] = data[idx].number
         result['time'] = data[idx].join_time
+        result['teacher_name'] = data[idx].teacher_name
         result['clazz_id'] = data[idx].clazz_id
+        result['description'] = data[idx].description === '' || data[idx].description === null ? "暂无描述" : data[idx].description
         results.push(result)
     }
     return results

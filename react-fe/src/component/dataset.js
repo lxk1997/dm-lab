@@ -17,7 +17,10 @@ import {
     Tabs,
     DatePicker,
     Upload,
-    Tag
+    Tag,
+    List,
+    Card,
+    Avatar
 } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import Highlighter from 'react-highlight-words';
@@ -129,18 +132,78 @@ export default class Dataset extends React.Component {
 
     render() {
         $("#header_title").text('')
+        let CartText = ({item}) => {
+            let id_icon = (<span style={{borderRadius: 4, background: '#81b3ff', marginRight: "12px"}}>
+                  <span style={{margin: "4px 0 4px 4px"}}>
+                  <span
+                      style={{
+                          borderTopLeftRadius: 4,
+                          borderBottomLeftRadius: 4,
+                          color: 'white',
+                          marginRight: '3px',
+                          fontSize: '13px'
+                      }}>
+                    ID
+                  </span>
+                  <span style={{
+                      borderTopRightRadius: 4,
+                      borderBottomRightRadius: 4,
+                      background: '#E3EEFC',
+                      color: '#81b3ff',
+                      paddingLeft: '3px',
+                      paddingRight: '4px'
+                  }}>
+                      {item.dataset_id}
+                  </span>
+                  </span>
+            </span>)
+            let title = (<div>
+                <div><span>{id_icon}</span><a href={"/dataset/" + item.dataset_id} style={{color: 'black', 'margin-right': '20px'}}>{item.dataset_name}</a><span
+                    style={{position: "absolute", right: "20px"}}><span><Avatar style={{
+                    color: '#ffffff',
+                    backgroundColor: '#35caca',
+                }} size={20}>{item.user_only===1?item.user_name[0]:item.teacher_name[0]}</Avatar></span><span
+                    style={{fontSize: '15px', marginRight: '5px'}}>{item.user_only===1?item.user_name:item.teacher_name}</span><span
+                    style={{color: '#C0C0C0', fontSize: '15px'}}>{item.create_time}</span></span></div>
+                <div style={{color: '#C0C0C0', marginTop: '5px'}}>{item.description}</div>
+            </div>);
+            let content = (
+                <div>
+                    <span/>
+                    <span style={{position: "absolute", right: "20px"}}>
+                    {
+                        item.user_only===1?(<span>
+                            <a style={{marginRight: 8}} href={"#"}
+                               onClick={() => this.handleUpdateDataset(item)}>修改</a>
+                            <Popconfirm title='确认删除该数据集吗?请谨慎选择'
+                                        onConfirm={() => this.handleDeleteDataset(item)}>
+                                <a style={{"color": 'red'}}>删除</a>
+                            </Popconfirm>
+                        </span>):<span/>
+                    }</span>
+                </div>)
+            return (<Card title={title}>{content}</Card>)
+        };
         let pagination = {
             showQuickJumper: true,
             defaultPageSize: 20
         }
         return (
             <div>
-                 <NewDatasetModal parent={this} experimental_item_id={this.experimental_item_id}/>
+                <NewDatasetModal parent={this} experimental_item_id={this.experimental_item_id}/>
                 <UpdateDatasetModal visiable={this.update_modal_visible}
                                              update_dataset={this.update_dataset}
                                              ref={"updateDatasetModal"} parent={this}/>
-                <Table pagination={pagination} ref={"table"} dataSource={this.state.datasets}
-                       columns={this.columns}/>
+                <List
+                    grid={{gutter: 16, column: 1}}
+                    dataSource={this.state.datasets}
+                    pagination={pagination}
+                    renderItem={item => (
+                        <List.Item>
+                            <CartText item={item}/>
+                        </List.Item>
+                    )}
+                />
             </div>)
     }
 }
@@ -301,7 +364,9 @@ function datasetTableFilter(data) {
         result['dataset_name'] = data[idx].dataset_name
         result['dataset_id'] = data[idx].dataset_id
         result['user_only'] = data[idx].user_only
-        result['description'] = data[idx].description
+        result['user_name'] = data[idx].hasOwnProperty('user_name')?data[idx].user_name: ''
+        result['teacher_name'] = data[idx].teacher_name
+        result['description'] = data[idx].description === '' || data[idx].description === null ? "暂无描述" : data[idx].description
         result['create_time'] = data[idx].create_time
         results.push(result)
     }
