@@ -30,14 +30,8 @@ export default class Dataset extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            limit: 20,
-            offset: 0,
             datasets: []
         };
-        this.offset = 0
-        this.limit = 20
-        this.total = 0
-        this.current = 0
         this.experimental_item_id = props.experimental_item_id
         this.update_modal_visible = false
         this.update_dataset = null
@@ -56,12 +50,52 @@ export default class Dataset extends React.Component {
                 key: 'create_time',
                 sorter: (a, b) => a.time > b.time,
                 sortDirections: ['descend', 'ascend'],
+            },
+            {
+                title: '操作',
+                key: 'action',
+                render: (text, record) => {
+                    if(record.user_only === 1) {
+                        return (<span>
+                            <a style={{marginRight: 8}} href={"#"}
+                               onClick={() => this.handleUpdateDataset(record)}>修改</a>
+                            <Popconfirm title='确认删除该数据集吗?请谨慎选择'
+                                        onConfirm={() => this.handleDeleteDataset(record)}>
+                                <a style={{"color": 'red'}}>删除</a>
+                            </Popconfirm>
+                        </span>)
+                    } else {
+                        return (<span/>)
+                    }
+                }
             }
         ];
     }
 
-    handleChangePage = (pageNumber) => {
-        this.getData({offset: (pageNumber - 1) * this.limit, limit: this.limit})
+    handleUpdateDataset = recode => {
+        this.update_modal_visible = true
+        this.update_dataset = recode
+        this.refs.updateDatasetModal.setInfo({
+            visible: this.update_modal_visible,
+            dataset: this.update_dataset
+        })
+    }
+
+    handleDeleteDataset = recode => {
+        $.ajax({
+            type: 'DELETE',
+            url: '/api/dataset/' + recode.dataset_id,
+            async: false,
+            dataType: 'json',
+            success: (jsonData) => {
+                if (jsonData.error) {
+                    message.error(jsonData.msg)
+                } else {
+                    message.success('数据集删除成功')
+                    this.getData()
+                }
+            }
+        })
     }
 
     getModalMsg = (result, msg) => {
@@ -71,27 +105,22 @@ export default class Dataset extends React.Component {
     }
 
 
-    getData = ({offset = this.offset, limit = this.limit} = {}) => {
-        this.offset = offset
-        this.limit = limit
-        const api = `/api/dataset?experimental_item_id=${this.experimental_item_id}&offset=${offset}&limit=${limit}`
-        fetch(api)
-            .then(checkFetchStatus)
-            .then(resp => resp.json())
-            .then(jsonData => {
+    getData = () => {
+        let api = `/api/dataset?experimental_item_id=${this.experimental_item_id}&user_only=${-1}`
+        $.ajax({
+            url: api,
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            success: jsonData => {
                 let data = jsonData.data.detail
-                this.total = jsonData.data.count
-                this.current = Number.parseInt(offset / limit, 10) + 1
                 let datasets = datasetTableFilter(data)
                 if (this.state.datasets.length > 0) {
                     this.setState({datasets: []})
                 }
                 this.setState({datasets: datasets})
-            })
-            .catch(err => {
-                alert(`fatal error, error message in console.`)
-                console.log(err)
-            })
+            }
+        })
     }
 
     componentWillMount = () => {
@@ -102,16 +131,164 @@ export default class Dataset extends React.Component {
         $("#header_title").text('')
         let pagination = {
             showQuickJumper: true,
-            total: this.total,
-            current: this.current,
-            onChange: this.handleChangePage,
             defaultPageSize: 20
         }
         return (
             <div>
+                 <NewDatasetModal parent={this} experimental_item_id={this.experimental_item_id}/>
+                <UpdateDatasetModal visiable={this.update_modal_visible}
+                                             update_dataset={this.update_dataset}
+                                             ref={"updateDatasetModal"} parent={this}/>
                 <Table pagination={pagination} ref={"table"} dataSource={this.state.datasets}
                        columns={this.columns}/>
             </div>)
+    }
+}
+
+class NewDatasetModal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading: false,
+            visible: false,
+        };
+        this.experimental_item_id = props.experimental_item_id
+    }
+
+    showModal = () => {
+        this.setState({visible: true});
+    }
+
+    hideModal = () => {
+        this.setState({visible: false, loading: false});
+        this.refs.form.resetFields();
+
+    }
+
+    setParentMsg = () => {
+        this.props.parent.getModalMsg(this, true)
+    }
+
+    handleCreateDataset = values => {
+        this.setState({loading: true});
+        if(this.dataset_file_path === null || this.dataset_file_path === '') {
+            message.error('数据集上传失败,请重新上传数据集');
+            this.setState({loading: false});
+        } else {
+            $.ajax({
+            type: 'POST',
+            url: '/api/dataset/create',
+            async: false,
+            data: {
+                'experimental_item_id': this.experimental_item_id,
+                'dataset_name': values.dataset_name,
+                'description': values.description,
+                'file': this.dataset_file_path,
+                'user_only': 1
+            },
+            dataType: 'json',
+            success: (jsonData) => {
+                if (jsonData.error) {
+                    message.error(jsonData.msg);
+                } else {
+                    this.setParentMsg();
+                    message.success('数据集创建成功')
+                }
+                this.refs.form.resetFields()
+                this.setState({loading: false, visible: false});
+            }
+        });
+        }
+        this.dataset_file_path = null;
+    }
+
+    render() {
+        const props = {
+          name: 'file',
+          multiple: false,
+          action: '/api/uploader',
+          onChange: (info) => {
+            let status = info.file.hasOwnProperty('response') && info.file.response.hasOwnProperty('status') ?info.file.response.status: ""
+            if (status === 'done') {
+              message.success(`${info.file.name} file uploaded successfully.`);
+              this.dataset_file_path = info.file.response.name
+            } else if (status === 'error'){
+              message.error(`${info.file.name} file upload failed.`);
+            }
+          },
+        };
+        return (
+            <div>
+                <div style={{"textAlign": "right"}}>
+                    <Button type="primary" size={"large"} onClick={this.showModal}>
+                        ＋&nbsp;&nbsp;新建数据集
+                    </Button></div>
+                <Modal
+                    width="800px"
+                    visible={this.state.visible}
+                    title="添加数据集"
+                    onOk={this.handleCreateDataset}
+                    onCancel={this.hideModal}
+                    footer={null}>
+                    <Form
+                        name="new-dataset"
+                        ref="form"
+                        className="new-dataset-form"
+                        onFinish={this.handleCreateDataset}>
+                        <Form.Item
+                            name="dataset_name"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input the Dataset Name!',
+                                },
+                            ]}>
+                            <Input placeholder="Dataset Name"/>
+                        </Form.Item>
+                        <Form.Item
+                            name="description"
+                            rules={[
+                                {
+                                    required: false
+                                },
+                            ]}>
+                            <TextArea placeholder="Description"/>
+                        </Form.Item>
+                        <Form.Item
+                            name="file"
+                            rules={[
+                                {
+                                    required: true
+                                }
+                            ]}>
+                            <div style={{"height":"70px"}}>
+                                <Upload.Dragger {...props}>
+                                    <p style={{"color": "blue"}}>
+                                        <InboxOutlined/>
+                                    </p>
+                                    <p>Click or drag file to this area to upload</p>
+                                </Upload.Dragger>
+                            </div>
+                        </Form.Item>
+                        <Form.Item style={{"textAlign": "center"}}>
+                            <Button key="submit" type="primary" htmlType="submit" loading={this.state.loading}>
+                                提交
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </Modal>
+            </div>
+        );
+    }
+}
+
+class UpdateDatasetModal extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return <span/>
     }
 }
 
@@ -123,6 +300,7 @@ function datasetTableFilter(data) {
         result['key'] = idx
         result['dataset_name'] = data[idx].dataset_name
         result['dataset_id'] = data[idx].dataset_id
+        result['user_only'] = data[idx].user_only
         result['description'] = data[idx].description
         result['create_time'] = data[idx].create_time
         results.push(result)

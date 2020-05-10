@@ -121,6 +121,8 @@ class DatasetModel(Base):
     name = Column(String(50), nullable=False)
     experimental_item_id = Column(Integer, ForeignKey('experimental_item.id', ondelete='CASCADE'), nullable=False)
     description = Column(Text)
+    user_only = Column(Integer, default=0)
+    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'))
     file_key = Column(String(100), nullable=False)
     deleted = Column(Integer, nullable=False)
     create_time = Column(DateTime, server_default=func.now())

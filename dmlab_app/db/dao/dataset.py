@@ -8,8 +8,8 @@ class Dataset:
     def __init__(self):
         self._db = get_db()
 
-    def create(self, dataset_name, experimental_item_id, file_key, deleted=0, description=None):
-        dataset = DatasetModel(name=dataset_name, experimental_item_id=experimental_item_id, file_key=file_key, deleted=deleted, description=description)
+    def create(self, dataset_name, experimental_item_id, file_key, deleted=0, description=None, user_only=0, user_id=None):
+        dataset = DatasetModel(name=dataset_name, experimental_item_id=experimental_item_id, file_key=file_key, deleted=deleted, description=description, user_id=user_id, user_only=user_only)
         try:
             self._db.add(dataset)
             self._db.commit()
@@ -21,7 +21,7 @@ class Dataset:
             self._db.close()
         return d_id
 
-    def query(self, dataset_id=None, dataset_name=None, experimental_item_id=None, file_key=None, deleted=0, description=None, limit=None, offset=None):
+    def query(self, dataset_id=None, dataset_name=None, experimental_item_id=None, file_key=None, user_only=None, user_id=None, deleted=0, description=None, limit=None, offset=None):
         try:
             query = self._db.query(DatasetModel, ExperimentalItemModel).filter(DatasetModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.deleted == 0)
             if dataset_id is not None:
@@ -34,6 +34,10 @@ class Dataset:
                 query = query.filter(DatasetModel.file_key == file_key)
             if description is not None:
                 query = query.filter(DatasetModel.description == description)
+            if user_only is not None:
+                query = query.filter(DatasetModel.user_only == user_only)
+            if user_id is not None:
+                query = query.filter(DatasetModel.user_id == user_id)
             query = query.filter(DatasetModel.deleted == deleted)
             query = query.order_by(DatasetModel.create_time.desc())
             if limit is not None:
@@ -46,6 +50,8 @@ class Dataset:
                 'dataset_name': d.DatasetModel.name,
                 'experimental_item_id': d.DatasetModel.experimental_item_id,
                 'file_key': d.DatasetModel.file_key,
+                'user_id': d.DatasetModel.user_id,
+                'user_only': d.DatasetModel.user_only,
                 'deleted': d.DatasetModel.deleted,
                 'description': d.DatasetModel.description,
                 'create_time': d.DatasetModel.create_time.strftime("%Y-%m-%d  %H:%M:%S")
