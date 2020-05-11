@@ -119,7 +119,7 @@ class CustomizedRegressor extends React.Component{
         console.log(val)
     }
 
-    onParamsChange = val => {
+    onParamsChange = e => {
         const {propsAPI}=this.props;
         const {getSelected, update}=propsAPI;
 
@@ -127,9 +127,9 @@ class CustomizedRegressor extends React.Component{
 
         if(!item) return null;
         let values = item.getModel()
-        values.params = val
+        values.params = e.target.value
         update(item, {...values})
-        this.setState({params: val})
+        this.setState({params: e.target.value})
     }
 
     render(){

@@ -74,17 +74,18 @@ class CustomizedAssociationRule(Base):
         if success:
             par_evaluation_dir = self._get_evaluation_dir(params['parent_id'])
             script_key = params['script_key']
-            params.pop('script_key')
-            params.pop('parent_id')
             par_evaluation_output_dir = fs.join(par_evaluation_dir, 'outputs')
             par_data_path = fs.join(par_evaluation_output_dir, 'data.json')
             if fs.isfile(par_data_path):
                 with fs.open(par_data_path, 'r') as fin:
                     data_content = json.loads(fin.read())
                 try:
+                    model_params = params.get('params', {})
+                    if isinstance(model_params, str):
+                        model_params = json.loads(model_params)
                     content = self._format_content(data_content)
                     class_instance = create_instance(os.path.basename(script_key).split('.')[0], 'Solver')
-                    itemsets, rules = class_instance.solve(data=content['content'], params=params)
+                    itemsets, rules = class_instance.solve(data=content['content'], params=model_params)
                     reformat_itemsets = {}
                     for key in itemsets.keys():
                         items = {}

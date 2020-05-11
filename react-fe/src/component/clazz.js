@@ -153,6 +153,8 @@ export default class Clazz extends React.Component {
                     <span>
                         <span style={{color: '#C0C0C0', fontSize: '13px'}}>人数: </span>
                         <span>{item.count}</span>
+                        <span style={{color: '#C0C0C0', fontSize: '13px', marginLeft: '15px'}}>邀请码: </span>
+                        <span>{item.code}</span>
                     </span>
                     <span style={{position: "absolute", right: "20px"}}><Popconfirm title='确定退出班级吗? 退出后对应的实验提交记录将一并删除，请谨慎选择' onConfirm={() => this.handleDeleteClazz(item)}>
                             <a style={{"color": "red"}}>退出</a>
@@ -564,6 +566,7 @@ function clazzTableFilter(data) {
         result['time'] = data[idx].join_time
         result['teacher_name'] = data[idx].teacher_name
         result['clazz_id'] = data[idx].clazz_id
+        result['code'] = data[idx].invite_code
         result['description'] = data[idx].description === '' || data[idx].description === null ? "暂无描述" : data[idx].description
         results.push(result)
     }

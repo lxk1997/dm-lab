@@ -118,7 +118,7 @@ class CustomizedClassifier extends React.Component{
         this.setState({target_column: val})
     }
 
-    onParamsChange = val => {
+    onParamsChange = e => {
         const {propsAPI}=this.props;
         const {getSelected, update}=propsAPI;
 
@@ -126,9 +126,9 @@ class CustomizedClassifier extends React.Component{
 
         if(!item) return null;
         let values = item.getModel()
-        values.params = val
+        values.params = e.target.value
         update(item, {...values})
-        this.setState({params: val})
+        this.setState({params: e.target.value})
     }
 
     render(){

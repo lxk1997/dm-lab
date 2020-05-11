@@ -95,10 +95,6 @@ class CustomizedRegressor(Base):
         target_column = params['target_column']
         script_key = params['script_key']
         par_evaluation_dir = self._get_evaluation_dir(params['parent_id'])
-        params.pop('script_key')
-        params.pop('parent_id')
-        params.pop('selected_columns')
-        params.pop('target_column')
         if success:
             par_evaluation_output_dir = fs.join(par_evaluation_dir, 'outputs')
             par_data_path = fs.join(par_evaluation_output_dir, 'data.json')
@@ -106,6 +102,9 @@ class CustomizedRegressor(Base):
                 with fs.open(par_data_path, 'r') as fin:
                     data_content = json.loads(fin.read())
                 try:
+                    model_params = params.get('params', {})
+                    if isinstance(model_params, str):
+                        model_params = json.loads(model_params)
                     feature_rsts = self._get_feature(data_content, selected_columns)
                     target_rsts = self._get_target(data_content, target_column)
                     feature_train, feature_test, target_train, target_test = train_test_split(feature_rsts['content'],
@@ -113,7 +112,7 @@ class CustomizedRegressor(Base):
                                                                                               test_size=0.33,
                                                                                               random_state=42)
                     class_instance = create_instance(os.path.basename(script_key).split('.')[0], 'Solver')
-                    class_instance.fit(feature_train, target_train, params)
+                    class_instance.fit(feature_train, target_train, model_params)
                     prediction_test = class_instance.predict(feature_test)
                     mse = metrics.mean_squared_error(target_test, prediction_test)
                     rmse = np.sqrt(metrics.mean_squared_error(target_test, prediction_test))

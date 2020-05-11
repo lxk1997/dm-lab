@@ -47,6 +47,7 @@ class Clazz:
                 'teacher_id': c.ClazzModel.teacher_id,
                 'teacher_name': c.UserModel.username,
                 'deleted': c.ClazzModel.deleted,
+                'invite_code': c.ClazzModel.invite_code,
                 'description': c.ClazzModel.description,
                 'create_time': c.ClazzModel.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets))

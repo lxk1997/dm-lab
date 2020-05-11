@@ -75,7 +75,7 @@ def handle_get_clazzes():
     user_clazz_relations = UserClazzRelation().query(user_id=g.user['user_id'], limit=limit, offset=offset)
     for user_clazz_relation in user_clazz_relations:
         clazz = Clazz().query(clazz_id=user_clazz_relation['clazz_id'])[0]
-        user_clazz_relation.update({'number': UserClazzRelation().get_count(clazz_id=clazz['clazz_id']), 'clazz_name': clazz['clazz_name'], 'description': clazz['description'], 'teacher_name': clazz['teacher_name'], 'create_time': clazz['create_time']})
+        user_clazz_relation.update({'number': UserClazzRelation().get_count(clazz_id=clazz['clazz_id']), 'clazz_name': clazz['clazz_name'], 'description': clazz['description'], 'invite_code': clazz['invite_code'], 'teacher_name': clazz['teacher_name'], 'create_time': clazz['create_time']})
    # map(lambda clazz: clazz.update({'number': UserClazzRelation().get_count(clazz_id=clazz['clazz_id'])}), clazzes)
     count = UserClazzRelation().get_count(user_id=g.user['user_id'])
     msg = 'ok'
