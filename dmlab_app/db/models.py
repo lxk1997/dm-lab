@@ -127,6 +127,16 @@ class DatasetModel(Base):
     deleted = Column(Integer, nullable=False)
     create_time = Column(DateTime, server_default=func.now())
 
+class EvaluationModel(Base):
+    __tablename__ = 'evaluation'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    experimental_task_id = Column(Integer, ForeignKey('experimental_task.id', ondelete='CASCADE'), nullable=False)
+    task_name = Column(String, nullable=False)
+    status = Column(String(50), nullable=False)
+    deleted = Column(Integer, nullable=False)
+    create_time = Column(DateTime, server_default=func.now())
+
 
 def init_models(engine):
     Base.metadata.create_all(engine)

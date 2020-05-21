@@ -37,7 +37,7 @@ class ReportUploadContextMenu extends React.Component{
         const item = getSelected()[0];
         if (!item) return;
         let values = item.getModel();
-        values.color = "#1890ff"
+        values.color = "#FAFF37"
         values.status = false
         update(item, {...values})
         let mp = save();

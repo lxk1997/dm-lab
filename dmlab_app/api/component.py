@@ -7,6 +7,7 @@ from .auth import login_required
 from .runit import create_evaluation
 from ..db.dao.component import Component
 from ..db.dao.component_type import ComponentType
+from ..db.dao.evaluation import Evaluation
 from ..filesystem import get_fs
 from ..task import get_task_method, get_customized_task_method
 from ..utils import api_response, get_uuid
@@ -72,8 +73,23 @@ def handle_run_component():
     customized = request.form.get('customized', False)
     params = request.form['params']
     params = json.loads(params)
-    success = create_evaluation(item_id, task_name, params, g.user['user_id'], customized=customized)
-    return api_response('', success is False)
+    evaluation_id = create_evaluation(item_id, task_name, params, g.user['user_id'], customized=customized)
+    if evaluation_id == -1:
+        msg = 'fail'
+        error = 1
+        data = {}
+    else:
+        msg = 'ok'
+        error = 0
+        data = evaluation_id
+    return api_response(msg, error, data)
+
+
+@bp.route('/status/<int:evaluation_id>', methods=['GET'])
+@login_required
+def handle_get_run_status(evaluation_id):
+    evaluation = Evaluation().query(evaluation_id=evaluation_id)[0]
+    return api_response('ok', 0, evaluation)
 
 
 @bp.route('/<string:task_name>/<string:item_id>/<string:info_name>', methods=['GET'])

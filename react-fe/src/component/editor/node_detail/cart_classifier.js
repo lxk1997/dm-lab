@@ -15,6 +15,7 @@ class CARTClassifier extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
+            table_loading: false,
             dataset_columns: [],
             selected_columns: [],
             target_column: '',
@@ -79,10 +80,11 @@ class CARTClassifier extends React.Component{
         } else {
             let tmp_item = find(parent_id)
             let tmp_values = tmp_item.getModel()
+            this.setState({table_loading: true})
             $.ajax({
                 type: 'GET',
                 url: `/api/component/${tmp_values.task_name}/${tmp_values.id}/data`,
-                async: false,
+                async: true,
                 dataType: 'json',
                 success: (jsonData) => {
                     if (jsonData.error) {
@@ -93,7 +95,7 @@ class CARTClassifier extends React.Component{
                         }
                         let data = JSON.parse(jsonData.data.detail[0].data)
                         let dataset_columns = datasetColumnTableFilter(data)
-                        this.setState({dataset_columns: dataset_columns})
+                        this.setState({dataset_columns: dataset_columns, table_loading: false})
                     }
                 }
             })
@@ -317,7 +319,7 @@ class CARTClassifier extends React.Component{
         let target_fields_msg = null
         if(this.state.dataset_columns) {
             let options = this.state.dataset_columns.map(ele => (<Option value={ele.field}>{ele.field}</Option>))
-            fields_msg = <Table rowSelection={rowSelection} columns={this.columns} dataSource={this.state.dataset_columns} pagination={null} scroll={{y: 150}}  style={{"overflow":"scroll", "width": "300px"}}/>
+            fields_msg = <Table loading={this.state.table_loading} rowSelection={rowSelection} columns={this.columns} dataSource={this.state.dataset_columns} pagination={null} scroll={{y: 150}}  style={{"overflow":"scroll", "width": "300px"}}/>
             if(this.state.target_column === '') {
                 target_fields_msg = <Select showSearch style={{ width: 130 }} placeholder="选择分类字段" onChange={this.onTargetFieldChange}>{options}</Select>
             } else {

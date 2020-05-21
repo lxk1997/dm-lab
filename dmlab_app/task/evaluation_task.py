@@ -1,18 +1,30 @@
-from dmlab_app.task import get_task_method
-#from celery_app import celery
+from flask import g
+
+from ..db.dao.component import Component
+from ..db.dao.evaluation import Evaluation
+from ..task import get_task_method, get_customized_task_method
+from ..extensions import celery
 
 
-#@celery.task(bind=True)
-def evaluation_task(self, item_id, task_name, params, user_id):
-    status = 'fail'
+@celery.task(bind=True)
+def evaluation_task(self, evaluation_id, item_id, task_name, params, user_id, customized):
+    success = False
     try:
-        task_method = get_task_method(task_name)
-        success = task_method.execute(item_id, params)
+        if not customized:
+            task_method = get_task_method(task_name)
+        else:
+            component = Component().query(component_name=task_name, user_id=g.user['user_id'])[0]
+            task_method = get_customized_task_method(component['component_type_id'])
+            params['script_key'] = component['file_key']
+        Evaluation().update(evaluation_id, status='running')
+        success = task_method.execute(item_id=item_id, params=params)
         if success:
             status = 'success'
         else:
             status = 'fail'
+        Evaluation().update(evaluation_id, status=status)
     except:
-        pass
-    return status
+        Evaluation().update(evaluation_id, status='fail')
+    return success
+
 

@@ -15,7 +15,8 @@ class DuplicateRemoval extends React.Component{
         super(props);
         this.state = {
             dataset_columns: [],
-            selected_columns: []
+            selected_columns: [],
+            table_loading: false
         }
         this.columns = [
             {
@@ -64,10 +65,11 @@ class DuplicateRemoval extends React.Component{
         } else {
             let tmp_item = find(parent_id)
             let tmp_values = tmp_item.getModel()
+            this.setState({table_loading: true})
             $.ajax({
                 type: 'GET',
                 url: `/api/component/${tmp_values.task_name}/${tmp_values.id}/data`,
-                async: false,
+                async: true,
                 dataType: 'json',
                 success: (jsonData) => {
                     if (jsonData.error) {
@@ -78,7 +80,7 @@ class DuplicateRemoval extends React.Component{
                         }
                         let data = JSON.parse(jsonData.data.detail[0].data)
                         let dataset_columns = datasetColumnTableFilter(data)
-                        this.setState({dataset_columns: dataset_columns})
+                        this.setState({dataset_columns: dataset_columns, table_loading: false})
                     }
                 }
             })
@@ -117,7 +119,7 @@ class DuplicateRemoval extends React.Component{
 
         let fields_msg = null
         if(this.state.dataset_columns) {
-            fields_msg = <Table rowSelection={rowSelection} columns={this.columns} dataSource={this.state.dataset_columns} pagination={null} scroll={{y: 150}}  style={{"overflow":"scroll", "width": "300px"}}/>
+            fields_msg = <Table loading={this.state.table_loading} rowSelection={rowSelection} columns={this.columns} dataSource={this.state.dataset_columns} pagination={null} scroll={{y: 150}}  style={{"overflow":"scroll", "width": "300px"}}/>
         }
         return(
             <div>

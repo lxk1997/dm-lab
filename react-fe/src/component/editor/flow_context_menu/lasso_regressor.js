@@ -54,7 +54,7 @@ class LASSORegressorContextMenu extends React.Component{
         const item=getSelected()[0];
         if(!item) return;
         let values = item.getModel();
-        values.color = "#1890ff"
+        values.color = "#FAFF37"
         values.status = false
         update(item, {...values})
         let mp = save();
@@ -69,6 +69,12 @@ class LASSORegressorContextMenu extends React.Component{
                 break;
             }
         }
+        let project_id = $('#project_id').text()
+        if(project_id !== '') {
+            project_id = Number.parseInt(project_id)
+        } else {
+            project_id = null
+        }
         $.ajax({
             type: 'POST',
             url: '/api/component',
@@ -79,6 +85,7 @@ class LASSORegressorContextMenu extends React.Component{
                 task_name: values.task_name,
                 params: JSON.stringify({
                     parent_id: parent_id,
+                    project_id: project_id,
                     selected_columns: values.selected_columns,
                     target_column: values.target_column === '' ? null: values.target_column,
                     alpha: values.alpha,
@@ -99,9 +106,27 @@ class LASSORegressorContextMenu extends React.Component{
                     values.status = false
                     update(item, {...values})
                 } else {
-                    values.color = "#00EE00"
-                    values.status = true
-                    update(item, {...values})
+                    let test2 = setInterval(function(){
+                        $.ajax({
+                            url: `/api/component/status/${jsonData.data}`,
+                            type: 'GET',
+                            async: false,
+                            dataType: 'json',
+                            success: jsonData => {
+                                if(jsonData.data.status === 'fail') {
+                                    values.color = "#EE0000"
+                                    values.status = false
+                                    update(item, {...values})
+                                    clearInterval(test2)
+                                } else if (jsonData.data.status === 'success') {
+                                    values.color = "#00EE00"
+                                    values.status = true
+                                    update(item, {...values})
+                                    clearInterval(test2)
+                                }
+                            }
+                        })
+                    },2000)
                 }
             }
         })

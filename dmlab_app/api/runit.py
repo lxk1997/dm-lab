@@ -1,22 +1,14 @@
 from flask import g
 
-from dmlab_app.db.dao.component import Component
-from dmlab_app.task import get_task_method, evaluation_task, get_customized_task_method
+from dmlab_app.db.dao.evaluation import Evaluation
+from dmlab_app.db.dao.project import Project
+from ..task.evaluation_task import evaluation_task
 
 
-def create_evaluation(item_id, task_name, params, user_id, is_async=False, customized=False):
-    success = False
-    if not is_async:
-        if not customized:
-            task_method = get_task_method(task_name)
-        else:
-            component = Component().query(component_name=task_name, user_id=g.user['user_id'])[0]
-            task_method = get_customized_task_method(component['component_type_id'])
-            params['script_key'] = component['file_key']
-        success = task_method.execute(item_id=item_id, params=params)
-
-    else:
-        # return evaluation_task.delay(item_id, task_name, params, user_id)
-        pass
-
-    return success
+def create_evaluation(item_id, task_name, params, user_id, customized=False):
+    project_id = params['project_id']
+    projects = Project().query(project_id=project_id)
+    evaluation_id = Evaluation().create(user_id=g.user['user_id'], experimental_task_id=projects[0]['experimental_task_id'], task_name=task_name, status='pending')
+    if evaluation_id != -1:
+        evaluation_task.delay(evaluation_id, item_id, task_name, params, user_id, customized)
+    return evaluation_id

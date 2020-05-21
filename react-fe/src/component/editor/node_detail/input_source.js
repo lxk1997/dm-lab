@@ -21,7 +21,8 @@ class InputSource extends React.Component{
             dataset_columns: [],
             dataset_id: '',
             dataset_options: [],
-            project: null
+            project: null,
+            table_loading: false
         }
         this.columns = [
             {
@@ -45,7 +46,7 @@ class InputSource extends React.Component{
         ]
     }
 
-    getFirstData(){
+    getFirstData = () =>{
         let project_id = $('#project_id').text()
         if(project_id !== '') {
             project_id = Number.parseInt(project_id)
@@ -104,10 +105,11 @@ class InputSource extends React.Component{
         if(this.state.dataset_id === "") {
             message.error('请先选择要使用的数据表')
         } else {
+            this.setState({table_loading: true})
             $.ajax({
                 type: 'GET',
                 url: `/api/dataset/info?dataset_id=${this.state.dataset_id}`,
-                async: false,
+                async: true,
                 dataType: 'json',
                 success: (jsonData) => {
                     if (jsonData.error) {
@@ -118,7 +120,7 @@ class InputSource extends React.Component{
                         }
                         let data = jsonData.data.detail
                         let dataset_columns = datasetColumnTableFilter(data)
-                        this.setState({dataset_columns: dataset_columns})
+                        this.setState({dataset_columns: dataset_columns, table_loading: false})
 
                     }
                 }
@@ -151,7 +153,7 @@ class InputSource extends React.Component{
         }
         let fields_msg = null
         if(this.state.dataset_columns) {
-            fields_msg = <Table columns={this.columns} dataSource={this.state.dataset_columns} pagination={null} scroll={{y: 150}}  style={{"overflow":"scroll", "width": "300px"}}/>
+            fields_msg = <Table loading={this.state.table_loading} columns={this.columns} dataSource={this.state.dataset_columns} pagination={null} scroll={{y: 150}}  style={{"overflow":"scroll", "width": "300px"}}/>
         }
         return(
             <div>

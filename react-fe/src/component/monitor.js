@@ -1,7 +1,7 @@
 import React from 'react'
 import $ from 'jquery'
 import {Link} from 'react-router-dom'
-import {Button, Tree, Card, Form, Input, message, Modal, Divider,Select, Table} from 'antd';
+import {Button, Tree, Card, Form, Input, message, Modal, Divider,Select, Table, Tag} from 'antd';
 
 export default class Monitor extends React.Component {
     constructor(props) {
@@ -14,48 +14,73 @@ export default class Monitor extends React.Component {
                 title: '用户',
                 dataIndex: 'user_name',
                 key: 'user_name',
+                align: 'center'
             },
             {
                 title: '班级',
                 dataIndex: 'clazz_name',
                 key: 'clazz_name',
+                align: 'center'
             },
             {
                 title: '实验项目',
                 dataIndex: 'experimental_item_name',
                 key: 'experimental_item_name',
+                align: 'center'
             },
             {
                 title: '实验任务',
                 dataIndex: 'experimental_task_name',
                 key: 'experimental_task_name',
+                align: 'center'
             },
             {
-                title: '分数',
-                dataIndex: 'score',
-                key: 'score',
-            },
-            {
-                title: '指标',
-                dataIndex: 'score_content',
-                key: 'score_content',
+                title: '状态',
+                dataIndex: 'status',
+                key: 'status',
+                align: 'center',
+                render: status => {
+                    let color = ""
+                    switch (status) {
+                        case "pending":
+                            color = "#1890ff"
+                            break
+                        case "running":
+                            color = "#FAFF37"
+                            break
+                        case "success":
+                            color = "#00EE00"
+                            break
+                        case "fail":
+                            color = "#EE0000"
+                            break
+                    }
+                    return (
+                        <span>
+                            <Tag color={color} key={status}>
+                              {status}
+                            </Tag>
+                        </span>
+                    );
+                }
             },
             {
                 title: '提交时间',
                 dataIndex: 'create_time',
                 key: 'create_time',
+                align: 'center'
             }
         ];
     }
 
     getData() {
         $.ajax({
-            url: '/api/report',
+            url: '/api/evaluation',
             type: 'GET',
             async: false,
             dataType: 'json',
             success: jsonData => {
-                let data = reportFilter(jsonData.data.detail)
+                let data = evaluationFilter(jsonData.data.detail)
                 this.setState({grades: data})
             }
         })
@@ -66,7 +91,18 @@ export default class Monitor extends React.Component {
     }
 
     componentDidMount() {
-        setInterval("this.getData()", 150000)
+        setInterval(() => {
+            $.ajax({
+            url: '/api/evaluation',
+            type: 'GET',
+            async: false,
+            dataType: 'json',
+            success: jsonData => {
+                let data = evaluationFilter(jsonData.data.detail)
+                this.setState({grades: data})
+            }
+        })
+        }, 10000)
     }
 
     render() {
@@ -83,14 +119,13 @@ export default class Monitor extends React.Component {
 }
 
 
-function reportFilter(data) {
+function evaluationFilter(data) {
     let results = []
     for (let idx = 0; idx < data.length; idx++) {
         let result = {}
         result['key'] = idx
-        result['report_id'] = data[idx].report_id
-        result['score'] = data[idx].score
-        result['score_content'] = data[idx].score_content
+        result['evaluation_id'] = data[idx].evaluation_id
+        result['status'] = data[idx].status
         result['create_time'] = data[idx].create_time
         result['clazz_id'] = data[idx].clazz_id
         result['clazz_name'] = data[idx].clazz_name

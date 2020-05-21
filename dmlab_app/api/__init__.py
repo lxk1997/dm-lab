@@ -11,6 +11,7 @@ from . import uploader
 from . import mine_info
 from . import report
 from . import project
+from . import evaluation
 
 
 def init_app(app):
@@ -27,4 +28,5 @@ def init_app(app):
     app.register_blueprint(mine_info.bp)
     app.register_blueprint(report.bp)
     app.register_blueprint(project.bp)
+    app.register_blueprint(evaluation.bp)
 
