@@ -31,10 +31,10 @@ class DatasetUtils:
             self._dataset_name = file_name
         for line in csv.readlines():
             if not head_row:
-                self._header = line.strip('\n').split(sep)
+                self._header = line.decode('utf-8').strip('\n').split(sep)
                 head_row = True
             else:
-                self._content.append(line.strip('\n').split(sep))
+                self._content.append(line.decode('utf-8').strip('\n').split(sep))
 
     def obj2csv(self, output_dir, file_name=None, sep=','):
         file_name = file_name if file_name else self._dataset_name

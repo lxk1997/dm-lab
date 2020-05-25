@@ -14,7 +14,7 @@ from dmlab_app.task.io_source.report_upload import ReportUpload
 from dmlab_app.task.regression.cart_regressor import CARTRegressor
 from dmlab_app.task.regression.customized import CustomizedRegressor
 from dmlab_app.task.regression.knn_regressor import KNNRegressor
-from dmlab_app.task.regression.lasso_Regressor import LASSORegressor
+from dmlab_app.task.regression.lasso_regressor import LASSORegressor
 from dmlab_app.task.regression.linear_regressor import LinearRegressor
 from dmlab_app.task.regression.svm_regressor import SVMRegressor
 

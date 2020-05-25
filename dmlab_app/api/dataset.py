@@ -1,5 +1,6 @@
 # coding=utf-8
 import logging
+from io import BytesIO
 
 from flask import Blueprint, request, g
 
@@ -8,7 +9,7 @@ from ..db.dao.dataset import Dataset
 from ..db.dao.experimental_item import ExperimentalItem
 from ..db.dao.project import Project
 from ..db.dao.user_clazz_relation import UserClazzRelation
-from ..filesystem import get_fs
+from ..extensions import get_file_client
 from ..task.dataset_utils import DatasetUtils
 from ..utils import api_response
 
@@ -145,11 +146,10 @@ def handle_get_dataset_info():
     limit = request.args.get('limit', None)
     offset = request.args.get('offset', None)
     dataset_id = request.args.get('dataset_id', None)
-    fs = get_fs()
+    file_client = get_file_client()
     datasets = Dataset().query(dataset_id=dataset_id, limit=limit, offset=offset)
     datau = DatasetUtils(dataset_name='')
-    with fs.open(datasets[0]['file_key'], 'r') as fin:
-        datau.csv2obj(fin)
+    datau.csv2obj(BytesIO(file_client.download((datasets[0]['file_key']))))
     data = {
         'detail': datau.format_dict(),
     }

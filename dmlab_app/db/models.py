@@ -132,10 +132,21 @@ class EvaluationModel(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     experimental_task_id = Column(Integer, ForeignKey('experimental_task.id', ondelete='CASCADE'), nullable=False)
+    item_id = Column(String(50), nullable=False)
     task_name = Column(String, nullable=False)
     status = Column(String(50), nullable=False)
     deleted = Column(Integer, nullable=False)
     create_time = Column(DateTime, server_default=func.now())
+
+class EvaluationFileModel(Base):
+    __tablename__ = 'evaluation_file'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    evaluation_id = Column(Integer, ForeignKey('evaluation.id', ondelete='CASCADE'), nullable=False)
+    file_key = Column(String(150), nullable=False)
+    file_path = Column(String(200), nullable=False)
+    deleted = Column(Integer, nullable=False)
+    create_time = Column(DateTime, server_default=func.now())
+
 
 
 def init_models(engine):

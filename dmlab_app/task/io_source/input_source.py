@@ -1,17 +1,18 @@
 # coding=utf-8
 import json
+import logging
 import os
+from io import BytesIO
 
 from ..base import Base
-
-import logging
-
 from ..dataset_utils import DatasetUtils
-from ...db.dao.component import Component
+from ...db import get_db
 from ...db.dao.dataset import Dataset
-from ...db.dao.experimental_item import ExperimentalItem
-from ...db.dao.user_clazz_relation import UserClazzRelation
-from ...filesystem import get_fs, get_tmp_dir
+from ...db.dao.evaluation import Evaluation
+from ...db.dao.evaluation_file import EvaluationFile
+from ...db.models import EvaluationFileModel
+from ...extensions import get_file_client
+from ...filesystem import get_fs
 
 logging.basicConfig(
         level   = logging.ERROR,
@@ -43,34 +44,10 @@ class InputSource(Base):
             logger.exception('params has no attribute name "dataset_id"')
             return False
 
-    def get_init_infos(self, params=None):
-        assert params and params.get('user_id'), 'params is None or params has no attribute named "user_id"'
-        rst = dict()
-        user_clazz_relations = UserClazzRelation().query(user_id=params['user_id'])
-        for user_clazz_relation in user_clazz_relations:
-            experimental_items = ExperimentalItem().query(clazz_id=user_clazz_relation['clazz_id'])
-            for experimental_item in experimental_items:
-                datasets = Dataset().query(experimental_item_id=experimental_item['experimental_item_id'])
-                experimental_item.update({'datasets': datasets})
-            user_clazz_relation.update({'experimental_items', experimental_items})
-        rst['detail'] = user_clazz_relations
-        rst['description'] = Component().query(component_id=self.component_id)[0]['description']
-        return rst
-
-    def get_dataset_info(self, params=None):
-        fs = get_fs()
-        assert params and params.get('dataset_id'), 'params is None or params has no attribute named "dataset_id"'
-        dataset = Dataset().query(dataset_id=params['dataset_id'])[0]
-        if fs.exists(dataset['file_key']):
-            fil = fs.open(dataset['file_key'])
-            data = DatasetUtils(dataset_name=os.path.basename(dataset['file_key']))
-            data.csv2obj(fil)
-            return data.format_dict()
-        else:
-            raise Exception(dataset['file_key'] + ' is not a file')
 
     def execute(self, evaluation_id=None, params=None, item_id=None):
         fs = get_fs()
+        file_client = get_file_client()
         evaluation_dir = self._get_evaluation_dir(item_id)
         evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
         if fs.isdir(fs.join(evaluation_dir, 'outputs')):
@@ -88,10 +65,10 @@ class InputSource(Base):
         success = self._check_valid_params(logger, params)
         if success:
             dataset = Dataset().query(dataset_id=params['dataset_id'])[0]
-            if fs.exists(dataset['file_key']):
+            data_content = file_client.download(dataset['file_key'])
+            if data_content:
                 datau = DatasetUtils(dataset_name=dataset['dataset_name'])
-                with fs.open(dataset['file_key'], 'r') as fin:
-                    datau.csv2obj(fin)
+                datau.csv2obj(BytesIO(data_content))
                 with fs.open(data_path, 'w') as fout:
                     json.dump(datau.format_dict(), fout, indent=2, ensure_ascii=False)
                 success = True
@@ -99,6 +76,30 @@ class InputSource(Base):
                 logger.exception(Exception(dataset['file_key'] + ' is not a file'))
                 success = False
         logger.removeHandler(fh)
+        db = get_db()
+        try:
+            collection = file_client.get_collection()
+            file_paths = list()
+
+            for dirpath, dirnames, filenames in os.walk(fs.abs_path(evaluation_dir)):
+                for filename in filenames:
+                    file_path = os.path.join(dirpath, filename)
+                    r_path = os.path.relpath(file_path, fs.abs_path(evaluation_dir))
+                    with open(file_path, 'rb') as fin:
+                        collection.add(fin.read())
+                        file_paths.append(r_path)
+            rets = file_client.upload_collection(collection)
+            for idx, ret in enumerate(rets):
+                evaluation_file = EvaluationFileModel(evaluation_id=evaluation_id,
+                                                      file_path=file_paths[idx], file_key=ret.id, deleted=0)
+                db.add(evaluation_file)
+            collection.close()
+            # os.remove(fs.abs_path(evaluation_dir))
+            db.commit()
+        except:
+            db.rollback()
+        finally:
+            db.close()
         return success
 
     def get_evaluation_info_list(self, item_id, info_name, config=None, limit=None, offset=None):
@@ -111,18 +112,16 @@ class InputSource(Base):
             raise NotImplementedError
 
     def _get_evaluation_data(self, item_id, limit=None, offset=None):
-        fs = get_fs()
-        evaluation_dir = self._get_evaluation_dir(item_id)
-        evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
-        data_path = fs.join(evaluation_output_dir, 'data.json')
-        if fs.exists(data_path):
-            with fs.open(data_path, 'r') as fin:
-                data_content = fin.read()
+        file_client = get_file_client()
+        evaluation = Evaluation().query(item_id=item_id)[0]
+        evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'], file_path='outputs/data.json')
+        if evaluation_file:
+            data_content = file_client.download(evaluation_file[0]['file_key'])
             datas = [{
                 'id': 1,
                 'name': 'data',
                 'type': 'json_str',
-                'data': data_content
+                'data': str(data_content, encoding='utf-8')
             }]
         else:
             datas = []
@@ -138,13 +137,11 @@ class InputSource(Base):
         return datas[offset:offset + limit], count, None
 
     def _get_evaluation_log(self, item_id, limit=None, offset=None):
-        fs = get_fs()
-        evaluation_dir = self._get_evaluation_dir(item_id)
-        evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
-        log_path = fs.join(evaluation_output_dir, 'evaluation.log')
-        if fs.exists(log_path):
-            with fs.open(log_path, 'rb') as fin:
-                log_content = fin.read()
+        file_client = get_file_client()
+        evaluation = Evaluation().query(item_id=item_id)[0]
+        evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'], file_path='outputs/evaluation.log')
+        if evaluation_file:
+            log_content = file_client.download(evaluation_file[0]['file_key'])
             logs = [{
                 'id': 1,
                 'name': 'evaluation.log',

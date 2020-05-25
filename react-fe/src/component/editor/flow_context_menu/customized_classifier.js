@@ -255,20 +255,8 @@ class CustomizedClassifierContextMenu extends React.Component{
         const item=getSelected()[0];
         if(!item) return;
         let values = item.getModel();
-        $.ajax({
-            type: 'GET',
-            url: `/api/component/${values.task_name}/${values.id}/data`,
-            async: false,
-            dataType: 'json',
-            success: (jsonData) => {
-                if (jsonData.error) {
-                    message.error('当前组件运行数据不存在')
-                } else {
-                    let data = JSON.parse(jsonData.data.detail[0].data)
-                    this.refs.dataModal.setInfo({visible: true, data: data});
-                }
-            }
-        })
+        let api = `/api/component/${values.task_name}/${values.id}/data`
+        this.refs.dataModal.setInfo({visible: true, api: api})
     }
 
     handleDisplayReport = () => {
@@ -491,6 +479,7 @@ class DataModal extends React.Component {
         super(props);
         this.state = {
             visible: props.visible,
+            table_loading: false,
             data: {
                 headers: [],
                 content: []
@@ -499,11 +488,26 @@ class DataModal extends React.Component {
     }
 
     setInfo = val => {
-        this.setState({visible: val.visible, data: val.data})
+        this.setState({visible: val.visible, table_loading: true})
+        $.ajax({
+            type: 'GET',
+            url: val.api,
+            async: true,
+            dataType: 'json',
+            success: (jsonData) => {
+                if (jsonData.error) {
+                    this.hideModal()
+                    message.error('当前组件运行数据不存在')
+                } else {
+                    let data = JSON.parse(jsonData.data.detail[0].data)
+                    this.setState({data: data, table_loading: false})
+                }
+            }
+        })
     }
 
     hideModal = () => {
-        this.setState({visible: false, data: {headers: [], content: []}});
+        this.setState({visible: false, table_loading: false, data: {headers: [], content: []}});
     }
 
     render() {
@@ -522,7 +526,7 @@ class DataModal extends React.Component {
                 title="数据"
                 onCancel={this.hideModal}
                 footer={null}>
-                <Table columns={columns} dataSource={data} bordered pagination={pagination}/>
+                <Table loading={this.state.table_loading} columns={columns} dataSource={data} bordered pagination={pagination}/>
             </Modal>
         );
     }

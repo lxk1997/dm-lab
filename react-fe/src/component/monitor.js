@@ -34,6 +34,12 @@ export default class Monitor extends React.Component {
                 key: 'experimental_task_name',
                 align: 'center'
             },
+            // {
+            //     title: '组件类型',
+            //     dataIndex: 'task_name',
+            //     key: 'task_name',
+            //     align: 'center'
+            // },
             {
                 title: '状态',
                 dataIndex: 'status',
@@ -130,6 +136,7 @@ function evaluationFilter(data) {
         result['clazz_id'] = data[idx].clazz_id
         result['clazz_name'] = data[idx].clazz_name
         result['user_name'] = data[idx].user_name
+        result['task_name'] = data[idx].task_name
         result['experimental_item_id'] = data[idx].experimental_item_id
         result['experimental_item_name'] = data[idx].experimental_item_name
         result['experimental_task_name'] = data[idx].experimental_task_name

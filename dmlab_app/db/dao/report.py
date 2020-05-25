@@ -56,6 +56,8 @@ class Report:
                 'deleted': r.ReportModel.deleted,
                 'create_time': r.ReportModel.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets))
+        except Exception as e:
+            print(e.args)
         finally:
             self._db.close()
         return rs

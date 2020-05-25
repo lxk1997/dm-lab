@@ -6,8 +6,8 @@ class Evaluation:
     def __init__(self):
         self._db = get_db()
 
-    def create(self, user_id, experimental_task_id, task_name, status, deleted=0):
-        evaluation = EvaluationModel(user_id=user_id, experimental_task_id=experimental_task_id, status=status, task_name=task_name, deleted=deleted)
+    def create(self, user_id, experimental_task_id, task_name, item_id, status, deleted=0):
+        evaluation = EvaluationModel(user_id=user_id, experimental_task_id=experimental_task_id, status=status, item_id=item_id, task_name=task_name, deleted=deleted)
         try:
             self._db.add(evaluation)
             self._db.commit()
@@ -19,7 +19,7 @@ class Evaluation:
             self._db.close()
         return e_id
 
-    def query(self, evaluation_id=None, user_id=None, experimental_task_id=None, task_name=None, status=None, deleted=0, limit=None, offset=None):
+    def query(self, evaluation_id=None, user_id=None, item_id=None, experimental_task_id=None, task_name=None, status=None, deleted=0, limit=None, offset=None):
         try:
             query = self._db.query(EvaluationModel, UserModel, ExperimentalTaskModel, ExperimentalItemModel, ClazzModel).filter(EvaluationModel.user_id==UserModel.id, EvaluationModel.experimental_task_id==ExperimentalTaskModel.id, ExperimentalTaskModel.deleted == 0, ExperimentalTaskModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id)
             if evaluation_id is not None:
@@ -27,7 +27,9 @@ class Evaluation:
             if user_id is not None:
                 query = query.filter(EvaluationModel.user_id == user_id)
             if experimental_task_id is not None:
-                query = query.filter(EvaluationModel.experimental_task_id)
+                query = query.filter(EvaluationModel.experimental_task_id == experimental_task_id)
+            if item_id is not None:
+                query = query.filter(EvaluationModel.item_id == item_id)
             if status is not None:
                 query = query.filter(EvaluationModel.status == status)
             if task_name is not None:
@@ -44,6 +46,7 @@ class Evaluation:
                 'user_id': e.EvaluationModel.user_id,
                 'experimental_task_id': e.EvaluationModel.experimental_task_id,
                 'status': e.EvaluationModel.status,
+                'item_id': e.EvaluationModel.item_id,
                 'task_name': e.EvaluationModel.task_name,
                 'experimental_task_name': e.ExperimentalTaskModel.name,
                 'experimental_item_id': e.ExperimentalItemModel.id,

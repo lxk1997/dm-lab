@@ -4,7 +4,6 @@ from datetime import datetime
 from flask import Blueprint, request, g
 
 from .auth import login_required
-from ..db.dao.clazz import Clazz
 from ..db.dao.experimental_item import ExperimentalItem
 from ..db.dao.experimental_task import ExperimentalTask
 from ..db.dao.user_clazz_relation import UserClazzRelation

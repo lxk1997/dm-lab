@@ -1,28 +1,24 @@
 # coding=utf-8
-import base64
 import json
+import logging
 import os
 
-from flask import url_for
-
-from ..base import Base
-
-import logging
-
-from ..dataset_utils import DatasetUtils
-from ...db.dao.component import Component
-from ...db.dao.dataset import Dataset
-from ...db.dao.experimental_item import ExperimentalItem
-from ...db.dao.user_clazz_relation import UserClazzRelation
-from ...filesystem import get_fs, get_tmp_dir
-
-from sklearn.model_selection import train_test_split
-from sklearn import tree, metrics
-import pydotplus
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator
 import numpy as np
+import pydotplus
+from flask import url_for
+from sklearn import tree, metrics
+from sklearn.model_selection import train_test_split
+
+from ..base import Base
+from ..dataset_utils import DatasetUtils
+from ...db import get_db
+from ...db.dao.evaluation import Evaluation
+from ...db.dao.evaluation_file import EvaluationFile
+from ...db.models import EvaluationFileModel
+from ...extensions import get_file_client
+from ...filesystem import get_fs
 from ...utils import NpEncoder, numeric
 
 matplotlib.use('Agg')
@@ -70,6 +66,7 @@ class CARTRegressor(Base):
 
     def execute(self, evaluation_id=None, params=None, item_id=None):
         fs = get_fs()
+        file_client = get_file_client()
         evaluation_dir = self._get_evaluation_dir(item_id)
         evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
         if fs.isdir(fs.join(evaluation_dir, 'outputs')):
@@ -92,12 +89,12 @@ class CARTRegressor(Base):
         selected_columns = params['selected_columns']
         target_column = params['target_column']
         if success:
-            par_evaluation_dir = self._get_evaluation_dir(params['parent_id'])
-            par_evaluation_output_dir = fs.join(par_evaluation_dir, 'outputs')
-            par_data_path = fs.join(par_evaluation_output_dir, 'data.json')
-            if fs.isfile(par_data_path):
-                with fs.open(par_data_path, 'r') as fin:
-                    data_content = json.loads(fin.read())
+            evaluation = Evaluation().query(item_id=params['parent_id'])[0]
+            evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'],
+                                                     file_path='outputs/data.json')
+            if evaluation_file:
+                parent_data_content = file_client.download(evaluation_file[0]['file_key'])
+                data_content = json.loads(parent_data_content)
                 try:
                     feature_rsts = self._get_feature(data_content, selected_columns)
                     target_rsts = self._get_target(data_content, target_column)
@@ -175,6 +172,30 @@ class CARTRegressor(Base):
                 logger.exception(Exception('parent %s has no data.' % params['parent_id']))
                 success = False
         logger.removeHandler(fh)
+        db = get_db()
+        try:
+            collection = file_client.get_collection()
+            file_paths = list()
+
+            for dirpath, dirnames, filenames in os.walk(fs.abs_path(evaluation_dir)):
+                for filename in filenames:
+                    file_path = os.path.join(dirpath, filename)
+                    r_path = os.path.relpath(file_path, fs.abs_path(evaluation_dir))
+                    with open(file_path, 'rb') as fin:
+                        collection.add(fin.read())
+                        file_paths.append(r_path)
+            rets = file_client.upload_collection(collection)
+            for idx, ret in enumerate(rets):
+                evaluation_file = EvaluationFileModel(evaluation_id=evaluation_id,
+                                                      file_path=file_paths[idx], file_key=ret.id, deleted=0)
+                db.add(evaluation_file)
+            collection.close()
+            # os.remove(fs.abs_path(evaluation_dir))
+            db.commit()
+        except:
+            db.rollback()
+        finally:
+            db.close()
         return success
 
     def get_evaluation_info_list(self, item_id, info_name, config=None, limit=None, offset=None):
@@ -189,18 +210,17 @@ class CARTRegressor(Base):
             raise NotImplementedError
 
     def _get_evaluation_data(self, item_id, limit=None, offset=None):
-        fs = get_fs()
-        evaluation_dir = self._get_evaluation_dir(item_id)
-        evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
-        data_path = fs.join(evaluation_output_dir, 'data.json')
-        if fs.exists(data_path):
-            with fs.open(data_path, 'r') as fin:
-                data_content = fin.read()
+        file_client = get_file_client()
+        evaluation = Evaluation().query(item_id=item_id)[0]
+        evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'],
+                                                 file_path='outputs/data.json')
+        if evaluation_file:
+            data_content = file_client.download(evaluation_file[0]['file_key'])
             datas = [{
                 'id': 1,
                 'name': 'data',
                 'type': 'json_str',
-                'data': data_content
+                'data': str(data_content, encoding='utf-8')
             }]
         else:
             datas = []
@@ -216,13 +236,12 @@ class CARTRegressor(Base):
         return datas[offset:offset + limit], count, None
 
     def _get_evaluation_log(self, item_id, limit=None, offset=None):
-        fs = get_fs()
-        evaluation_dir = self._get_evaluation_dir(item_id)
-        evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
-        log_path = fs.join(evaluation_output_dir, 'evaluation.log')
-        if fs.exists(log_path):
-            with fs.open(log_path, 'rb') as fin:
-                log_content = fin.read()
+        file_client = get_file_client()
+        evaluation = Evaluation().query(item_id=item_id)[0]
+        evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'],
+                                                 file_path='outputs/evaluation.log')
+        if evaluation_file:
+            log_content = file_client.download(evaluation_file[0]['file_key'])
             logs = [{
                 'id': 1,
                 'name': 'evaluation.log',
@@ -243,17 +262,16 @@ class CARTRegressor(Base):
         return logs[offset:offset + limit], count, None
 
     def _get_evaluation_report(self, item_id, limit=None, offset=None):
-        fs = get_fs()
+        file_client = get_file_client()
         cur = 1
         reports = []
-        evaluation_dir = self._get_evaluation_dir(item_id)
-        evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
-        report_path = fs.join(evaluation_output_dir, 'result.json')
-        result_png_path = fs.join(evaluation_output_dir, 'result.png')
-        overview_png = fs.join(evaluation_output_dir, 'overview.png')
-        if fs.exists(report_path):
-            with fs.open(report_path, 'r') as fin:
-                report_content = fin.read()
+        evaluation = Evaluation().query(item_id=item_id)[0]
+        report = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'], file_path='outputs/result.json')
+        result_png = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'], file_path='outputs/result.png')
+        overview = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'],
+                                                  file_path='outputs/overview.png')
+        if report:
+            report_content = file_client.download(report[0]['file_key'])
             json_report = json.loads(report_content)
             datau = DatasetUtils()
             datau.set_header(['MSE', 'RMSE', 'MAE', 'EVS', 'R-Squared', 'Num GT'])
@@ -268,20 +286,20 @@ class CARTRegressor(Base):
             })
             cur += 1
 
-        if fs.exists(overview_png):
+        if overview:
             reports.append({
                 'id': cur,
                 'name': 'Overview',
                 'type': 'image',
-                'data': url_for('files_image.handle_get_info', path=overview_png)
+                'data': url_for('files_image.handle_get_info', path=overview[0]['file_key'])
             })
             cur += 1
-        if fs.exists(result_png_path):
+        if result_png:
             reports.append({
                 'id': cur,
                 'name': 'Tree',
                 'type': 'image',
-                'data': url_for('files_image.handle_get_info', path=result_png_path)
+                'data': url_for('files_image.handle_get_info', path=result_png[0]['file_key'])
             })
         count = len(reports)
         if limit is None:
@@ -337,13 +355,12 @@ class CARTRegressor(Base):
 
     def get_score(self, item_id):
         score_content = ''
-        fs = get_fs()
-        evaluation_dir = self._get_evaluation_dir(item_id)
-        evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
-        report_path = fs.join(evaluation_output_dir, 'result.json')
-        if fs.exists(report_path):
-            with fs.open(report_path, 'r') as fin:
-                report_content = fin.read()
+        file_client = get_file_client()
+        evaluation = Evaluation().query(item_id=item_id)[0]
+        evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'],
+                                                 file_path='outputs/result.json')
+        if evaluation_file:
+            report_content = file_client.download(evaluation_file[0]['file_key'])
             json_report = json.loads(report_content)
             score_content = 'MSE: %s,MAE: %s, R2: %s' % (
                 round(json_report['mse'], 2), round(json_report['mse'], 2), round(json_report['rsquared'], 2))
@@ -353,13 +370,12 @@ class CARTRegressor(Base):
         if not score_field or not item_id:
             return None
         else:
-            fs = get_fs()
-            evaluation_dir = self._get_evaluation_dir(item_id)
-            evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
-            report_path = fs.join(evaluation_output_dir, 'result.json')
-            if fs.exists(report_path):
-                with fs.open(report_path, 'r') as fin:
-                    report_content = fin.read()
+            file_client = get_file_client()
+            evaluation = Evaluation().query(item_id=item_id)[0]
+            evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'],
+                                                     file_path='outputs/result.json')
+            if evaluation_file:
+                report_content = file_client.download(evaluation_file[0]['file_key'])
                 json_report = json.loads(report_content)
                 target = score_field['algorithm_target']
                 if json_report.get(target):

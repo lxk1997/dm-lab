@@ -1,12 +1,18 @@
 # coding=utf-8
 import json
 import logging
+import os
 
 import matplotlib
 from efficient_apriori import apriori
 
 from ..base import Base
 from ..dataset_utils import DatasetUtils
+from ...db import get_db
+from ...db.dao.evaluation import Evaluation
+from ...db.dao.evaluation_file import EvaluationFile
+from ...db.models import EvaluationFileModel
+from ...extensions import get_file_client
 from ...filesystem import get_fs
 from ...utils import NpEncoder, numeric
 
@@ -50,6 +56,7 @@ class Apriori(Base):
 
     def execute(self, evaluation_id=None, params=None, item_id=None):
         fs = get_fs()
+        file_client = get_file_client()
         evaluation_dir = self._get_evaluation_dir(item_id)
         evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
         if fs.isdir(fs.join(evaluation_dir, 'outputs')):
@@ -68,12 +75,11 @@ class Apriori(Base):
 
         success = self._check_valid_params(logger, params)
         if success:
-            par_evaluation_dir = self._get_evaluation_dir(params['parent_id'])
-            par_evaluation_output_dir = fs.join(par_evaluation_dir, 'outputs')
-            par_data_path = fs.join(par_evaluation_output_dir, 'data.json')
-            if fs.isfile(par_data_path):
-                with fs.open(par_data_path, 'r') as fin:
-                    data_content = json.loads(fin.read())
+            evaluation = Evaluation().query(item_id=params['parent_id'])[0]
+            evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'], file_path='outputs/data.json')
+            if evaluation_file:
+                parent_data_content = file_client.download(evaluation_file[0]['file_key'])
+                data_content = json.loads(parent_data_content)
                 try:
                     content = self._format_content(data_content)
                     itemsets, rules = apriori(transactions=content['content'],
@@ -120,6 +126,30 @@ class Apriori(Base):
                 logger.exception(Exception('parent %s has no data.' % params['parent_id']))
                 success = False
         logger.removeHandler(fh)
+        db = get_db()
+        try:
+            collection = file_client.get_collection()
+            file_paths = list()
+
+            for dirpath, dirnames, filenames in os.walk(fs.abs_path(evaluation_dir)):
+                for filename in filenames:
+                    file_path = os.path.join(dirpath, filename)
+                    r_path = os.path.relpath(file_path, fs.abs_path(evaluation_dir))
+                    with open(file_path, 'rb') as fin:
+                        collection.add(fin.read())
+                        file_paths.append(r_path)
+            rets = file_client.upload_collection(collection)
+            for idx, ret in enumerate(rets):
+                evaluation_file = EvaluationFileModel(evaluation_id=evaluation_id,
+                                                      file_path=file_paths[idx], file_key=ret.id, deleted=0)
+                db.add(evaluation_file)
+            collection.close()
+            # os.remove(fs.abs_path(evaluation_dir))
+            db.commit()
+        except:
+            db.rollback()
+        finally:
+            db.close()
         return success
 
     def get_evaluation_info_list(self, item_id, info_name, config=None, limit=None, offset=None):
@@ -134,18 +164,16 @@ class Apriori(Base):
             raise NotImplementedError
 
     def _get_evaluation_data(self, item_id, limit=None, offset=None):
-        fs = get_fs()
-        evaluation_dir = self._get_evaluation_dir(item_id)
-        evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
-        data_path = fs.join(evaluation_output_dir, 'data.json')
-        if fs.exists(data_path):
-            with fs.open(data_path, 'r') as fin:
-                data_content = fin.read()
+        file_client = get_file_client()
+        evaluation = Evaluation().query(item_id=item_id)[0]
+        evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'], file_path='outputs/data.json')
+        if evaluation_file:
+            data_content = file_client.download(evaluation_file[0]['file_key'])
             datas = [{
                 'id': 1,
                 'name': 'data',
                 'type': 'json_str',
-                'data': data_content
+                'data': str(data_content, encoding='utf-8')
             }]
         else:
             datas = []
@@ -161,13 +189,11 @@ class Apriori(Base):
         return datas[offset:offset + limit], count, None
 
     def _get_evaluation_log(self, item_id, limit=None, offset=None):
-        fs = get_fs()
-        evaluation_dir = self._get_evaluation_dir(item_id)
-        evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
-        log_path = fs.join(evaluation_output_dir, 'evaluation.log')
-        if fs.exists(log_path):
-            with fs.open(log_path, 'rb') as fin:
-                log_content = fin.read()
+        file_client = get_file_client()
+        evaluation = Evaluation().query(item_id=item_id)[0]
+        evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'], file_path='outputs/evaluation.log')
+        if evaluation_file:
+            log_content = file_client.download(evaluation_file[0]['file_key'])
             logs = [{
                 'id': 1,
                 'name': 'evaluation.log',
@@ -188,15 +214,13 @@ class Apriori(Base):
         return logs[offset:offset + limit], count, None
 
     def _get_evaluation_report(self, item_id, limit=None, offset=None):
-        fs = get_fs()
+        file_client = get_file_client()
+        evaluation = Evaluation().query(item_id=item_id)[0]
+        evaluation_file = EvaluationFile().query(evaluation_id=evaluation['evaluation_id'], file_path='outputs/result.json')
         cur = 1
         reports = []
-        evaluation_dir = self._get_evaluation_dir(item_id)
-        evaluation_output_dir = fs.join(evaluation_dir, 'outputs')
-        report_path = fs.join(evaluation_output_dir, 'result.json')
-        if fs.exists(report_path):
-            with fs.open(report_path, 'r') as fin:
-                report_content = fin.read()
+        if evaluation_file:
+            report_content = file_client.download(evaluation_file[0]['file_key'])
             json_report = json.loads(report_content)
             datau = DatasetUtils()
             datau.set_header(['Min Support', 'Min Confidence', 'Max Length'])

@@ -1,5 +1,6 @@
 import json
 import logging
+from io import BytesIO
 
 from flask import Blueprint, request, g, url_for
 
@@ -8,9 +9,9 @@ from .runit import create_evaluation
 from ..db.dao.component import Component
 from ..db.dao.component_type import ComponentType
 from ..db.dao.evaluation import Evaluation
-from ..filesystem import get_fs
+from ..extensions import get_file_client
 from ..task import get_task_method, get_customized_task_method
-from ..utils import api_response, get_uuid
+from ..utils import api_response
 
 # TODO
 logger = logging.getLogger(__name__)
@@ -35,13 +36,12 @@ def handle_create_component():
         msg = 'Component Name has been exists.'
         error = 1
         return api_response(msg, error)
-    fs = get_fs()
-    file_name = get_uuid() + '.py'
-    if not fs.exists('components'):
-        fs.makedirs('components')
-    with fs.open(fs.join('components', file_name), 'w') as fin:
-        fin.write(content)
-    c_id = Component().create(component_name=component_name, component_type_id=component_type_id, description=description, user_id=g.user['user_id'], file_key=fs.join('components', file_name))
+    file_client = get_file_client()
+    collection = file_client.get_collection()
+    collection.add(content.encode('utf-8'))
+    rets = file_client.upload_collection(collection)
+    collection.close()
+    c_id = Component().create(component_name=component_name, component_type_id=component_type_id, description=description, user_id=g.user['user_id'], file_key=rets[0].id)
     if c_id == -1:
         msg = 'Invalid Params.'
         error = 1
@@ -73,8 +73,8 @@ def handle_run_component():
     customized = request.form.get('customized', False)
     params = request.form['params']
     params = json.loads(params)
-    evaluation_id = create_evaluation(item_id, task_name, params, g.user['user_id'], customized=customized)
-    if evaluation_id == -1:
+    evaluation_id, success = create_evaluation(item_id, task_name, params, g.user['user_id'], customized=customized)
+    if evaluation_id == -1 or not success:
         msg = 'fail'
         error = 1
         data = {}
