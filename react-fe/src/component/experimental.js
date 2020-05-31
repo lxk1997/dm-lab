@@ -136,7 +136,7 @@ export default class ExperimentalItem extends React.Component {
                     style={{position: "absolute", right: "20px"}}><span><Avatar style={{
                     color: '#ffffff',
                     backgroundColor: '#35caca',
-                }} size={20}>{item.teacher_name[0]}</Avatar></span><span
+                }} size={20}>{item.teacher_name.length?item.teacher_name[0]:''}</Avatar></span><span
                     style={{fontSize: '15px', marginRight: '5px'}}>{item.teacher_name}</span><span
                     style={{color: '#C0C0C0', fontSize: '15px'}}>{item.time}</span></span></div>
                 <div style={{color: '#C0C0C0', marginTop: '5px'}}>{item.description}</div>
@@ -448,7 +448,7 @@ class ExperimentalTask extends React.Component {
                     style={{position: "absolute", right: "20px"}}><span><Avatar style={{
                     color: '#ffffff',
                     backgroundColor: '#35caca',
-                }} size={20}>{item.teacher_name[0]}</Avatar></span><span
+                }} size={20}>{item.teacher_name.length?item.teacher_name[0]:''}</Avatar></span><span
                     style={{fontSize: '15px', marginRight: '5px'}}>{item.teacher_name}</span><span
                     style={{color: '#C0C0C0', fontSize: '15px'}}>{item.time}</span></span></div>
                 <div style={{color: '#C0C0C0', marginTop: '5px'}}>{item.description}</div>
@@ -627,8 +627,8 @@ class ScoreLeaderboard extends React.Component {
         this.columns = [
             {
                 title: '用户',
-                dataIndex: 'user_name',
-                key: 'user_name',
+                dataIndex: 'user_info',
+                key: 'user_info',
                 render: (text, recode) => <a href={"/user/" + recode.user_id}>{text}</a>
             },
             {
@@ -822,8 +822,8 @@ function reportTableFilter(data) {
         result['task_name'] = haveField(data[idx], 'task_name') ? data[idx].task_name : ''
         result['data_id'] = haveField(data[idx], 'data_id') ? data[idx].data_id : ''
         result['user_id'] = haveField(data[idx], 'user_id') ? data[idx].user_id : ''
-        result['user_name'] = haveField(data[idx], 'user_name') ? data[idx].user_name : ''
         result['content'] = haveField(data[idx], 'content') ? data[idx].content : ''
+        result['user_info'] = data[idx].school_id + '('+data[idx].name+')'
         result['file_key'] = haveField(data[idx], 'file_key') ? data[idx].file_key : ''
         result['score'] = haveField(data[idx], 'score') ? data[idx].score : '暂无'
         result['score_content'] = haveField(data[idx], 'score_content') ? data[idx].score_content : ''

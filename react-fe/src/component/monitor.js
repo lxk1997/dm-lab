@@ -12,8 +12,8 @@ export default class Monitor extends React.Component {
         this.columns = [
             {
                 title: '用户',
-                dataIndex: 'user_name',
-                key: 'user_name',
+                dataIndex: 'user_info',
+                key: 'user_info',
                 align: 'center'
             },
             {
@@ -135,8 +135,8 @@ function evaluationFilter(data) {
         result['create_time'] = data[idx].create_time
         result['clazz_id'] = data[idx].clazz_id
         result['clazz_name'] = data[idx].clazz_name
-        result['user_name'] = data[idx].user_name
         result['task_name'] = data[idx].task_name
+        result['user_info'] = data[idx].school_id + '('+data[idx].name+')'
         result['experimental_item_id'] = data[idx].experimental_item_id
         result['experimental_item_name'] = data[idx].experimental_item_name
         result['experimental_task_name'] = data[idx].experimental_task_name

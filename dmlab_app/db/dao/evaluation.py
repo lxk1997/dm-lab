@@ -1,5 +1,5 @@
 from ..db import get_db
-from ..models import EvaluationModel, UserModel, ExperimentalTaskModel, ExperimentalItemModel, ClazzModel
+from ..models import EvaluationModel, UserModel, ExperimentalTaskModel, ExperimentalItemModel, ClazzModel, UserInfoModel
 
 
 class Evaluation:
@@ -21,7 +21,7 @@ class Evaluation:
 
     def query(self, evaluation_id=None, user_id=None, item_id=None, experimental_task_id=None, task_name=None, status=None, deleted=0, limit=None, offset=None):
         try:
-            query = self._db.query(EvaluationModel, UserModel, ExperimentalTaskModel, ExperimentalItemModel, ClazzModel).filter(EvaluationModel.user_id==UserModel.id, EvaluationModel.experimental_task_id==ExperimentalTaskModel.id, ExperimentalTaskModel.deleted == 0, ExperimentalTaskModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id)
+            query = self._db.query(EvaluationModel, UserModel, ExperimentalTaskModel, ExperimentalItemModel, ClazzModel, UserInfoModel).filter(EvaluationModel.user_id==UserModel.id, EvaluationModel.experimental_task_id==ExperimentalTaskModel.id, ExperimentalTaskModel.deleted == 0, ExperimentalTaskModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id, UserModel.id == UserInfoModel.user_id)
             if evaluation_id is not None:
                 query = query.filter(EvaluationModel.id == evaluation_id)
             if user_id is not None:
@@ -53,7 +53,8 @@ class Evaluation:
                 'experimental_item_name': e.ExperimentalItemModel.name,
                 'clazz_id': e.ClazzModel.id,
                 'clazz_name': e.ClazzModel.name,
-                'user_name': e.UserModel.username,
+                'name': e.UserInfoModel.name,
+                'school_id': e.UserModel.school_id,
                 'deleted': e.EvaluationModel.deleted,
                 'create_time': e.EvaluationModel.create_time.strftime("%Y-%m-%d  %H:%M:%S")
             }, rets))

@@ -26,6 +26,8 @@ import 'react-markdown-editor-lite/lib/index.css';
 import {DateUtil} from "../static/js/date_util";
 var echarts = require('echarts');
 
+const {Option} = Select
+
 export default class Mine extends React.Component{
     render() {
         $("#header_title").text('个人中心')
@@ -43,7 +45,8 @@ class MineMessage extends React.Component {
         this.state = {
             user : ''
         }
-        this.update_modal_visible = false
+        this.update_info_modal_visible = false
+        this.update_password_modal_visible = false
         this.update_user = null
     }
 
@@ -62,17 +65,25 @@ class MineMessage extends React.Component {
         this.getData()
     }
 
-    updateUser = () => {
-        this.update_modal_visible = true
+    updatePassword = () => {
+        this.update_password_modal_visible = true
         this.update_user = this.state.user
-        this.refs.updateUserModal.setInfo({
-            visible: this.update_modal_visible,
+        this.refs.updatePasswordModal.setInfo({
+            visible: this.update_password_modal_visible,
             user: this.update_user
         })
     }
 
+    updateUserInfo = () => {
+        this.update_info_modal_visible = true
+        this.refs.updateUserInfoModal.setInfo({
+            visible: this.update_info_modal_visible
+        })
+    }
+
     getModalMsg = (result, msg) => {
-        this.update_modal_visible = false
+        this.update_info_modal_visible = false
+        this.update_password_modal_visible = false
         this.update_user = null;
         this.getData()
     }
@@ -80,10 +91,13 @@ class MineMessage extends React.Component {
     render() {
         return (<div className="site-page-header-ghost-wrapper" style={{margin: '8px', 'background-color': '#fff'}}>
                     <PageHeader
-                      title={this.state.user.user_name}
+                      title={this.state.user.school_id}
                       extra={[
-                        <Button key="1" type="primary" onClick={this.updateUser} style={{'border-radius': '4px'}}>
-                          信息修改
+                        <Button key="1" type="primary" onClick={this.updatePassword} style={{'border-radius': '4px'}}>
+                          密码修改
+                        </Button>,
+                          <Button key="2" type="primary" onClick={this.updateUserInfo} style={{'border-radius': '4px'}}>
+                          个人信息修改
                         </Button>,
                       ]}
                     >
@@ -91,7 +105,14 @@ class MineMessage extends React.Component {
                       {/*<Descriptions size="small" column={3}>*/}
                       {/*  <Descriptions.Item label="学号">{this.state.user.school_id}</Descriptions.Item>*/}
                       {/*</Descriptions>*/}
-                      <Descriptions size="small" column={3}>
+                      <Descriptions size="small" column={4}>
+                        <Descriptions.Item label="姓名">{this.state.user.hasOwnProperty('name')?this.state.user.name:null}</Descriptions.Item>
+                        <Descriptions.Item label="学号">{this.state.user.hasOwnProperty('school_id')?this.state.user.school_id:null}</Descriptions.Item>
+                        <Descriptions.Item label="性别">{this.state.user.hasOwnProperty('sex')&&this.state.user.sex?(this.state.user.sex === 1?'男':'女'):null}</Descriptions.Item>
+                        <Descriptions.Item label="学院">{this.state.user.hasOwnProperty('department')?this.state.user.department:null}</Descriptions.Item>
+                        <Descriptions.Item label="专业">{this.state.user.hasOwnProperty('major')?this.state.user.major:null}</Descriptions.Item>
+                        <Descriptions.Item label="年级">{this.state.user.hasOwnProperty('grade')?this.state.user.grade:null}</Descriptions.Item>
+                        <Descriptions.Item label="班级">{this.state.user.hasOwnProperty('clazz')?this.state.user.clazz:null}</Descriptions.Item>
                         <Descriptions.Item label="邮箱">{this.state.user.email}</Descriptions.Item>
                       </Descriptions>
                       {/*<Descriptions size="small" column={3}>*/}
@@ -104,15 +125,17 @@ class MineMessage extends React.Component {
                       {/*  <Descriptions.Item label="学院">{this.state.user.department}</Descriptions.Item>*/}
                       {/*</Descriptions>*/}
                     </PageHeader>
-                    <UpdateUserModal visiable={this.update_modal_visible}
+                    <UpdatePasswordModal visiable={this.update_password_modal_visible}
                                     user={this.update_user}
-                                    ref={"updateUserModal"} parent={this}/>
+                                    ref={"updatePasswordModal"} parent={this}/>
+                    <UpdateUserInfoModal visiable={this.update_info_modal_visible}
+                                    ref={"updateUserInfoModal"} parent={this}/>
                   </div>
         )
     }
 }
 
-class UpdateUserModal extends React.Component {
+class UpdatePasswordModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -135,16 +158,27 @@ class UpdateUserModal extends React.Component {
         this.props.parent.getModalMsg(this, true)
     }
 
+     handleLogout = () => {
+        $.ajax({
+            type: 'GET',
+            url: '/api/auth/logout',
+            async: false,
+            success: resp => {
+                window.location.href = '/login'
+            }
+        })
+    }
 
-    handleUpdateUser = values => {
+
+    handleUpdatePassword = values => {
         this.setState({loading: true});
         $.ajax({
             type: 'POST',
-            url: '/api/auth',
+            url: '/api/auth/password',
             async: false,
             data: {
-                'new_password': values.new_password,
-                'email': values.email,
+                'old_password': values.old_password,
+                'new_password': values.new_password
             },
             dataType: 'json',
             success: (jsonData) => {
@@ -152,10 +186,11 @@ class UpdateUserModal extends React.Component {
                     message.error(jsonData.msg);
                 } else {
                     this.setParentMsg();
-                    message.success('修改成功');
+                    message.success('密码修改成功');
                 }
                 this.refs.form.resetFields();
                 this.setState({loading: false, visible: false});
+                this.handleLogout();
             }
         });
     }
@@ -165,18 +200,25 @@ class UpdateUserModal extends React.Component {
             <Modal
                 width="300px"
                 visible={this.state.visible}
-                title="修改个人信息"
-                onOk={this.handleUpdateUser}
+                title="修改密码"
+                onOk={this.handleUpdatePassword}
                 onCancel={this.hideModal}
                 footer={null}>
                 <Form
                     ref="form"
-                    name="update-user"
-                    className="update-user-form"
-                    onFinish={this.handleUpdateUser}
-                    initialValues = {{
-                        'email': this.state.user?this.state.user.email: null
-                    }}>
+                    name="update-password"
+                    className="update-password-form"
+                    onFinish={this.handleUpdatePassword}>
+                    <Form.Item
+                        name="old_password"
+                        rules={[
+                            {
+                                required: true,
+                                message: '请输入旧密码!',
+                            },
+                        ]}>
+                        <Input placeholder="旧密码" type="password"/>
+                    </Form.Item>
                     <Form.Item
                         name="new_password"
                         rules={[
@@ -187,19 +229,158 @@ class UpdateUserModal extends React.Component {
                         ]}>
                         <Input placeholder="新密码" type="password"/>
                     </Form.Item>
+                    <Form.Item style={{"textAlign": "center"}}>
+                        <Button key="submit" type="primary" htmlType="submit" loading={this.state.loading}>
+                            修改
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Modal>
+        );
+    }
+}
+
+class UpdateUserInfoModal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading: false,
+            visible: props.visible,
+            user: null
+        };
+    }
+
+    getData = () => {
+        $.ajax({
+            type: 'GET',
+            url: '/api/auth/info',
+            async: false,
+            success: resp => {
+                this.setState({user: resp.data})
+            }
+        })
+    }
+
+    componentWillMount() {
+        this.getData()
+    }
+
+    setInfo = val => {
+        this.getData()
+        this.setState({visible: val.visible})
+    }
+
+    hideModal = () => {
+        this.setState({visible: false, loading: false});
+        this.refs.form.resetFields();
+    }
+
+    setParentMsg = () => {
+        this.props.parent.getModalMsg(this, true)
+    }
+
+
+    handleUpdateUserInfo = values => {
+        this.setState({loading: true});
+        $.ajax({
+            type: 'POST',
+            url: '/api/auth/info',
+            async: false,
+            data: {
+                'name': values.hasOwnProperty('name')?values.name:null,
+                'sex': values.hasOwnProperty('sex')?values.sex:null,
+                'department': values.hasOwnProperty('department')?values.department:null,
+                'grade': values.hasOwnProperty('grade')?values.grade:null,
+                'clazz': values.hasOwnProperty('clazz')?values.clazz:null,
+                'major': values.hasOwnProperty('major')?values.major:null,
+                'email': values.hasOwnProperty('email')?values.email:null
+            },
+            dataType: 'json',
+            success: (jsonData) => {
+                if (jsonData.error) {
+                    message.error(jsonData.msg);
+                } else {
+                    this.setParentMsg();
+                    message.success('信息修改成功');
+                }
+                this.refs.form.resetFields();
+                this.setState({loading: false, visible: false});
+                this.getData()
+            }
+        });
+    }
+
+    render() {
+        return (
+            <Modal
+                width="300px"
+                visible={this.state.visible}
+                title="修改个人信息"
+                onOk={this.handleUpdateUserInfo}
+                onCancel={this.hideModal}
+                footer={null}>
+                <Form
+                    ref="form"
+                    name="update-user-info"
+                    className="update-user-info-form"
+                    onFinish={this.handleUpdateUserInfo}
+                    initialValues={{
+                        name: this.state.user && this.state.user.hasOwnProperty('name')?this.state.user.name:null,
+                        email: this.state.user && this.state.user.hasOwnProperty('email')?this.state.user.email:null,
+                        department: this.state.user && this.state.user.hasOwnProperty('department')?this.state.user.department:null,
+                        major: this.state.user && this.state.user.hasOwnProperty('major')?this.state.user.major:null,
+                        grade: this.state.user && this.state.user.hasOwnProperty('grade')?this.state.user.grade:null,
+                        clazz: this.state.user && this.state.user.hasOwnProperty('clazz')?this.state.user.clazz:null,
+                        sex: this.state.user && this.state.user.hasOwnProperty('sex')?this.state.user.sex:null,
+                    }}>
                     <Form.Item
+                        style={{'margin-bottom': '6px'}}
+                        name="name"
+                        >
+                        <Input placeholder="姓名"/>
+                    </Form.Item>
+                    <Form.Item
+                        style={{'margin-bottom': '6px'}}
                         name="email"
-                        rules={[
-                            {
-                                required: true,
-                                message: '请输入邮箱!',
-                            },
-                        ]}>
+                       >
                         <Input placeholder="邮箱"/>
+                    </Form.Item>
+                    <Form.Item
+                        style={{'margin-bottom': '6px'}}
+                        name="department"
+                        >
+                        <Input placeholder="学院"/>
+                    </Form.Item>
+                    <Form.Item
+                        style={{'margin-bottom': '6px'}}
+                        name="major"
+                        >
+                        <Input placeholder="专业"/>
+                    </Form.Item>
+                     <Form.Item
+                         style={{'margin-bottom': '6px'}}
+                        name="grade"
+                        >
+                        <Input placeholder="年级"/>
+                    </Form.Item>
+                    <Form.Item
+                        style={{'margin-bottom': '6px'}}
+                        name="clazz"
+                       >
+                        <Input placeholder="班级"/>
+                    </Form.Item>
+                    <Form.Item
+                        style={{'margin-bottom': '6px'}}
+                        name="sex"
+                        >
+                        <Select placeholder={'请选择性别'}>
+                            <Option value={1}>男</Option>
+                            <Option value={2}>女</Option>
+                        </Select>
                     </Form.Item>
                     <Form.Item style={{"textAlign": "center"}}>
                         <Button key="submit" type="primary" htmlType="submit" loading={this.state.loading}>
-                            更新
+                            修改
                         </Button>
                     </Form.Item>
                 </Form>

@@ -6,8 +6,8 @@ class User:
     def __init__(self):
         self._db = get_db()
 
-    def create(self, username, password, email, role_id):
-        user = UserModel(username=username, password=password, email=email, role_id=role_id)
+    def create(self, school_id, password, email, role_id):
+        user = UserModel(school_id=school_id, password=password, email=email, role_id=role_id)
         try:
             self._db.add(user)
             self._db.commit()
@@ -19,13 +19,13 @@ class User:
             self._db.close()
         return u_id
 
-    def query(self, user_id=None, username=None, email=None, limit=None, offset=None):
+    def query(self, user_id=None, school_id=None, email=None, limit=None, offset=None):
         try:
             query = self._db.query(UserModel)
             if user_id is not None:
                 query = query.filter(UserModel.id == user_id)
-            if username is not None:
-                query = query.filter(UserModel.username == username)
+            if school_id is not None:
+                query = query.filter(UserModel.school_id == school_id)
             if email is not None:
                 query = query.filter(UserModel.email == email)
             query = query.order_by(UserModel.create_time.desc())
@@ -36,7 +36,7 @@ class User:
             rets = query.all()
             users = list(map(lambda u: {
                 'user_id': u.id,
-                'user_name': u.username,
+                'school_id': u.school_id,
                 'password': u.password,
                 'email': u.email,
                 'create_time': u.create_time.strftime("%Y-%m-%d  %H:%M:%S")

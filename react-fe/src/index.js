@@ -96,7 +96,7 @@ class App extends React.Component {
                                             color: '#ffffff',
                                             backgroundColor: '#35caca',
                                           }}>
-                                            {this.user.user_name[0].toUpperCase()}
+                                            {this.user.name.length?this.user.name[0].toUpperCase():''}
                                         </Avatar>
                                         </Dropdown>
                                     </div>

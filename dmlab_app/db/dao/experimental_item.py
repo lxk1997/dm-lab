@@ -1,7 +1,7 @@
 from sqlalchemy import func
 
 from ..db import get_db
-from ..models import ExperimentalItemModel, ClazzModel, UserModel
+from ..models import ExperimentalItemModel, ClazzModel, UserModel, UserInfoModel
 
 
 class ExperimentalItem:
@@ -23,7 +23,7 @@ class ExperimentalItem:
 
     def query(self, experimental_item_id=None, experimental_item_name=None, experimental_item_name_like=None, clazz_id=None, clazz_name=None, teacher_id=None, description=None, deleted=0, limit=None, offset=None):
         try:
-            query = self._db.query(ExperimentalItemModel, ClazzModel, UserModel).filter(ExperimentalItemModel.clazz_id == ClazzModel.id, ClazzModel.teacher_id == UserModel.id, ClazzModel.deleted == 0)
+            query = self._db.query(ExperimentalItemModel, ClazzModel, UserModel, UserInfoModel).filter(ExperimentalItemModel.clazz_id == ClazzModel.id, ClazzModel.teacher_id == UserModel.id, ClazzModel.deleted == 0, UserInfoModel.user_id == UserModel.id)
             if experimental_item_id is not None:
                 query = query.filter(ExperimentalItemModel.id == experimental_item_id)
             if experimental_item_name is not None:
@@ -50,7 +50,7 @@ class ExperimentalItem:
                 'experimental_item_name': ei.ExperimentalItemModel.name,
                 'clazz_id': ei.ExperimentalItemModel.clazz_id,
                 'clazz_name': ei.ClazzModel.name,
-                'teacher_name': ei.UserModel.username,
+                'teacher_name': ei.UserInfoModel.name,
                 'teacher_id': ei.ClazzModel.teacher_id,
                 'description': ei.ExperimentalItemModel.description,
                 'deleted': ei.ExperimentalItemModel.deleted,

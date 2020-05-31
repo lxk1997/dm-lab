@@ -1,7 +1,7 @@
 from sqlalchemy import func
 
 from ..db import get_db
-from ..models import ClazzModel, DatasetModel, ExperimentalItemModel, UserModel
+from ..models import ClazzModel, DatasetModel, ExperimentalItemModel, UserModel, UserInfoModel
 
 
 class Dataset:
@@ -23,7 +23,7 @@ class Dataset:
 
     def query(self, dataset_id=None, dataset_name=None, experimental_item_id=None, file_key=None, user_only=None, user_id=None, deleted=0, description=None, limit=None, offset=None):
         try:
-            query = self._db.query(DatasetModel, ExperimentalItemModel, ClazzModel, UserModel).filter(DatasetModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id, ClazzModel.teacher_id == UserModel.id, ExperimentalItemModel.deleted == 0)
+            query = self._db.query(DatasetModel, ExperimentalItemModel, ClazzModel, UserModel, UserInfoModel).filter(DatasetModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id, ClazzModel.teacher_id == UserModel.id, ExperimentalItemModel.deleted == 0, UserModel.id == UserInfoModel.user_id)
             if dataset_id is not None:
                 query = query.filter(DatasetModel.id == dataset_id)
             if dataset_name is not None:
@@ -50,7 +50,7 @@ class Dataset:
                 'dataset_name': d.DatasetModel.name,
                 'experimental_item_id': d.DatasetModel.experimental_item_id,
                 'teacher_id': d.ClazzModel.teacher_id,
-                'teacher_name': d.UserModel.username,
+                'teacher_name': d.UserInfoModel.name,
                 'file_key': d.DatasetModel.file_key,
                 'user_id': d.DatasetModel.user_id,
                 'user_only': d.DatasetModel.user_only,

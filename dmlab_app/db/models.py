@@ -16,10 +16,23 @@ class RoleModel(Base):
 class UserModel(Base):
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(100), unique=True, nullable=False)
+    school_id = Column(String(100), unique=True, nullable=False)
     password = Column(Text, nullable=False)
     email = Column(Text, nullable=False)
     role_id = Column(Integer, ForeignKey('role.id', ondelete='CASCADE'), nullable=False)
+    create_time = Column(DateTime(timezone=False), server_default=func.now())
+
+
+class UserInfoModel(Base):
+    __tablename__ = 'user_info'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"), nullable=False)
+    name = Column(String(50))
+    department = Column(String(100))
+    major = Column(String(100))
+    grade = Column(String(100))
+    clazz = Column(String(100))
+    sex = Column(Integer)
     create_time = Column(DateTime(timezone=False), server_default=func.now())
 
 

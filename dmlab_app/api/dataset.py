@@ -120,7 +120,7 @@ def handle_get_datasets():
         datasets = Dataset().query(experimental_item_id=experimental_item['experimental_item_id'], user_only=1,
                                    user_id=g.user['user_id'], limit=limit, offset=offset)
         for dataset in datasets:
-            dataset['user_name'] = g.user['user_name']
+            dataset['user_name'] = g.user['name']
         datasets.extend(
             Dataset().query(experimental_item_id=experimental_item['experimental_item_id'], user_only=0, limit=limit,
                             offset=offset))
@@ -128,7 +128,7 @@ def handle_get_datasets():
         datasets = Dataset().query(experimental_item_id=experimental_item['experimental_item_id'], user_only=1,
                                    user_id=g.user['user_id'], limit=limit, offset=offset)
         for dataset in datasets:
-            dataset['user_name'] = g.user['user_name']
+            dataset['user_name'] = g.user['name']
     else:
         datasets = Dataset().query(experimental_item_id=experimental_item['experimental_item_id'], user_only=0,
                                    limit=limit, offset=offset)

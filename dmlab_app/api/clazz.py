@@ -9,6 +9,7 @@ from ..db.dao.experimental_task import ExperimentalTask
 from ..db.dao.report import Report
 from ..db.dao.user import User
 from ..db.dao.user_clazz_relation import UserClazzRelation
+from ..db.dao.user_info import UserInfo
 from ..utils import api_response
 
 # TODO
@@ -147,7 +148,8 @@ def handle_get_clazz_leaderboard(clazz_id):
         if item[1] < last_score:
             last_score = item[1]
             rank = cur
-        cur_data = {'user_id': item[0], 'degree': '%d/%d' % (cnt[item[0]], count), 'rank': rank, 'score': round(item[1], 2), 'user_name': User().query(user_id=item[0])[0]['user_name']}
+        user_info = UserInfo().query(user_id=item[0])[0]
+        cur_data = {'user_id': item[0], 'degree': '%d/%d' % (cnt[item[0]], count), 'rank': rank, 'score': round(item[1], 2), 'name': user_info['name'], 'school_id': user_info['school_id']}
         data.append(cur_data)
         cur += 1
     data = {'detail': data}

@@ -1,7 +1,7 @@
 from sqlalchemy import func
 
 from ..db import get_db
-from ..models import UserClazzRelationModel, ClazzModel, UserModel
+from ..models import UserClazzRelationModel, ClazzModel, UserModel, UserInfoModel
 
 
 class UserClazzRelation:
@@ -23,7 +23,7 @@ class UserClazzRelation:
 
     def query(self, user_id=None, clazz_id=None, deleted=0, limit=None, offset=None):
         try:
-            query = self._db.query(UserClazzRelationModel, ClazzModel, UserModel).filter(UserClazzRelationModel.clazz_id == ClazzModel.id, UserClazzRelationModel.user_id == UserModel.id, ClazzModel.deleted == 0)
+            query = self._db.query(UserClazzRelationModel, ClazzModel, UserModel, UserInfoModel).filter(UserClazzRelationModel.clazz_id == ClazzModel.id, UserClazzRelationModel.user_id == UserModel.id, ClazzModel.deleted == 0, UserModel.id == UserInfoModel.user_id)
             if user_id is not None:
                 query = query.filter(UserClazzRelationModel.user_id == user_id)
             if clazz_id is not None:
@@ -37,9 +37,10 @@ class UserClazzRelation:
             ucrs = list(map(lambda ucr: {
                 'user_clazz_relation_id': ucr.UserClazzRelationModel.id,
                 'user_id': ucr.UserClazzRelationModel.user_id,
-                'user_name': ucr.UserModel.username,
                 'teacher_id': ucr.ClazzModel.teacher_id,
                 'email': ucr.UserModel.email,
+                'name': ucr.UserInfoModel.name,
+                'school_id': ucr.UserModel.school_id,
                 'clazz_id': ucr.UserClazzRelationModel.clazz_id,
                 'clazz_name': ucr.ClazzModel.name,
                 'deleted': ucr.UserClazzRelationModel.deleted,

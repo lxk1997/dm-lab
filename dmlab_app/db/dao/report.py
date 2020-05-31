@@ -1,7 +1,7 @@
 from sqlalchemy import func
 
 from ..db import get_db
-from ..models import ExperimentalItemModel, ClazzModel, ReportModel, UserModel, ExperimentalTaskModel
+from ..models import ExperimentalItemModel, ClazzModel, ReportModel, UserModel, ExperimentalTaskModel, UserInfoModel
 
 
 class Report:
@@ -23,7 +23,7 @@ class Report:
 
     def query(self, report_id=None, experimental_task_id=None, user_id=None, deleted=0, limit=None, offset=None):
         try:
-            query = self._db.query(ReportModel, UserModel, ExperimentalTaskModel, ExperimentalItemModel, ClazzModel).filter(ReportModel.user_id==UserModel.id, ReportModel.experimental_task_id==ExperimentalTaskModel.id, ExperimentalTaskModel.deleted == 0, ExperimentalTaskModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id)
+            query = self._db.query(ReportModel, UserModel, ExperimentalTaskModel, ExperimentalItemModel, ClazzModel, UserInfoModel).filter(ReportModel.user_id==UserModel.id, ReportModel.experimental_task_id==ExperimentalTaskModel.id, ExperimentalTaskModel.deleted == 0, ExperimentalTaskModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id, UserModel.id == UserInfoModel.user_id)
             if report_id is not None:
                 query = query.filter(ReportModel.id == report_id)
             if experimental_task_id is not None:
@@ -48,7 +48,8 @@ class Report:
                 'task_name': r.ReportModel.task_name,
                 'data_id': r.ReportModel.data_id,
                 'user_id': r.ReportModel.user_id,
-                'user_name': r.UserModel.username,
+                'name': r.UserInfoModel.name,
+                'school_id': r.UserModel.school_id,
                 'content': r.ReportModel.content,
                 'file_key': r.ReportModel.file_key,
                 'score': round(float(r.ReportModel.score), 2) if r.ReportModel.score is not None else None,

@@ -143,7 +143,7 @@ export default class Clazz extends React.Component {
                     style={{position: "absolute", right: "20px"}}><span><Avatar style={{
                     color: '#ffffff',
                     backgroundColor: '#35caca',
-                }} size={20}>{item.teacher_name[0]}</Avatar></span><span
+                }} size={20}>{item.teacher_name.length?item.teacher_name[0]:''}</Avatar></span><span
                     style={{fontSize: '15px', marginRight: '5px'}}>{item.teacher_name}</span><span
                     style={{color: '#C0C0C0', fontSize: '15px'}}>{item.time}</span></span></div>
                 <div style={{color: '#C0C0C0', marginTop: '5px'}}>{item.description}</div>
@@ -281,9 +281,9 @@ export class ClazzDetail extends React.Component {
         };
         this.columns = [
             {
-                title: '用户名',
-                dataIndex: 'name',
-                key: 'name',
+                title: '用户',
+                dataIndex: 'user_info',
+                key: 'user_info',
                 width: '30%',
                 ...this.getColumnSearchProps('name'),
             },
@@ -492,8 +492,8 @@ class ScoreLeaderboard extends React.Component {
             },
             {
                 title: '用户',
-                dataIndex: 'user_name',
-                key: 'user_name'
+                dataIndex: 'user_info',
+                key: 'user_info'
             },
             {
                 title: '总分',
@@ -579,6 +579,7 @@ function studentTableFilter(data) {
         let result = {}
         result['key'] = idx
         result['name'] = data[idx].user_name
+        result['user_info'] = data[idx].school_id + '('+data[idx].name+')'
         result['email'] = data[idx].email
         result['join_time'] = data[idx].join_time
         result['student_id'] = data[idx].user_id
@@ -592,8 +593,8 @@ function leaderBoardTableFilter(data) {
     for (let idx = 0; idx < data.length; idx++) {
         let result = {}
         result['key'] = idx
-        result['user_name'] = data[idx].user_name
         result['user_id'] = data[idx].user_id
+        result['user_info'] = data[idx].school_id + '('+data[idx].name+')'
         result['score'] = data[idx].score
         result['rank'] = data[idx].rank
         result['degree'] = data[idx].degree

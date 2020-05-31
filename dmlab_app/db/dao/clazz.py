@@ -1,7 +1,7 @@
 from sqlalchemy import func
 
 from ..db import get_db
-from ..models import ClazzModel, UserClazzRelationModel, UserModel
+from ..models import ClazzModel, UserClazzRelationModel, UserModel, UserInfoModel
 
 
 class Clazz:
@@ -23,7 +23,7 @@ class Clazz:
 
     def query(self, clazz_id=None, clazz_name=None, teacher_id=None, invite_code=None, deleted=0, description=None, limit=None, offset=None):
         try:
-            query = self._db.query(ClazzModel, UserModel).filter(ClazzModel.teacher_id == UserModel.id)
+            query = self._db.query(ClazzModel, UserModel, UserInfoModel).filter(ClazzModel.teacher_id == UserModel.id, UserModel.id == UserInfoModel.user_id)
             if clazz_id is not None:
                 query = query.filter(ClazzModel.id == clazz_id)
             if clazz_name is not None:
@@ -45,7 +45,7 @@ class Clazz:
                 'clazz_id': c.ClazzModel.id,
                 'clazz_name': c.ClazzModel.name,
                 'teacher_id': c.ClazzModel.teacher_id,
-                'teacher_name': c.UserModel.username,
+                'teacher_name': c.UserInfoModel.name,
                 'deleted': c.ClazzModel.deleted,
                 'invite_code': c.ClazzModel.invite_code,
                 'description': c.ClazzModel.description,
