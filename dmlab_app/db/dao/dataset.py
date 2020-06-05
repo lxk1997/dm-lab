@@ -21,7 +21,7 @@ class Dataset:
             self._db.close()
         return d_id
 
-    def query(self, dataset_id=None, dataset_name=None, experimental_item_id=None, file_key=None, user_only=None, user_id=None, deleted=0, description=None, limit=None, offset=None):
+    def query(self, dataset_id=None, dataset_name=None, experimental_item_id=None, file_key=None, user_only=None, user_id=None, school_id=None, deleted=0, description=None, limit=None, offset=None):
         try:
             query = self._db.query(DatasetModel, ExperimentalItemModel, ClazzModel, UserModel, UserInfoModel).filter(DatasetModel.experimental_item_id == ExperimentalItemModel.id, ExperimentalItemModel.clazz_id == ClazzModel.id, ClazzModel.teacher_id == UserModel.id, ExperimentalItemModel.deleted == 0, UserModel.id == UserInfoModel.user_id)
             if dataset_id is not None:
@@ -38,6 +38,8 @@ class Dataset:
                 query = query.filter(DatasetModel.user_only == user_only)
             if user_id is not None:
                 query = query.filter(DatasetModel.user_id == user_id)
+            if school_id is not None:
+                query = query.filter(UserModel.school_id == school_id)
             query = query.filter(DatasetModel.deleted == deleted)
             query = query.order_by(DatasetModel.create_time.desc())
             if limit is not None:

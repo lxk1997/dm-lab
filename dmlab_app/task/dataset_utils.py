@@ -30,6 +30,8 @@ class DatasetUtils:
         if file_name:
             self._dataset_name = file_name
         for line in csv.readlines():
+            if len(line.decode('utf-8').strip('\n')) == 0:
+                continue
             if not head_row:
                 self._header = line.decode('utf-8').strip('\n').split(sep)
                 head_row = True

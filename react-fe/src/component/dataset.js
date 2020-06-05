@@ -29,6 +29,8 @@ import 'react-markdown-editor-lite/lib/index.css';
 import {checkFetchStatus} from "../page/utils";
 import {getId} from "./utils";
 
+const {Option} = Select;
+
 export default class Dataset extends React.Component {
     constructor(props) {
         super(props)
@@ -214,6 +216,7 @@ class NewDatasetModal extends React.Component {
         this.state = {
             loading: false,
             visible: false,
+            public_datasets: null
         };
         this.experimental_item_id = props.experimental_item_id
     }
@@ -232,9 +235,50 @@ class NewDatasetModal extends React.Component {
         this.props.parent.getModalMsg(this, true)
     }
 
+    getData = () => {
+        $.ajax({
+            url: '/api/dataset/public',
+            type: 'GET',
+            async: false,
+            dataType: 'json',
+            success: jsonData => {
+                this.setState({public_datasets: jsonData.data.detail})
+            }
+        })
+    }
+
+    componentWillMount() {
+        this.getData()
+    }
+
     handleCreateDataset = values => {
         this.setState({loading: true});
-        if(this.dataset_file_path === null || this.dataset_file_path === '') {
+        if(values.dataset !== null && values.dataset !== undefined && values.dataset !== '') {
+            $.ajax({
+            type: 'POST',
+            url: '/api/dataset/copy',
+            async: false,
+            data: {
+                'experimental_item_id': this.experimental_item_id,
+                'dataset_name': values.dataset_name,
+                'description': values.description,
+                'dataset_id': values.dataset,
+                'user_only': 1
+            },
+            dataType: 'json',
+            success: (jsonData) => {
+                if (jsonData.error) {
+                    message.error(jsonData.msg);
+                } else {
+                    this.setParentMsg();
+                    message.success('数据集创建成功')
+                }
+                this.refs.form.resetFields()
+                this.setState({loading: false, visible: false});
+            }
+        });
+        }
+        else if(this.dataset_file_path === null || this.dataset_file_path === '') {
             message.error('数据集上传失败,请重新上传数据集');
             this.setState({loading: false});
         } else {
@@ -280,6 +324,9 @@ class NewDatasetModal extends React.Component {
             }
           },
         };
+        const public_datasets = this.state.public_datasets.map(ele => {
+            return <Option value={ele.dataset_id}>{ele.dataset_name}</Option>
+        })
         return (
             <div>
                 <div style={{"textAlign": "right"}}>
@@ -321,7 +368,7 @@ class NewDatasetModal extends React.Component {
                             name="file"
                             rules={[
                                 {
-                                    required: true
+                                    required: false
                                 }
                             ]}>
                             <div style={{"height":"70px"}}>
@@ -332,6 +379,21 @@ class NewDatasetModal extends React.Component {
                                     <p>Click or drag file to this area to upload</p>
                                 </Upload.Dragger>
                             </div>
+                        </Form.Item>
+                        <Form.Item
+                            name="dataset"
+                            rules={[
+                                {
+                                    required: false,
+                                },
+                            ]}>
+                            <Select
+                                showSearch
+                                style={{width: '100%'}}
+                                placeholder="请选择公开数据集"
+                            >
+                                {public_datasets}
+                            </Select>
                         </Form.Item>
                         <Form.Item style={{"textAlign": "center"}}>
                             <Button key="submit" type="primary" htmlType="submit" loading={this.state.loading}>

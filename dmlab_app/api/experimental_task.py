@@ -96,6 +96,7 @@ def handle_get_experimental_task_leaderboard(experimental_task_id):
         for user_clazz_relation in user_clazz_relations:
             report = Report().query(experimental_task_id=experimental_task_id, user_id=user_clazz_relation['user_id'])
             if report:
+                report[0]['submit_count'] = len(report)
                 rsts.append(report[0])
 
         data = rsts
@@ -103,3 +104,26 @@ def handle_get_experimental_task_leaderboard(experimental_task_id):
         error = 0
     return api_response(msg, error, data)
 
+
+@bp.route('/<int:experimental_task_id>/<int:user_id>/record', methods=['GET'])
+@login_required
+def handle_get_experimental_task_submit_record(experimental_task_id, user_id):
+    experimental_tasks = ExperimentalTask().query(experimental_task_id=experimental_task_id)
+    data = {}
+    if not experimental_tasks:
+        msg = 'Experimental Task %d does not exists' % experimental_task_id
+        error = 1
+    else:
+        experimental_task = experimental_tasks[0]
+        if datetime.now() < experimental_task['start_time']:
+            status = '未开始'
+        elif datetime.now() < experimental_task['dead_line']:
+            status = '正在进行'
+        else:
+            status = '已结束'
+        experimental_task['status'] = status
+        reports = Report().query(experimental_task_id=experimental_task_id, user_id=user_id)
+        data = reports
+        msg = 'ok'
+        error = 0
+    return api_response(msg, error, data)

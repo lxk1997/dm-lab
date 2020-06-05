@@ -621,7 +621,8 @@ class ScoreLeaderboard extends React.Component {
             visible: props.visible,
             report_modal_visible: false,
             experimental_task_id: props.experimental_task_id,
-            reports: []
+            reports: [],
+            submit_record_modal_visible: false
         }
 
         this.columns = [
@@ -629,30 +630,44 @@ class ScoreLeaderboard extends React.Component {
                 title: '用户',
                 dataIndex: 'user_info',
                 key: 'user_info',
+                 align: 'center',
                 render: (text, recode) => <a href={"/user/" + recode.user_id}>{text}</a>
             },
             {
                 title: '评测',
                 dataIndex: 'score_content',
                 key: 'score_content',
+                 align: 'center',
             },
             {
                 title: '提交时间',
                 dataIndex: 'create_time',
                 key: 'create_time',
+                 align: 'center',
                 sorter: (a, b) => a.create_time > b.create_time,
                 sortDirections: ['descend', 'ascend'],
+            },
+            {
+                title: '提交次数',
+                dataIndex: 'submit_count',
+                key: 'submit_count',
+                sorter: (a, b) => a.submit_count <  b.submit_count,
+                sortDirections: ['descend', 'ascend'],
+                align: 'center',
+                render: (text, recode) => <a href={'#'} onClick={() => this.handleDisplaySubmitRecord(recode.user_id)}>{text}</a>
             },
             {
                 title: '成绩',
                 dataIndex: 'score',
                 key: 'score',
+                 align: 'center',
                 sorter: (a, b) => a.score > b.score,
                 sortDirections: ['descend', 'ascend'],
             },
             {
                 title: '',
                 key: 'action',
+                 align: 'center',
                 render: (text, record) => {
                     if (record.score !== '') {
                         return (<span>
@@ -688,6 +703,10 @@ class ScoreLeaderboard extends React.Component {
 
     componentWillMount = () => {
         this.getData()
+    }
+
+    handleDisplaySubmitRecord = user_id => {
+        this.refs.submitRecordModal.setInfo({visible: true, user_id: user_id, experimental_task_id: this.state.experimental_task_id});
     }
 
     handleDisplayReport = record => {
@@ -732,6 +751,95 @@ class ScoreLeaderboard extends React.Component {
                 <ReportModal visiable={this.state.report_modal_visible} ref={"reportModal"} parent={this}/>
                 <Table size={"small"} pagination={pagination} ref={"table"} dataSource={this.state.reports}
                        columns={this.columns}/>
+                <SubmitRecordModal parent={this} visible={this.state.submit_record_modal_visible} ref={"submitRecordModal"}/>
+            </Modal>
+        );
+    }
+}
+
+class SubmitRecordModal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            visible: props.visible,
+            data: []
+        }
+        this.column = [
+            {
+                title: '用户',
+                dataIndex: 'user_info',
+                key: 'user_info',
+                align: 'center',
+                render: (text, recode) => <a href={"/user/" + recode.user_id}>{text}</a>
+            },
+            {
+                title: '评测',
+                dataIndex: 'score_content',
+                key: 'score_content',
+                align: 'center',
+            },
+            {
+                title: '提交时间',
+                dataIndex: 'create_time',
+                key: 'create_time',
+                align: 'center',
+                sorter: (a, b) => a.create_time > b.create_time,
+                sortDirections: ['descend', 'ascend'],
+            },
+            {
+                title: '成绩',
+                dataIndex: 'score',
+                key: 'score',
+                align: 'center',
+                sorter: (a, b) => a.score > b.score,
+                sortDirections: ['descend', 'ascend'],
+                editable: true
+            }
+        ];
+    }
+
+    getData = (experimental_task_id, user_id) => {
+        const api = `/api/experimental-task/${experimental_task_id}/${user_id}/record`
+        $.ajax({
+            url: api,
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            success: jsonData => {
+                let data = jsonData.data
+                let reports = reportTableFilter(data)
+                if (this.state.data.length > 0) {
+                    this.setState({data: []})
+                }
+                this.setState({data: reports})
+            }
+        })
+    }
+
+    setInfo = val => {
+        this.getData(val.experimental_task_id, val.user_id)
+        this.setState({visible: val.visible})
+    }
+
+    hideModal = () => {
+        this.setState({visible: false, data: []});
+    }
+
+    render() {
+        let pagination = {
+            showQuickJumper: true,
+            defaultPageSize: 20
+        }
+        return (
+            <Modal
+                width="800px"
+                height="600px"
+                visible={this.state.visible}
+                title="提交记录"
+                onCancel={this.hideModal}
+                footer={null}>
+                <Table  size={"small"} pagination={pagination} ref={"table"} dataSource={this.state.data}
+                       columns={this.column}/>
             </Modal>
         );
     }
@@ -828,6 +936,7 @@ function reportTableFilter(data) {
         result['score'] = haveField(data[idx], 'score') ? data[idx].score : '暂无'
         result['score_content'] = haveField(data[idx], 'score_content') ? data[idx].score_content : ''
         result['create_time'] = haveField(data[idx], 'create_time') ? data[idx].create_time : ''
+        result['submit_count'] = haveField(data[idx], 'submit_count')?data[idx].submit_count: ''
         results.push(result)
     }
     return results
