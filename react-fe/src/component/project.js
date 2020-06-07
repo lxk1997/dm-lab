@@ -739,6 +739,25 @@ function generateComponent(div_components) {
                                 shape={'flow-rect'}
                                 model={{
                                     color:'#1890ff',
+                                    label:'特征构造',
+                                    task_name: 'Feature Structure',
+                                    status: '',
+                                    selected_columns: [],
+                                    new_feature: 'new',
+                                    expression: ''
+                                }}
+                                label={'特征构造'}
+                                children={<div>特征构造</div>}
+                            />,
+                        key: '特征构造'
+                    },
+                    {
+                        title: <Item
+                                type={'node'}
+                                size={'80*28'}
+                                shape={'flow-rect'}
+                                model={{
+                                    color:'#1890ff',
                                     label:'记录去重',
                                     task_name: 'Duplicate Removal',
                                     status: '',
@@ -748,6 +767,24 @@ function generateComponent(div_components) {
                                 children={<div>记录去重</div>}
                             />,
                         key: '记录去重'
+                    },
+                    {
+                        title: <Item
+                                type={'node'}
+                                size={'80*28'}
+                                shape={'flow-rect'}
+                                model={{
+                                    color:'#1890ff',
+                                    label:'缺失值处理',
+                                    task_name: 'Missing Values Handle',
+                                    status: '',
+                                    selected_columns: [],
+                                    solve_method: 'drop'
+                                }}
+                                label={'缺失值处理'}
+                                children={<div>缺失值处理</div>}
+                            />,
+                        key: '缺失值处理'
                     }
                 ]
             },
@@ -1056,6 +1093,47 @@ function generateComponent(div_components) {
                                 children={<div>K-Means</div>}
                             />,
                         key: 'K-Means'
+                    },
+                    {
+                        title: <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'DBSCAN密...',
+                                task_name: 'DBSCAN',
+                                status: '',
+                                selected_columns: [],
+                                eps: 0.5,
+                                min_samples: 5,
+                                algorithm: 'auto',
+                                leaf_size: '30'
+                            }}
+                            label={'DBSCAN密度聚类'}
+                            children={<div>DBSCAN密度聚类</div>}
+                        />,
+                        key: 'DBSCAN密度聚类'
+                    },
+                    {
+                        title: <Item
+                            type={'node'}
+                            size={'80*28'}
+                            shape={'flow-rect'}
+                            model={{
+                                color:'#1890ff',
+                                label:'层次聚类',
+                                task_name: 'Hierarchical',
+                                status: '',
+                                selected_columns: [],
+                                n_clusters: 2,
+                                affinity: 'euclidean',
+                                linkage: 'average'
+                            }}
+                            label={'层次聚类'}
+                            children={<div>层次聚类</div>}
+                        />,
+                        key: '层次聚类'
                     }
                 ]
             },

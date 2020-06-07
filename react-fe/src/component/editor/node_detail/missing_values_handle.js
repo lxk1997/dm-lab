@@ -1,21 +1,24 @@
 import React from 'react';
-import {Collapse, Form, Select, Table, Button, message} from 'antd';
+import {Collapse, Form, Select, Table, Button, message, Input} from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import 'rc-color-picker/assets/index.css';
 import {withPropsAPI} from 'gg-editor';
 import 'antd/dist/antd.css';
+import TextArea from 'antd/lib/input/TextArea';
 import $ from 'jquery'
 import {checkFetchStatus} from "../../../page/utils";
 
 const {Item}=Form;
 const { Panel } = Collapse;
+const {Option} = Select
 
-class DuplicateRemoval extends React.Component{
+class MissingValuesHandle extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
             dataset_columns: [],
             selected_columns: [],
+            solve_method: 'drop',
             table_loading: false
         }
         this.columns = [
@@ -104,6 +107,19 @@ class DuplicateRemoval extends React.Component{
         update(item, {...values})
   };
 
+    onSolveMethodChange = val => {
+        const {propsAPI}=this.props;
+        const {getSelected, update}=propsAPI;
+
+        const item=getSelected()[0]
+
+        if(!item) return null;
+        let values = item.getModel()
+        values.solve_method = val
+        update(item, {...values})
+        this.setState({solve_method: val})
+    }
+
     render(){
         const {selected_columns } = this.state;
         const rowSelection = {
@@ -129,11 +145,20 @@ class DuplicateRemoval extends React.Component{
                         <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
                         {fields_msg}
                     </Panel>
+                    <Panel header="基础参数" key="2">
+                        <div>处理方法</div>
+                        <Select style={{ width: 130 }} defaultValue={this.state.solve_method} onChange={this.onSolveMethodChange}>
+                            <Option value={"drop"}>{"删除缺失值"}</Option>
+                            <Option value={"median"}>{"中位数插补"}</Option>
+                            <Option value={"most_frequent"}>{"众数插补"}</Option>
+                            <Option value={"mean"}>{"均值插补"}</Option>
+                        </Select>
+                    </Panel>
                 </Collapse>
                 <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
-                        记录去重是去除数据表中的重复的行数据，只保留其中一行数据。
+                        缺失值处理：对缺失值进行处理。选用中位数插值法、众数插值法、均值插值法时，请选择数值型数据，如果勾选了非数值类型数据，则会自动过滤，下个组件可能无法获取所有列。
                     </div>
                     </Panel>
                  </Collapse>
@@ -142,7 +167,7 @@ class DuplicateRemoval extends React.Component{
     }
 }
 
-export default withPropsAPI(DuplicateRemoval);
+export default withPropsAPI(MissingValuesHandle);
 
 
 

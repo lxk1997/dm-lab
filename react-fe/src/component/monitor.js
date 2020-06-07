@@ -49,16 +49,16 @@ export default class Monitor extends React.Component {
                     let color = ""
                     switch (status) {
                         case "pending":
-                            color = "#1890ff"
+                            color = "blue"
                             break
                         case "running":
-                            color = "#FAFF37"
+                            color = "yellow"
                             break
                         case "success":
-                            color = "#00EE00"
+                            color = "green"
                             break
                         case "fail":
-                            color = "#EE0000"
+                            color = "red"
                             break
                     }
                     return (

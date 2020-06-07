@@ -23,6 +23,10 @@ import KNNRegressorContextMenu from "./knn_regressor";
 import LASSORegressorContextMenu from "./lasso_regressor";
 import LinearRegressorContextMenu from "./linear_regressor";
 import KMeansClusterContextMenu from "./k_means_cluster";
+import DBSCANClusterContextMenu from "./dbscan_cluster";
+import HierarchicalClusterContextMenu from "./hierarchical_cluster";
+import FeatureStructureContextMenu from "./feature_structure";
+import MissingValuesHandleContextMenu from "./missing_values_handle";
 
 const {Item}=Form;
 
@@ -87,6 +91,18 @@ class FlowContextMenu extends React.Component{
                 break;
             case '实验提交':
                 MenuComponent = ReportUploadContextMenu;
+                break;
+            case 'DBSCAN密度聚类':
+                MenuComponent = DBSCANClusterContextMenu;
+                break;
+            case '层次聚类':
+                MenuComponent = HierarchicalClusterContextMenu;
+                break;
+            case '特征构造':
+                MenuComponent = FeatureStructureContextMenu;
+                break;
+            case '缺失值处理':
+                MenuComponent = MissingValuesHandleContextMenu;
                 break;
         }
         if(MenuComponent === null) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Collapse, Form, Select, Table, Button, message} from 'antd';
+import {Collapse, Form, Select, Table, Button, message, Input, InputNumber,Switch} from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import 'rc-color-picker/assets/index.css';
 import {withPropsAPI} from 'gg-editor';
@@ -9,14 +9,17 @@ import {checkFetchStatus} from "../../../page/utils";
 
 const {Item}=Form;
 const { Panel } = Collapse;
+const { Option } = Select;
 
-class DuplicateRemoval extends React.Component{
+class HierarchicalCluster extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
             dataset_columns: [],
             selected_columns: [],
-            table_loading: false
+            n_clusters: 2,
+            affinity: 'euclidean',
+            linkage: 'average'
         }
         this.columns = [
             {
@@ -102,7 +105,48 @@ class DuplicateRemoval extends React.Component{
         let values = item.getModel()
         values.selected_columns = selected_columns
         update(item, {...values})
-  };
+    };
+
+    onNClustersChange = val => {
+        const {propsAPI}=this.props;
+        const {getSelected, update}=propsAPI;
+
+        const item=getSelected()[0]
+
+        if(!item) return null;
+        let values = item.getModel()
+        values.n_clusters = val
+        update(item, {...values})
+        this.setState({n_clusters: val})
+    }
+
+    onAffinityChange = val => {
+        const {propsAPI}=this.props;
+        const {getSelected, update}=propsAPI;
+
+        const item=getSelected()[0]
+
+        if(!item) return null;
+        let values = item.getModel()
+        values.affinity = val
+        update(item, {...values})
+        this.setState({affinity: val})
+    }
+
+    onLinkageChange = val => {
+        const {propsAPI}=this.props;
+        const {getSelected, update}=propsAPI;
+
+        const item=getSelected()[0]
+
+        if(!item) return null;
+        let values = item.getModel()
+        values.linkage = val
+        update(item, {...values})
+        this.setState({linkage: val})
+    }
+
+
 
     render(){
         const {selected_columns } = this.state;
@@ -120,6 +164,7 @@ class DuplicateRemoval extends React.Component{
         let fields_msg = null
         if(this.state.dataset_columns) {
             fields_msg = <Table loading={this.state.table_loading} rowSelection={rowSelection} columns={this.columns} dataSource={this.state.dataset_columns} pagination={null} scroll={{y: 150}}  style={{"overflow":"scroll", "width": "300px"}}/>
+
         }
         return(
             <div>
@@ -129,11 +174,31 @@ class DuplicateRemoval extends React.Component{
                         <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
                         {fields_msg}
                     </Panel>
+                    <Panel header="基础参数" key="2">
+                        <div>聚类数</div>
+                        <InputNumber min={0} step={1} defaultValue={this.state.n_clusters} onChange={this.onNClustersChange} />
+                    </Panel>
+                    <Panel header="高级参数" key="3">
+                        <div>affinity</div>
+                        <Select style={{ width: 130 }} defaultValue={this.state.affinity} onChange={this.onAffinityChange}>
+                            <Option value={'euclidean'}>{"euclidean"}</Option>
+                            <Option value={'l1'}>{"l1"}</Option>
+                            <Option value={'l2'}>{"l2"}</Option>
+                            <Option value={'manhattan'}>{"manhattan"}</Option>
+                            <Option value={'cosine'}>{"cosine"}</Option>
+                        </Select>
+                        <div>linkage</div>
+                        <Select style={{ width: 130 }} defaultValue={this.state.linkage} onChange={this.onLinkageChange}>
+                            <Option value={'average'}>{"average"}</Option>
+                            <Option value={'ward'}>{"ward"}</Option>
+                            <Option value={'complete'}>{"complete"}</Option>
+                        </Select>
+                    </Panel>
                 </Collapse>
                 <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
-                        记录去重是去除数据表中的重复的行数据，只保留其中一行数据。
+                        层次聚类，是一种很直观的算法。顾名思义就是要一层一层地进行聚类，可以从下而上地把小的cluster合并聚集，也可以从上而下地将大的cluster进行分割。
                     </div>
                     </Panel>
                  </Collapse>
@@ -142,7 +207,7 @@ class DuplicateRemoval extends React.Component{
     }
 }
 
-export default withPropsAPI(DuplicateRemoval);
+export default withPropsAPI(HierarchicalCluster);
 
 
 

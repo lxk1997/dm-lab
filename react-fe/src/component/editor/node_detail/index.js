@@ -25,6 +25,10 @@ import KNNRegressor from "./knn_regressor";
 import LASSORegressor from "./lasso_regressor";
 import LinearRegressor from "./linear_regressor";
 import KMeansCluster from "./k_means_cluster";
+import DBSCANCluster from "./dbscan_cluster";
+import HierarchicalCluster from "./hierarchical_cluster";
+import FeatureStructure from "./feature_structure";
+import MissingValuesHandle from "./missing_values_handle";
 
 const {Item}=Form;
 
@@ -99,6 +103,18 @@ class NodeDetail extends React.Component{
                 break;
             case '实验提交':
                 Component = ReportUpload;
+                break;
+            case 'DBSCAN密度聚类':
+                Component = DBSCANCluster;
+                break;
+            case '层次聚类':
+                Component = HierarchicalCluster;
+                break;
+            case '特征构造':
+                Component = FeatureStructure;
+                break;
+            case '缺失值处理':
+                Component = MissingValuesHandle;
                 break;
         }
         if(Component === null) {

@@ -6,8 +6,12 @@ from dmlab_app.task.classification.knn_classifier import KNNClassifier
 from dmlab_app.task.classification.lr_classifier import LRClassifier
 from dmlab_app.task.classification.nb_classifier import NBClassifier
 from dmlab_app.task.classification.svm_classifier import SVMClassifier
+from dmlab_app.task.cluster.dbscan_cluster import DBSCANCluster
+from dmlab_app.task.cluster.hierarchical_cluster import HierarchicalCluster
 from dmlab_app.task.cluster.k_means_cluster import KMeansCluster
 from dmlab_app.task.data_preprocessing.duplicate_removal import DuplicateRemoval
+from dmlab_app.task.data_preprocessing.feature_structure import FeatureStructure
+from dmlab_app.task.data_preprocessing.missing_values_handle import MissingValuesHandle
 from dmlab_app.task.io_source.input_source import InputSource
 from dmlab_app.task.io_source.output_source import OutputSource
 from dmlab_app.task.io_source.report_upload import ReportUpload
@@ -99,6 +103,26 @@ _tasks = [
             'name'      : 'K-Means',
             'method'    : KMeansCluster(),
         },
+        {
+            'id'        : 17,
+            'name'      : 'DBSCAN',
+            'method'    : DBSCANCluster(),
+        },
+        {
+            'id'        : 18,
+            'name'      : 'Hierarchical',
+            'method'    : HierarchicalCluster(),
+        },
+        {
+            'id'        : 19,
+            'name'      : 'Feature Structure',
+            'method'    : FeatureStructure(),
+        },
+        {
+            'id'        : 20,
+            'name'      : 'Missing Values Handle',
+            'method'    : MissingValuesHandle(),
+        }
     ]
 
 _customized_tasks = [

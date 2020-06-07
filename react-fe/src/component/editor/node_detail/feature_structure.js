@@ -1,21 +1,24 @@
 import React from 'react';
-import {Collapse, Form, Select, Table, Button, message} from 'antd';
+import {Collapse, Form, Select, Table, Button, message, Input} from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import 'rc-color-picker/assets/index.css';
 import {withPropsAPI} from 'gg-editor';
 import 'antd/dist/antd.css';
+import TextArea from 'antd/lib/input/TextArea';
 import $ from 'jquery'
 import {checkFetchStatus} from "../../../page/utils";
 
 const {Item}=Form;
 const { Panel } = Collapse;
 
-class DuplicateRemoval extends React.Component{
+class FeatureStructure extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
             dataset_columns: [],
             selected_columns: [],
+            new_feature: 'new',
+            expression: '',
             table_loading: false
         }
         this.columns = [
@@ -104,6 +107,32 @@ class DuplicateRemoval extends React.Component{
         update(item, {...values})
   };
 
+    onNewFeatureChange = e => {
+        const {propsAPI}=this.props;
+        const {getSelected, update}=propsAPI;
+
+        const item=getSelected()[0]
+
+        if(!item) return null;
+        let values = item.getModel()
+        values.new_feature = e.target.value
+        update(item, {...values})
+        this.setState({new_feature: e.target.value})
+    }
+
+    onExpressionChange = e => {
+        const {propsAPI}=this.props;
+        const {getSelected, update}=propsAPI;
+
+        const item=getSelected()[0]
+
+        if(!item) return null;
+        let values = item.getModel()
+        values.expression = e.target.value
+        update(item, {...values})
+        this.setState({expression: e.target.value})
+    }
+
     render(){
         const {selected_columns } = this.state;
         const rowSelection = {
@@ -129,11 +158,17 @@ class DuplicateRemoval extends React.Component{
                         <Button type="primary" size={'small'} icon={<SyncOutlined />} onClick={this.handleFieldRefresh}/>
                         {fields_msg}
                     </Panel>
+                    <Panel header="基础参数" key="2">
+                        <div>新特征名</div>
+                        <Input defaultValue={this.state.new_feature} onChange={this.onNewFeatureChange}/>
+                        <div>表达式</div>
+                        <TextArea defaultValue={this.state.expression} onChange={this.onExpressionChange}/>
+                    </Panel>
                 </Collapse>
                 <Collapse accordion expandIconPosition={'right'} style={{'position': 'absolute', 'bottom': '0px', 'width': '160px'}}>
                     <Panel header="组件描述" key="1">
                     <div>
-                        记录去重是去除数据表中的重复的行数据，只保留其中一行数据。
+                        衍生变量是指将一列或多列通过基本运算生成新列。
                     </div>
                     </Panel>
                  </Collapse>
@@ -142,7 +177,7 @@ class DuplicateRemoval extends React.Component{
     }
 }
 
-export default withPropsAPI(DuplicateRemoval);
+export default withPropsAPI(FeatureStructure);
 
 
 
