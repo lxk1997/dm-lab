@@ -27,6 +27,7 @@ import DBSCANClusterContextMenu from "./dbscan_cluster";
 import HierarchicalClusterContextMenu from "./hierarchical_cluster";
 import FeatureStructureContextMenu from "./feature_structure";
 import MissingValuesHandleContextMenu from "./missing_values_handle";
+import FPGrowthContextMenu from "./fp_growth";
 
 const {Item}=Form;
 
@@ -73,6 +74,9 @@ class FlowContextMenu extends React.Component{
                 break;
             case 'Apriori':
                 MenuComponent = AprioriContextMenu;
+                break;
+            case 'FP-Growth':
+                MenuComponent = FPGrowthContextMenu;
                 break;
             case '支持向量回归':
                 MenuComponent = SVMRegressorContextMenu;

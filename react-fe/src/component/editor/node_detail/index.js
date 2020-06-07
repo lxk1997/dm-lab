@@ -29,6 +29,7 @@ import DBSCANCluster from "./dbscan_cluster";
 import HierarchicalCluster from "./hierarchical_cluster";
 import FeatureStructure from "./feature_structure";
 import MissingValuesHandle from "./missing_values_handle";
+import FPGrowth from "./fp_growth";
 
 const {Item}=Form;
 
@@ -100,6 +101,9 @@ class NodeDetail extends React.Component{
                 break;
             case 'Apriori':
                 Component = Apriori;
+                break;
+            case 'FP-Growth':
+                Component = FPGrowth;
                 break;
             case '实验提交':
                 Component = ReportUpload;

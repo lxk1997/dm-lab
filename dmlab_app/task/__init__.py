@@ -1,5 +1,6 @@
 from dmlab_app.task.association_rule.apriori import Apriori
 from dmlab_app.task.association_rule.customized import CustomizedAssociationRule
+from dmlab_app.task.association_rule.fp_growth import FPGrowth
 from dmlab_app.task.classification.cart_classifier import CARTClassifier
 from dmlab_app.task.classification.customized import CustomizedClassifier
 from dmlab_app.task.classification.knn_classifier import KNNClassifier
@@ -122,6 +123,11 @@ _tasks = [
             'id'        : 20,
             'name'      : 'Missing Values Handle',
             'method'    : MissingValuesHandle(),
+        },
+        {
+            'id'        : 21,
+            'name'      : 'FP-Growth',
+            'method'    : FPGrowth(),
         }
     ]
 

@@ -1159,6 +1159,25 @@ function generateComponent(div_components) {
                                 children={<div>Apriori</div>}
                             />,
                         key: 'Apriori'
+                    },
+                    {
+                        title: <Item
+                                type={'node'}
+                                size={'80*28'}
+                                shape={'flow-rect'}
+                                model={{
+                                    color:'#1890ff',
+                                    label:'FP-Growth',
+                                    task_name: 'FP-Growth',
+                                    status: '',
+                                    min_support: 0.5,
+                                    min_confidence: 0.5,
+                                    max_length: 8
+                                }}
+                                label={'FP-Growth'}
+                                children={<div>FP-Growth</div>}
+                            />,
+                        key: 'FP-Growth'
                     }
                 ]
             },
