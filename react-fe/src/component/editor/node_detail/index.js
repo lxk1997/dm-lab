@@ -30,6 +30,7 @@ import HierarchicalCluster from "./hierarchical_cluster";
 import FeatureStructure from "./feature_structure";
 import MissingValuesHandle from "./missing_values_handle";
 import FPGrowth from "./fp_growth";
+import FrequencyAnalysis from "./frequency_analysis";
 
 const {Item}=Form;
 
@@ -119,6 +120,9 @@ class NodeDetail extends React.Component{
                 break;
             case '缺失值处理':
                 Component = MissingValuesHandle;
+                break;
+            case '频数分析':
+                Component = FrequencyAnalysis;
                 break;
         }
         if(Component === null) {

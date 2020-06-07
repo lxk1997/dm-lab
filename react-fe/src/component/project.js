@@ -791,6 +791,25 @@ function generateComponent(div_components) {
             {
                 title: '统计分析',
                 key: '统计分析',
+                children: [
+                    {
+                        title: <Item
+                                type={'node'}
+                                size={'80*28'}
+                                shape={'flow-rect'}
+                                model={{
+                                    color:'#1890ff',
+                                    label:'频数分析',
+                                    task_name: 'Frequency Analysis',
+                                    status: '',
+                                    selected_column: ''
+                                }}
+                                label={'频数分析'}
+                                children={<div>频数分析</div>}
+                            />,
+                        key: '频数分析'
+                    },
+                ]
             },
             {
                 title: '分类',

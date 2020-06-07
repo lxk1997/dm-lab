@@ -22,6 +22,7 @@ from dmlab_app.task.regression.knn_regressor import KNNRegressor
 from dmlab_app.task.regression.lasso_regressor import LASSORegressor
 from dmlab_app.task.regression.linear_regressor import LinearRegressor
 from dmlab_app.task.regression.svm_regressor import SVMRegressor
+from dmlab_app.task.statistic_analysis.frequency_analysis import FrequencyAnalysis
 
 _tasks = [
         {
@@ -128,6 +129,11 @@ _tasks = [
             'id'        : 21,
             'name'      : 'FP-Growth',
             'method'    : FPGrowth(),
+        },
+        {
+            'id'        : 22,
+            'name'      : 'Frequency Analysis',
+            'method'    : FrequencyAnalysis()
         }
     ]
 
