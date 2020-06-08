@@ -31,6 +31,7 @@ import FeatureStructure from "./feature_structure";
 import MissingValuesHandle from "./missing_values_handle";
 import FPGrowth from "./fp_growth";
 import FrequencyAnalysis from "./frequency_analysis";
+import FactorAnalysis from "./factor_analysis";
 
 const {Item}=Form;
 
@@ -123,6 +124,9 @@ class NodeDetail extends React.Component{
                 break;
             case '频数分析':
                 Component = FrequencyAnalysis;
+                break;
+            case '因子分析':
+                Component = FactorAnalysis;
                 break;
         }
         if(Component === null) {

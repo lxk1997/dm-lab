@@ -29,6 +29,7 @@ import FeatureStructureContextMenu from "./feature_structure";
 import MissingValuesHandleContextMenu from "./missing_values_handle";
 import FPGrowthContextMenu from "./fp_growth";
 import FrequencyAnalysisContextMenu from "./frequency_analysis";
+import FactorAnalysisContextMenu from "./factor_analysis";
 
 const {Item}=Form;
 
@@ -111,6 +112,9 @@ class FlowContextMenu extends React.Component{
                 break;
             case '频数分析':
                 MenuComponent = FrequencyAnalysisContextMenu;
+                break;
+            case '因子分析':
+                MenuComponent = FactorAnalysisContextMenu;
                 break;
         }
         if(MenuComponent === null) {

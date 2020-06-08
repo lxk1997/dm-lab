@@ -809,6 +809,25 @@ function generateComponent(div_components) {
                             />,
                         key: '频数分析'
                     },
+                    {
+                        title: <Item
+                                type={'node'}
+                                size={'80*28'}
+                                shape={'flow-rect'}
+                                model={{
+                                    color:'#1890ff',
+                                    label:'因子分析',
+                                    task_name: 'Factor Analysis',
+                                    status: '',
+                                    selected_columns: [],
+                                    n_components: 2,
+                                    max_iter: 1000
+                                }}
+                                label={'因子分析'}
+                                children={<div>因子分析</div>}
+                            />,
+                        key: '因子分析'
+                    },
                 ]
             },
             {
@@ -1199,10 +1218,6 @@ function generateComponent(div_components) {
                         key: 'FP-Growth'
                     }
                 ]
-            },
-            {
-                title: '时序模型',
-                key: '时序模型',
             },
             {
                 title: '提交',
