@@ -1,6 +1,7 @@
 # dm-lab
 数据挖掘协同学习平台
 ![image](https://github.com/lxk1997/dm-lab/blob/master/imgs/host.png)
+![image](https://github.com/lxk1997/dm-lab/blob/master/imgs/test_dag.png)
 see more images in [/imgs](https://github.com/lxk1997/dm-lab/tree/master/imgs)
 
 #### 平台介绍
