@@ -103,10 +103,6 @@ class App extends React.Component {
                                 </div>
                             </Header>
                             <Content style={{margin: '0 5px'}}>
-                                {/*<Breadcrumb style={{ margin: '16px 0' }}>*/}
-                                {/*    <Breadcrumb.Item>主页</Breadcrumb.Item>*/}
-                                {/*    <Breadcrumb.Item>实验项目</Breadcrumb.Item>*/}
-                                {/*</Breadcrumb>*/}
                                 <AppContent/>
                             </Content>
                         </Layout>

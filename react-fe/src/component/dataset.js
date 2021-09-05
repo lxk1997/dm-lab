@@ -330,7 +330,7 @@ class NewDatasetModal extends React.Component {
         return (
             <div>
                 <div style={{"textAlign": "right"}}>
-                    <Button type="primary" size={"large"} onClick={this.showModal}>
+                    <Button type="primary" size={"large"} onClick={this.showModal} style={{'border-radius': '4px'}}>
                         ＋&nbsp;&nbsp;新建数据集
                     </Button></div>
                 <Modal

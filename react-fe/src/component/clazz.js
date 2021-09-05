@@ -232,7 +232,7 @@ class JoinClazzModal extends React.Component {
         return (
             <div>
                 <div style={{"textAlign": "right"}}>
-                    <Button type="primary" size={"large"} onClick={this.showModal}>
+                    <Button type="primary" size={"large"} onClick={this.showModal} style={{'border-radius': '4px'}}>
                         加入班级
                     </Button></div>
                 <Modal

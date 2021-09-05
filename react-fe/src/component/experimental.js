@@ -303,7 +303,7 @@ class ExperimentalTask extends React.Component {
                 title: '实验任务',
                 dataIndex: 'name',
                 key: 'name',
-                render: (text, recode) => <a href={"/experimental-task/" + recode.experimental_task_id}>{text}</a>,
+                        render: (text, recode) => <a href={"/experimental-task/" + recode.experimental_task_id}>{text}</a>,
                 sorter: (a, b) => a.name > b.name,
                 sortDirections: ['descend', 'ascend'],
             },
